@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="phoneInfoDao" class="com.wtwd.sys.phoneinfo.dao.ibatis.SqlMapPhoneInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="phoneInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.phoneinfo.domain.logic.PhoneInfoFacadeImpl">
+				<property name="phoneInfoDao" ref="phoneInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+
+
+
+	<bean id="appUserInfoDao"
+		class="com.wtwd.sys.appuserinfo.dao.ibatis.SqlMapAppUserInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="appUserInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.appuserinfo.domain.logic.AppUserInfoFacadeImpl">
+				<property name="appUserInfoDao" ref="appUserInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="locationInfoDao"
+		class="com.wtwd.sys.locationinfo.dao.ibatis.SqlMapLocationInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="locationInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean
+				class="com.wtwd.sys.locationinfo.domain.logic.LocationInfoFacadeImpl">
+				<property name="locationInfoDao" ref="locationInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="deviceActiveInfoDao"
+		class="com.wtwd.sys.deviceactiveinfo.dao.ibatis.SqlMapDeviceActiveInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="deviceActiveInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean
+				class="com.wtwd.sys.deviceactiveinfo.domain.logic.DeviceActiveInfoFacadeImpl">
+				<property name="deviceActiveInfoDao" ref="deviceActiveInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+
+	
+	
+	
+	<bean id="directiveInfoDao"
+		class="com.wtwd.sys.directiveinfo.dao.ibatis.SqlMapDirectiveInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="directiveInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.directiveinfo.domain.logic.DirectiveInfoFacadeImpl">
+				<property name="directiveInfoDao" ref="directiveInfoDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="companyInfoDao" class="com.wtwd.sys.companyinfo.dao.ibatis.SqlMapCompanyInfoDao">
+        <property name="sqlMapClient">
+            <ref bean="sqlMapClient" />
+        </property>
+    </bean>
+	<bean id="companyInfoFacade" parent="baseTransactionProxy">
+        <property name="target">
+            <bean class="com.wtwd.sys.companyinfo.domain.logic.CompanyInfoFacadeImpl">
+                <property name="companyInfoDao" ref="companyInfoDao" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="channelInfoDao" class="com.wtwd.sys.channelinfo.dao.ibatis.SqlMapChannelInfoDao">
+        <property name="sqlMapClient">
+            <ref bean="sqlMapClient" />
+        </property>
+    </bean>
+	<bean id="channelInfoFacade" parent="baseTransactionProxy">
+        <property name="target">
+            <bean class="com.wtwd.sys.channelinfo.domain.logic.ChannelInfoFacadeImpl">
+                <property name="channelInfoDao" ref="channelInfoDao" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="projectInfoDao" class="com.wtwd.sys.projectinfo.dao.ibatis.SqlMapProjectInfoDao">
+        <property name="sqlMapClient">
+            <ref bean="sqlMapClient" />
+        </property>
+    </bean>
+	<bean id="projectInfoFacade" parent="baseTransactionProxy">
+        <property name="target">
+            <bean class="com.wtwd.sys.projectinfo.domain.logic.ProjectInfoFacadeImpl">
+                <property name="projectInfoDao" ref="projectInfoDao" />
+            </bean>
+        </property>
+    </bean>
+    
+     <bean id="saleInfoDao" class="com.wtwd.sys.saleinfo.dao.ibatis.SqlMapSaleInfoDao">
+        <property name="sqlMapClient">
+            <ref bean="sqlMapClient" />
+        </property>
+    </bean>
+	<bean id="saleInfoFacade" parent="baseTransactionProxy">
+        <property name="target">
+            <bean class="com.wtwd.sys.saleinfo.domain.logic.SaleInfoFacadeImpl">
+                <property name="saleInfoDao" ref="saleInfoDao" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="userLoginInfoDao" class="com.wtwd.sys.userlogininfo.dao.ibatis.SqlMapUserLoginInfoDao">
+        <property name="sqlMapClient">
+            <ref bean="sqlMapClient" />
+        </property>
+    </bean>
+	<bean id="userLoginInfoFacade" parent="baseTransactionProxy">
+        <property name="target">
+            <bean class="com.wtwd.sys.userlogininfo.domain.logic.UserLoginInfoFacadeImpl">
+                <property name="userLoginInfoDao" ref="userLoginInfoDao" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="deviceLoginDao" class="com.wtwd.sys.deviceLogin.dao.ibatis.SqlMapDeviceLoginDao">
+        <property name="sqlMapClient">
+            <ref bean="sqlMapClient" />
+        </property>
+    </bean>
+	<bean id="deviceLoginFacade" parent="baseTransactionProxy">
+        <property name="target">
+            <bean class="com.wtwd.sys.deviceLogin.domain.logic.DeviceLoginFacadeImpl">
+                <property name="deviceLoginDao" ref="deviceLoginDao" />
+            </bean>
+        </property>
+    </bean>
+    
+
+
+	<!--  wappusers yonghu -->
+	<bean id="wappUsersDao"
+		class="com.wtwd.sys.innerw.wappusers.dao.ibatis.SqlMapWappUsersDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wappUsersFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wappusers.domain.logic.WappUsersFacadeImpl">
+				<property name="wappUsersDao" ref="wappUsersDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<!--  wdeviceActiveInfo yonghu 20160625 lbl-->
+	<bean id="wdeviceActiveInfoDao"
+		class="com.wtwd.sys.innerw.wdeviceActiveInfo.dao.ibatis.SqlMapWdeviceActiveInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wdeviceActiveInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.logic.WdeviceActiveInfoFacadeImpl">
+				<property name="wdeviceActiveInfoDao" ref="wdeviceActiveInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- 
+	<bean id="wpetInfoDao"
+		class="com.wtwd.sys.innerw.wpetInfo.dao.ibatis.SqlMapWpetInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wpetInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wpetInfo.domain.logic.WpetInfoFacadeImpl">
+				<property name="wpetInfoDao" ref="wpetInfoDao" />
+			</bean>
+		</property>
+	</bean>
+ -->
+	<bean id="wpetMoveInfoDao"
+		class="com.wtwd.sys.innerw.wpetMoveInfo.dao.ibatis.SqlMapWpetMoveInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wpetMoveInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wpetMoveInfo.domain.logic.WpetMoveInfoFacadeImpl">
+				<property name="wpetMoveInfoDao" ref="wpetMoveInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="wfciPetKindDao"
+		class="com.wtwd.sys.innerw.wfciPetKind.dao.ibatis.SqlMapWfciPetKindDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wfciPetKindFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wfciPetKind.domain.logic.WfciPetKindFacadeImpl">
+				<property name="wfciPetKindDao" ref="wfciPetKindDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="wappuserVerifyDao"
+		class="com.wtwd.sys.innerw.wappuserverify.dao.ibatis.SqlMapWappuserVerifyDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wappuserVerifyFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wappuserverify.domain.logic.WappuserVerifyFacadeImpl">
+				<property name="wappuserVerifyDao" ref="wappuserVerifyDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="wshareInfoDao"
+		class="com.wtwd.sys.innerw.wshareInfo.dao.ibatis.SqlMapWshareInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wshareInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wshareInfo.domain.logic.WshareInfoFacadeImpl">
+				<property name="wshareInfoDao" ref="wshareInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="wpetDao"
+		class="com.wtwd.sys.innerw.wpet.dao.ibatis.SqlMapWpetDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wpetFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wpet.domain.logic.WpetFacadeImpl">
+				<property name="wpetDao" ref="wpetDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="wpetWifiRangeDao"
+		class="com.wtwd.sys.innerw.wpetwifirange.dao.ibatis.SqlMapWpetWifiRangeDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wpetWifiRangeFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wpetwifirange.domain.logic.WpetWifiRangeFacadeImpl">
+				<property name="wpetWifiRangeDao" ref="wpetWifiRangeDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="wupFirmwareDao"
+		class="com.wtwd.sys.innerw.wupfirmware.dao.ibatis.SqlMapWupFirmwareDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wupFirmwareFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.wupfirmware.domain.logic.WupFirmwareFacadeImpl">
+				<property name="wupFirmwareDao" ref="wupFirmwareDao" />
+			</bean>
+		</property>
+	</bean>
+    
+</beans>

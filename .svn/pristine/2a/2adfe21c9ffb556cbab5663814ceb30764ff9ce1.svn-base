@@ -1,0 +1,120 @@
+package com.wtwd.pet.app.entity;
+
+import java.io.Serializable;
+
+import com.wtwd.pet.app.base.BaseEntity;
+
+public class WeFencing extends BaseEntity implements Serializable {
+	
+	private static final long serialVersionUID = 6238292097188887581L;
+
+	private Integer id;
+
+    private Float centerGpsLo;
+
+    private Float centerGpsLa;
+
+    private Integer roundDistance;
+
+    private String deviceSafeName;
+
+    private String deviceSafeEffectTime;
+
+    private String ifActive;
+
+    private String ifPromptUser;
+
+    private Integer deviceId;
+
+    private String centerAddr;
+
+    private String safeType;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Float getCenterGpsLo() {
+        return centerGpsLo;
+    }
+
+    public void setCenterGpsLo(Float centerGpsLo) {
+        this.centerGpsLo = centerGpsLo;
+    }
+
+    public Float getCenterGpsLa() {
+        return centerGpsLa;
+    }
+
+    public void setCenterGpsLa(Float centerGpsLa) {
+        this.centerGpsLa = centerGpsLa;
+    }
+
+    public Integer getRoundDistance() {
+        return roundDistance;
+    }
+
+    public void setRoundDistance(Integer roundDistance) {
+        this.roundDistance = roundDistance;
+    }
+
+    public String getDeviceSafeName() {
+        return deviceSafeName;
+    }
+
+    public void setDeviceSafeName(String deviceSafeName) {
+        this.deviceSafeName = deviceSafeName == null ? null : deviceSafeName.trim();
+    }
+
+    public String getDeviceSafeEffectTime() {
+        return deviceSafeEffectTime;
+    }
+
+    public void setDeviceSafeEffectTime(String deviceSafeEffectTime) {
+        this.deviceSafeEffectTime = deviceSafeEffectTime == null ? null : deviceSafeEffectTime.trim();
+    }
+
+    public String getIfActive() {
+        return ifActive;
+    }
+
+    public void setIfActive(String ifActive) {
+        this.ifActive = ifActive == null ? null : ifActive.trim();
+    }
+
+    public String getIfPromptUser() {
+        return ifPromptUser;
+    }
+
+    public void setIfPromptUser(String ifPromptUser) {
+        this.ifPromptUser = ifPromptUser == null ? null : ifPromptUser.trim();
+    }
+
+    public Integer getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(Integer deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getCenterAddr() {
+        return centerAddr;
+    }
+
+    public void setCenterAddr(String centerAddr) {
+        this.centerAddr = centerAddr == null ? null : centerAddr.trim();
+    }
+
+    public String getSafeType() {
+        return safeType;
+    }
+
+    public void setSafeType(String safeType) {
+        this.safeType = safeType == null ? null : safeType.trim();
+    }
+}

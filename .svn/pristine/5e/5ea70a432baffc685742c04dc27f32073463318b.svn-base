@@ -1,0 +1,129 @@
+package com.wtwd.sys.appinterfaces;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.lang.DataMap;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.common.lang.Tools;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+import com.wtwd.sys.mediainfo.domain.MediaInfo;
+
+public class userGetMediaAction extends BaseAction{
+	
+Log logger = LogFactory.getLog(userSendMediaAction.class);
+	
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		JSONObject json = new JSONObject();
+		JSONArray arr = new JSONArray();
+		String href= request.getServletPath();
+		Date start = new Date();
+		try{
+			ServletInputStream input = request.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+			StringBuffer sb = new StringBuffer();
+			String online = "";
+			while((online = reader.readLine()) != null){
+				sb.append(online);
+			}
+			JSONObject object = JSONObject.fromObject(sb.toString());
+			String userId = object.has("user_id") ? object.getString("user_id"):"0";
+			String belongProject = object.has("belong_project") ? object.getString("belong_project"):"0";
+			
+			
+			MediaInfo vo = new MediaInfo();
+			vo.setCondition("to_id='"+userId+"' and belong_project ='"+belongProject+"' and send_type='0'");
+			JSONObject js = new JSONObject();
+			List<DataMap> list = ServiceBean.getInstance().getMediaInfoFacade().getMediaInfoList(vo);
+			String imei = "";
+			if(list.size() > 0){
+				DeviceActiveInfo dai = new DeviceActiveInfo();
+				String sendTime;
+				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				for(int i=0; i<list.size(); i++){
+					imei = (String)list.get(i).getAt("from_id");					
+					
+					dai.setCondition("device_imei='"+imei+"' and belong_project='"+belongProject+"'");
+					List<DataMap> daiList = ServiceBean.getInstance().getDeviceActiveInfoFacade().getDeviceActiveInfo(dai);
+					if(daiList.size() > 0){
+						js.accumulate("device_name", daiList.get(0).getAt("device_name"));
+					}else{
+						json.accumulate("device_name", "");
+					}
+					sendTime = format.format((Date)list.get(i).getAt("send_time"));
+					js.accumulate("device_imei", imei);
+					js.accumulate("time_length", list.get(i).getAt("time_length"));
+					js.accumulate("d_t", sendTime);
+					
+					String path = (String)list.get(i).getAt("msg_content");
+					//String dir = request.getSession(true).getServletContext().getRealPath("/upload/user/media/" + userId + "/");
+					String dir = "/usr/local/apache-tomcat-7.0.65/webapps/jfservice/upload/media/" + userId + "/";
+					String downloadPath = dir + path.substring(path.lastIndexOf("/")+1);
+					
+					String msgContent = Base64.encodeBase64String(Tools.getContent(downloadPath));
+					js.accumulate("msg", msgContent);
+					
+					arr.add(js);
+					js.clear();
+				}
+				vo.setSendType("1");
+				ServiceBean.getInstance().getMediaInfoFacade().updateMediaInfo(vo);
+				
+				result = Constant.SUCCESS_CODE;
+			}
+			
+			insertVisit(href, belongProject, userId, 0,start,new Date());
+		}catch(Exception e){
+			e.printStackTrace();	
+			StringBuffer sb = new StringBuffer();
+			Writer writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Throwable cause = e.getCause();		
+			while (cause != null) {
+				cause.printStackTrace(printWriter);
+				cause = cause.getCause();
+			}
+			printWriter.close();
+			String resultSb = writer.toString();
+			sb.append(resultSb);
+			
+			logger.error(e);
+			result = Constant.EXCEPTION_CODE;
+			json.put(Constant.EXCEPTION, sb.toString());
+		}
+		json.put("request", href);
+		json.put(Constant.RESULTCODE, result);
+		json.put("y_y", arr);
+		response.setCharacterEncoding("UTF-8");	
+		response.getWriter().write(json.toString());
+		
+		return null;
+	}
+
+}

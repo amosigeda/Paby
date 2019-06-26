@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="WpetInfo">
+	
+	<select id="getWpetInfoData" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpetInfo.domain.WpetInfo">
+		select a.*, c.device_imei FROM wpets_info  a left join wpets b on b.pet_id = a.pets_pet_id left join wdevice_active_info c on b.device_id = c.device_id 
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+</sqlMap>

@@ -1,0 +1,24 @@
+package com.wtwd.sys.mediainfo.dao;
+
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+
+import com.godoing.rose.lang.DataMap;
+import com.wtwd.sys.mediainfo.domain.MediaInfo;
+
+public interface MediaInfoDao {
+	
+	public List<DataMap> getMediaInfoList(MediaInfo vo) throws DataAccessException;
+	
+	public List<DataMap> getMediaInfoListByVo(MediaInfo vo) throws DataAccessException;
+	
+	public Integer getMediaInfoCount(MediaInfo vo) throws DataAccessException;
+	
+	public int insertMediaInfo(MediaInfo vo) throws DataAccessException;
+	
+	public int deleteMediaInfo(MediaInfo vo) throws DataAccessException;
+	
+	public int updateMediaInfo(MediaInfo vo) throws DataAccessException;
+
+}

@@ -1,0 +1,17 @@
+jdbc.driverClassName=com.mysql.jdbc.Driver
+#jdbc.url=jdbc:mysql://appserver1.paby.com:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+jdbc.url=jdbc:mysql://121.196.232.11:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+#jdbc.url=jdbc:mysql://appserver.paby.com:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+
+jdbc.username=root
+jdbc.password=siw@9890
+#jdbc.password=pets@paby#
+
+#初始化连接大小
+jdbc.initialSize=0
+#连接池最大数量 
+jdbc.maxActive=20
+#连接池最小空闲
+jdbc.minIdle=1
+#获取连接最大等待时间
+jdbc.maxWait=60000

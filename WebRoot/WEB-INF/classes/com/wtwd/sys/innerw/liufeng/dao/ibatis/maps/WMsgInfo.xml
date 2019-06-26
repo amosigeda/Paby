@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WMsgInfo">
+
+<!-- 	
+		SELECT msg_id, msg_type, msg_ind_id, date_format(msg_date, "%Y-%m-%d %T") as msg_date, msg_content, device_id, 
+		from_usrid, to_usrid, fence_id, status, share_id, pet_id FROM wmsg_info 
+ -->
+	<select id="queryByUserIdMsgInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+	select a.msg_id, a.msg_type, a.msg_ind_id, date_format(a.msg_date, "%Y-%m-%d %T") as msg_date, a.msg_content, a.device_id, a.from_usrid,
+	a.to_usrid, a.fence_id, a.status, a.share_id,a.pet_id,a.push_status,
+	a.summary,
+	b.email as from_email, b.nickname as from_nick, c.email as to_email, c.nickname as to_nick, 
+	c.ext1 as app_type, c.device_token, c.ios_token, c.ios_real 
+	from wmsg_info a 
+	left join wappusers b on a.from_usrid = b.user_id left join wappusers c on a.to_usrid = c.user_id 		
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryByUserIdMsgCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+		SELECT COUNT(*) FROM wmsg_info 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<update id="updateByUserIdMsgInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+		UPDATE wmsg_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="status">
+				status=#status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="push_status">
+				push_status=#push_status#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	<insert id="insertData" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+   INSERT INTO wmsg_info(msg_type,msg_ind_id,msg_date,msg_content,device_id,from_usrid,
+   to_usrid,fence_id,status, share_id, pet_id, hide_flag, summary, push_status, badge, msg_date_utc, order_id) VALUES 
+   (#msg_type#,#msg_ind_id#,#msg_date#,#msg_content#,#device_id#,#from_usrid#,
+	#to_usrid#,#fence_id#,#status#, #share_id#, #pet_id#, #hide_flag#, #summary#,#push_status#, #badge#, #msg_date_utc#, #order_id#)
+	</insert>
+
+	<insert id="resetMsgInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+   delete from wmsg_info where msg_id > 0
+	</insert>
+
+	<insert id="resetMsgInfo2" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+   delete from wmsg_info where msg_id > 0 and hide_flag = 1
+	</insert>
+
+
+	<delete id="delMsgInfoIdLst" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+   		delete from wmsg_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>   
+	</delete>
+
+	<select id="getMsgInfoNextId" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WMsgInfo">
+	   SELECT auto_increment FROM information_schema.`TABLES` WHERE TABLE_SCHEMA='dbdog' AND TABLE_NAME='wmsg_info'
+	</select>
+
+	
+	
+</sqlMap>

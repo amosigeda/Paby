@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="WpetWifiRange">
+
+    <select id="getWpetWifiRange" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpetwifirange.domain.WpetWifiRange">
+		SELECT * FROM wpetwifirange
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="limit">
+		   <isNotEmpty prepend=" " property="from">
+		      $from$
+		   </isNotEmpty>
+		   ,
+		   <isNotEmpty prepend=" " property="pageSize">
+		      $pageSize$
+		   </isNotEmpty>
+		</dynamic>
+	</select>	
+	
+	<insert id="insertWpetWifiRange" parameterClass="com.wtwd.sys.innerw.wpetwifirange.domain.WpetWifiRange">
+		INSERT INTO wpetwifirange(pet_id,wifi_radius,host_ssid,up_time) 
+		VALUES (#pet_id#,#wifi_radius#,#host_ssid#,#up_time#)
+	</insert>
+
+    <update id="updateWpetWifiRange" parameterClass="com.wtwd.sys.innerw.wpetwifirange.domain.WpetWifiRange">
+		UPDATE wpetwifirange
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="wifi_radius">
+				wifi_radius=#wifi_radius#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="host_ssid">
+				host_ssid=#host_ssid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="up_time">
+				up_time=#up_time#
+			</isNotEmpty>											
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>    	
+
+</sqlMap>

@@ -1,0 +1,47 @@
+package com.wtwd.pet.app.dao.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Repository;
+
+import com.wtwd.pet.app.base.BaseDaoImpl;
+import com.wtwd.pet.app.base.BizException;
+import com.wtwd.pet.app.dao.WDeviceActiveInfoDao;
+import com.wtwd.pet.app.entity.WDeviceActiveInfo;
+
+@Repository("wdeviceActiveInfoDao")
+public class WDeviceActiveInfoDaoImpl extends BaseDaoImpl<WDeviceActiveInfo> implements WDeviceActiveInfoDao {
+    public int updateOffline(Map<String, Object> paramMap) {
+        return sessionTemplate.update( getStatement("updateOffline"), paramMap);
+        
+        
+        
+    }
+
+    public List<WDeviceActiveInfo> searchOffline(Map<String, Object> paramMap) {
+        if (paramMap == null) {
+            return null;
+        }
+        return sessionTemplate.selectList(getStatement("searchOffline"), paramMap);
+    }
+
+    public List<WDeviceActiveInfo> getPetUserr(Integer id) {
+        return sessionTemplate.selectList(getStatement("getPetUserr"), id);
+    }
+    
+    
+    public List<WDeviceActiveInfo> getShareUser(Integer id) {
+        return sessionTemplate.selectList(getStatement("getShareUser"), id);
+    }
+
+    public List<WDeviceActiveInfo> getUnpushMsg() {
+        return sessionTemplate.selectList(getStatement("getUnpushMsg"));    	
+    }
+
+    public int updateMsgPushStatus(Integer[] data) {
+        return sessionTemplate.update(getStatement("updateMsgPushStatus"), data);    	    	
+    }
+    
+    
+}

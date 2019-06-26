@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Sat Nov 25 09:56:18 CST 2017
+onejar.license.required=false
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=D\:\\Workspaces\\wttestjar
+manifest.mergeall=true
+manifest.mainclass=com.wtwd.sys.appinterfaces.newpay.payforIccidAction
+manifest.file=<createnew>
+jarname.isextern=true
+onejar.expand=
+excludes=
+includes=

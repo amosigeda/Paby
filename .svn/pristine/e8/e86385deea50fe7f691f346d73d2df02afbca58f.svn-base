@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CheckInfo">
+	<select id="getCheckInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.checkinfo.domain.CheckInfo">
+		SELECT * FROM checkinfo 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<insert id="insertCheckInfo" parameterClass="com.wtwd.sys.checkinfo.domain.CheckInfo">
+		INSERT INTO checkinfo(package_name,version_name,version_code,download_path,function_cap,belong_project) 
+		VALUES 
+		(#packageName#,#versionName#,#versionCode#,#downloadPath#,#functionCap#,#belongProject#)
+	</insert>
+	
+	<update id="updateCheckInfo" parameterClass="com.wtwd.sys.checkinfo.domain.CheckInfo">
+		UPDATE checkinfo
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="packageName">
+				package_name = #packageName#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="packageName">
+				version_name = #versionName#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="packageName">
+				version_code = #versionCode#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="packageName">
+				download_path = #downloadPath#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="functionCap">
+				function_cap = #functionCap#
+			</isNotEmpty>
+		</dynamic>		
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+</sqlMap>

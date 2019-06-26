@@ -1,0 +1,9 @@
+package com.wtwd.pet.app.service;
+
+import com.wtwd.pet.app.entity.LocationInfo;
+
+public interface LocationInfoService {
+	
+	public LocationInfo getLocationByImei(String imei);
+	
+}

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="locationInfo">
+
+	<select id="getLocationInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		SELECT * FROM locationinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="limit">
+		   <isNotEmpty prepend=" " property="from">
+		      $from$
+		   </isNotEmpty>
+		   ,
+		   <isNotEmpty prepend=" " property="pageSize">
+		      $pageSize$
+		   </isNotEmpty>
+		</dynamic>
+	</select>	
+
+	<select id="getMaxUploadTime" resultClass="java.lang.String" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		SELECT date_format(max(upload_time), "%Y-%m-%d %T") FROM locationinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>	
+
+
+	<select id="getLocationListInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		SELECT * FROM locationinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$ desc
+			</isNotEmpty>
+		</dynamic>
+	</select>	
+	
+	<select id="getLocationInfoCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo" >
+		SELECT COUNT(*) FROM locationinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getLocationInfoGroupByTime" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		SELECT * FROM locationinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY SUBSTRING(upload_time,1,10)
+	</select>
+	
+	<insert id="insertLocationInfo" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		INSERT INTO locationinfo(serie_no,battery,longitude,latitude,location_type,accuracy,upload_time,change_longitude,change_latitude,belong_project,fall,step_count, pet_id) 
+		VALUES (#serieNo#,#battery#,#longitude#,#latitude#,#locationType#,#accuracy#,#uploadTime#,#changeLongitude#,#changeLatitude#,#belongProject#,#fall#,#stepCount#, #pet_id#)
+	</insert>
+
+    <update id="updateLocationInfo" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		UPDATE locationinfo
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="uploadTime">
+				upload_time=#uploadTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="longitude">
+				longitude=#longitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="latitude">
+				latitude=#latitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="changeLongitude">
+				change_longitude=#changeLongitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="changeLatitude">
+				change_latitude=#changeLatitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fall">
+				fall=#fall#
+			</isNotEmpty>	
+			<isNotEmpty prepend="," property="stepCount">
+				step_count=#stepCount#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="pet_id">
+				pet_id=#pet_id#
+			</isNotEmpty>																							
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	
+	<insert id="insertClickLocationInfo" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		INSERT INTO clicklocationinfo(serie_no,battery,longitude,latitude,location_type,accuracy,upload_time,change_longitude,change_latitude,belong_project,fall,step_count, pet_id) 
+		VALUES (#serieNo#,#battery#,#longitude#,#latitude#,#locationType#,#accuracy#,#uploadTime#,#changeLongitude#,#changeLatitude#,#belongProject#,#fall#,#stepCount#, #pet_id#)
+	</insert>
+
+    <update id="updateClickLocationInfo" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo">
+		UPDATE clicklocationinfo
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="uploadTime">
+				upload_time=#uploadTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="longitude">
+				longitude=#longitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="latitude">
+				latitude=#latitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="changeLongitude">
+				change_longitude=#changeLongitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="changeLatitude">
+				change_latitude=#changeLatitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fall">
+				fall=#fall#
+			</isNotEmpty>	
+			<isNotEmpty prepend="," property="stepCount">
+				step_count=#stepCount#
+			</isNotEmpty>											
+			<isNotEmpty prepend="," property="pet_id">
+				pet_id=#pet_id#
+			</isNotEmpty>																							
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	
+	<!-- yonghu label 20160625
+		select distinct a.user_id, a.device_id, b.device_imei, b.bind_count, c.location_type as type, c.battery, c.fall, 
+		c.change_longitude AS lon, 
+        c.change_latitude AS lat, 
+        c.accuracy as acc, b.led_on, b.sel_mode,b.gps_on, d.sex, d.photo_time_stamp,		
+        d.pet_id, d.photo as photo, d.nickname as nick_name, d.born_date as born_date, d.weight as weight, 
+        d.is_healthy as is_healthy, d.fat_level as fat_level, d.fci_detail_all_catid,g.`desc`, d.sheight, d.pet_type,
+        a.to_user_id as admin_userid, a.is_priority, b.callback_on, d.time_zone, b.urgent_mode, b.is_lowbat, e.esafe_on,
+        f.email as admin_email, f.nickname as admin_nick, f.photo as admin_photo  
+        from wshare_info a left join wdevice_active_info b on a.device_id = b.device_id 
+    left join (select  * from locationinfo where upload_time in ( select max(upload_time) from locationinfo group by serie_no) ) c 
+    on b.device_imei = c.serie_no left join wpets d on a.device_id=d.device_id left join wDeviceExtra e on b.device_id = e.device_id 
+    left join wappusers f on a.to_user_id = f.user_id left join wfci_detail_all g on d.fci_detail_all_catid= g.catid
+	-->
+	<select id="wtAppGpsManGetDevsList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo" >
+		SELECT DISTINCT a.user_id, a.device_id, b.device_imei, b.bind_count, 	
+		e.lct_type AS `type`, b.battery, 0 AS fall,    
+		    b.longitude AS lon,          
+		    b.latitude AS lat,          e.acc AS acc, b.led_on, b.sel_mode,
+		    b.gps_on, d.sex, d.photo_time_stamp,       
+		    d.pet_id, d.photo AS photo, d.nickname AS nick_name, 
+		    d.born_date AS born_date, d.weight AS weight,   
+		    d.is_healthy AS is_healthy, d.fat_level AS fat_level, 
+		    d.fci_detail_all_catid,g.`desc`, d.sheight, d.pet_type,     
+		    a.to_user_id AS admin_userid, a.is_priority, b.callback_on,
+		     b.time_zone,  1 as urgent_mode, b.is_lowbat, e.esafe_on,    
+		    f.email AS admin_email, f.nickname AS admin_nick, 
+		    f.photo AS admin_photo, a.share_date , 
+		    date_format(b.device_update_time, "%Y-%m-%d %T") as last_lctTime,
+		    e.dev_status as device_online, e.sig_level, 
+		    e.charging_status as is_charging, h.firmware_edition, e.order_by,
+		    e.ufirm_stat, 
+		    e.how_long sos_duration,
+			date_format(e.action_time_utc, "%Y-%m-%d %T") sos_start,	    		    
+			date_format(e.action_time_utc, "%Y-%m-%d %T") sos_start_utc,	    		    
+		    e.eco_mode, e.esafe_wifi, e.ssid_wifi,
+		    e.estat_wifi,e.sleep_status, e.bssid_wifi mac_wifi  ,
+		    d.weight_type, e.autopdn_status tflag, e.time_pon ton, e.time_poff toff,
+		    b.iccid, b.test_status,e.tm_flag,e.tm_dur,
+		    (b.device_update_time > '2016-11-11 00:00:00') ineted   
+		    FROM wshare_info a LEFT JOIN wdevice_active_info b ON a.device_id = b.device_id    
+		    LEFT JOIN wpets d ON a.device_id=d.device_id 
+		    LEFT JOIN wDeviceExtra e ON b.device_id = e.device_id   
+		    LEFT JOIN wappusers f ON a.to_user_id = f.user_id LEFT JOIN wfci_detail_all g ON d.fci_detail_all_catid= g.catid 
+            left join phoneinfo h on b.device_imei = h.serie_no             		                		  
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="wtAppGpsManGetDevsListMgr" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo" >
+		SELECT DISTINCT a.user_id, a.device_id, b.device_imei, b.bind_count, 	
+		e.lct_type AS `type`, b.battery, 0 AS fall,    
+		    b.longitude AS lon,          
+		    b.latitude AS lat,          e.acc AS acc, b.led_on, b.sel_mode,
+		    b.gps_on, d.sex, d.photo_time_stamp,       
+		    d.pet_id, d.photo AS photo, 
+		    concat( concat( concat(d.nickname, ':'), RIGHT(b.device_imei,4)),
+		    e.dev_status  		    
+		    )
+		    nick_name, 
+		    d.born_date AS born_date, d.weight AS weight,   
+		    d.is_healthy AS is_healthy, d.fat_level AS fat_level, 
+		    d.fci_detail_all_catid,g.`desc`, d.sheight, d.pet_type,     
+		    a.to_user_id AS admin_userid, a.is_priority, b.callback_on,
+		     b.time_zone, 1 as urgent_mode, b.is_lowbat, e.esafe_on,    
+		    f.email AS admin_email, f.nickname AS admin_nick, 
+		    f.photo AS admin_photo, a.share_date , 
+		    date_format(b.device_update_time, "%Y-%m-%d %T") as last_lctTime,
+		    e.dev_status as device_online, e.sig_level, 
+		    e.charging_status as is_charging, h.firmware_edition, 
+		    e.order_by, e.ufirm_stat,
+		    e.how_long sos_duration,
+			date_format(e.action_time_utc, "%Y-%m-%d %T") sos_start,	    
+			date_format(e.action_time_utc, "%Y-%m-%d %T") sos_start_utc,	    
+		    e.eco_mode, e.esafe_wifi, e.ssid_wifi,
+		    e.estat_wifi, e.sleep_status, e.bssid_wifi mac_wifi,
+		    d.weight_type, e.autopdn_status tflag, e.time_pon ton, e.time_poff toff,
+		    b.iccid, b.test_status,e.tm_flag,e.tm_dur   		     
+		    FROM wshare_info a LEFT JOIN wdevice_active_info b ON a.device_id = b.device_id    
+		    LEFT JOIN wpets d ON a.device_id=d.device_id 
+		    LEFT JOIN wDeviceExtra e ON b.device_id = e.device_id   
+		    LEFT JOIN wappusers f ON a.to_user_id = f.user_id LEFT JOIN wfci_detail_all g ON d.fci_detail_all_catid= g.catid 
+            left join phoneinfo h on b.device_imei = h.serie_no 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="SelectIccidInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.locationinfo.domain.LocationInfo" >
+SELECT 
+  w.user_id,
+  w.`device_id`,
+  d.`iccid`,
+  d.`device_imei`,
+  p.`photo` ,
+  d.`device_name`,
+  p.`nickname`,
+  d.`test_status`  
+FROM
+  wshare_info w 
+  LEFT JOIN wdevice_active_info d 
+    ON w.`device_id` = d.`device_id` 
+  LEFT JOIN wpets p 
+    ON w.`device_id` = p.`device_id` 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+</sqlMap>

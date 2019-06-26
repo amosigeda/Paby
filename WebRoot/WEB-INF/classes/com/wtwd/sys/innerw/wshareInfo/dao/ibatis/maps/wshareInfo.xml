@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="WshareInfo">
+	
+	<select id="getWshareInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		<!-- 
+		SELECT a.* FROM wshare_info a left join wpets b on a.device_id = b.device_id
+		-->
+		select 
+			a.*, b.pet_id, b.nickname as pet_nick, c.nickname as from_nick, d.nickname as to_nick, 
+			c.email as from_email, d.email to_email, d.ext1 app_type, d.device_token, d.ios_token, 
+			d.ios_real, d.badge, c.ext1 sapp_type, c.device_token sdevice_token, c.ios_token sios_token, 
+			c.ios_real sios_real, c.badge sbadge, d.lang, c.lang slang, c.time_zone  	
+		FROM
+			wshare_info a
+		LEFT JOIN wpets b ON a.device_id = b.device_id
+		LEFT JOIN wappusers c ON a.user_id = c.user_id
+		LEFT JOIN wappusers d ON a.to_user_id = d.user_id		
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+<!-- 
+		select a.device_id,b.device_type, c.pet_id, c.nickname as nick_name,
+		c.photo, a.to_user_id as admin_userid, a.is_priority, b.led_on,
+		b.sel_mode,b.gps_on,b.callback_on,c.time_zone,
+		b.urgent_mode, b.battery, b.is_lowbat, d.esafe_on,
+		c.photo, c.born_date, c.weight, c.is_healthy, c.fat_level,
+		c.fci_detail_all_catid, f.`desc`, c.sheight, c.pet_type, c.photo_time_stamp, c.sex,
+        e.email as admin_email,e.nickname as admin_nick, e.photo as admin_photo,
+        d.charging_status as is_charging,
+		b.bind_count,b.device_imei,g.firmware_edition from wshare_info a left join 
+		wdevice_active_info b on a.device_id = b.device_id 
+	        left join wpets c on b.device_id = c.device_id left join wDeviceExtra d on b.device_id = d.device_id 
+            left join wappusers e on a.to_user_id = e.user_id 
+            left join wfci_detail_all f on c.fci_detail_all_catid = f.catid 
+            left join phoneinfo g on b.device_imei = g.serie_no
+ -->            
+
+	<select id="getBindList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		select DISTINCT a.share_date, a.device_id,b.device_type, c.pet_id, c.nickname as nick_name,
+		c.photo, a.to_user_id as admin_userid, a.is_priority, b.led_on,
+		b.sel_mode,b.gps_on,b.callback_on,b.time_zone,
+		b.urgent_mode, b.battery, b.is_lowbat, d.esafe_on,
+		c.photo, c.born_date, c.weight, c.is_healthy, c.fat_level,
+		c.fci_detail_all_catid, f.`desc`, c.sheight, c.pet_type, c.photo_time_stamp, c.sex,
+        e.email as admin_email,e.nickname as admin_nick, e.photo as admin_photo,
+        d.charging_status as is_charging,
+		b.bind_count,b.device_imei,g.firmware_edition,
+		d.ufirm_stat, c.weight_type, c.other_desc 
+		from wshare_info a 
+			left join wdevice_active_info b on a.device_id = b.device_id 
+	        left join wpets c on b.device_id = c.device_id left join wDeviceExtra d on b.device_id = d.device_id 
+            left join wappusers e on a.to_user_id = e.user_id 
+            left join wfci_detail_all f on c.fci_detail_all_catid = f.catid 
+            left join phoneinfo g on b.device_imei = g.serie_no
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="getUnbindList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+     select pet_id, device_id, nickname as nick_name, wpets.photo, born_date, weight, is_healthy, 
+     fat_level, fci_detail_all_catid, other_desc, sheight, pet_type, photo_time_stamp, `desc`,
+     sex,time_zone, weight_type  
+     from  wpets left join wfci_detail_all on wpets.fci_detail_all_catid = wfci_detail_all.catid
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+	<select id="getUnbindListAs" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+     select distinct a.pet_id, b.nickname as nick_name, b.photo, b.born_date, b.weight, b.is_healthy, b.other_desc 
+     b.fat_level, b.fci_detail_all_catid, b.sheight, b.pet_type, b.photo_time_stamp, b.sex, b.time_zone 
+     from  wunshare_info a 
+     left join wpets b on a.pet_id = b.pet_id
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+	<insert id="insertWshareInfo" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		INSERT INTO wshare_info(user_id,to_user_id,device_id,is_priority, share_date, belong_project, status) 
+		VALUES (#user_id#,#to_user_id#,#device_id#,#is_priority#, #share_date#, #belong_project#, #status#)
+	</insert>
+
+	<insert id="insertWunshareInfo" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		INSERT INTO wunshare_info(user_id,device_id,unshare_date, belong_project, status, pet_id) 
+		VALUES (#user_id#,#device_id#, #share_date#, #belong_project#, #status#, #pet_id#)
+	</insert>
+
+
+	<delete id="delWshareInfo" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		delete from wshare_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+	<delete id="delWunshareInfo" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		delete from wunshare_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+
+	<update id="updateWshareInfo" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		UPDATE wshare_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="status">
+				status=#status#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<select id="getWdevUserCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">
+		SELECT count(*) FROM wshare_info  
+		<dynamic prepend="where"> 			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+<!-- 获取设备所有分享者用户id -->
+  <select id="getDevRelUser" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo" resultClass="com.godoing.rose.lang.DataMap">
+	select distinct a.user_id as from_usrid, 
+	b.pet_id, b.user_id, b.nickname as pet_nick,
+	c.ext1 app_type, c.device_token, c.ios_token, c.ios_real, c.badge,
+	c.lang 
+	from wshare_info a 
+	left join wpets b on a.device_id = b.device_id  
+	left join wappusers c on a.user_id = c.user_id    
+    WHERE a.STATUS=1 and 
+    	a.device_id = #device_id# and c.login_status != 0 AND c.login_status IS NOT NULL	
+  </select>
+	
+<!-- 获取指定用户所有相关的设备id -->
+  <select id="getUserRelDev" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo" resultClass="com.godoing.rose.lang.DataMap">
+	select distinct a.device_id, b.device_imei, b.auto_time_zone,
+	a.is_priority, b.time_zone   
+	from wshare_info  a 
+	left join wdevice_active_info b on a.device_id = b.device_id    
+    WHERE a.STATUS=1 and 
+    	a.user_id = #user_id# 	
+  </select>
+
+
+<!-- 获取指定设备相关用户APP ONLINE在线 的数量 -->
+  <select id="getDevRelUserOnlineCount" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo" resultClass="java.lang.Integer">
+   	select count(*) from wshare_info a left join wpets b on a.device_id = b.device_id 
+    left join wappusers c on a.user_id = c.user_id 
+    where a.status=1 and a.device_id = #device_id# and b.device_id = #device_id# and c.login_status = 1;
+  </select>
+
+
+</sqlMap>

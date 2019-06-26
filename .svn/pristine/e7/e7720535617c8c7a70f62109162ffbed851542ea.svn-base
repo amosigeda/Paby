@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WSuggestion">
+	
+	<insert id="insertUserSuggestion" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WSuggestion">
+		INSERT INTO wfeedbackinfo(user_id,user_feedback_content,date_time,photo) 
+		VALUES(#user_id#,#msg#,#date_time#,#photo#)
+	</insert>
+	
+</sqlMap>

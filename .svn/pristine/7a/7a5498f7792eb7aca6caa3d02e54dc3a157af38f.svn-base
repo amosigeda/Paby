@@ -1,0 +1,55 @@
+package com.wtwd.sys.msginfo.domain.logic;
+
+import java.util.List;
+
+import com.godoing.rose.lang.DataList;
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.lang.SystemException;
+import com.wtwd.sys.msginfo.dao.MsgInfoDao;
+import com.wtwd.sys.msginfo.domain.MsgInfo;
+
+public class MsgInfoFacadeImpl implements MsgInfoFacade{
+
+    private MsgInfoDao msgInfoDao;
+	
+	public void setMsgInfoDao(MsgInfoDao msgInfoDao){
+		this.msgInfoDao = msgInfoDao;
+	}
+	
+	public List<DataMap> getMsgInfo(MsgInfo vo)
+			throws SystemException {
+		// TODO Auto-generated method stub
+		return msgInfoDao.getMsgInfo(vo);
+	}
+
+	public int getMsgInfoCount(MsgInfo vo)
+			throws SystemException {
+		// TODO Auto-generated method stub
+		return msgInfoDao.getMsgInfoCount(vo);
+	}
+
+	public int insertMsgInfo(MsgInfo vo)
+			throws SystemException {
+		// TODO Auto-generated method stub
+		return msgInfoDao.insertMsgInfo(vo);
+	}
+
+	public int updateMsgInfo(MsgInfo vo)
+			throws SystemException {
+		// TODO Auto-generated method stub
+		return msgInfoDao.updateMsgInfo(vo);
+	}
+
+	public int deleteMsgInfo(MsgInfo vo)
+			throws SystemException {
+		// TODO Auto-generated method stub
+		return msgInfoDao.deleteMsgInfo(vo);
+	}
+
+	public DataList getMsgInfoListByVo(MsgInfo vo) throws SystemException {
+		DataList list = new DataList(msgInfoDao.getMsgInfoListByVo(vo));
+		list.setTotalSize(msgInfoDao.getMsgInfoCount(vo));
+		return list;
+	}
+
+}

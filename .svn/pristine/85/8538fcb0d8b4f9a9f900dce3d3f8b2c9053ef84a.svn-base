@@ -1,0 +1,38 @@
+package com.wtwd.pet.app.util;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
+import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSONObject;
+
+/**
+ * 
+ * @描述: MQ消息生产者 .
+ * @作者:  liufeng.
+ * @创建时间:  2016-09-21.
+ * @版本号: V1.0 .
+ */
+@Service("mqProducer")
+public class MQProducer {
+	
+	@Autowired
+	private JmsTemplate activeMqJmsTemplate;
+
+	/**
+	 * 发送消息.
+	 */
+	public void sendMessage(final Object msg) {
+		activeMqJmsTemplate.send(new MessageCreator() {
+			public Message createMessage(Session session) throws JMSException {
+				return session.createTextMessage(JSONObject.toJSONString(msg));
+			}
+		});
+	}
+	
+}

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="projectInfo">
+
+	<select id="getProjectInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.projectinfo.domain.ProjectInfo">
+		SELECT * FROM projectinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getProjectInfoListByVo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.projectinfo.domain.ProjectInfo">
+		SELECT * FROM projectinfo p LEFT JOIN 
+		(SELECT COUNT(id) count_user,belong_project FROM appuserinfo GROUP BY belong_project) 
+		a ON p.id=a.belong_project LEFT JOIN 
+		(SELECT COUNT(id) count_device,belong_project FROM device_active_info GROUP BY belong_project) 
+		b ON p.id=b.belong_project
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty> 
+		</dynamic>   
+			 limit
+			<isNotEmpty prepend=" " property="from">
+				$from$
+			</isNotEmpty>
+				,
+			<isNotEmpty prepend=" " property="pageSize">
+				$pageSize$
+			</isNotEmpty>
+	</select>
+	
+	<select id="getProjectInfoListCountByVo" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.projectinfo.domain.ProjectInfo">
+		SELECT COUNT(*) FROM projectinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getProjectInfoMaxId" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.projectinfo.domain.ProjectInfo">
+		SELECT MAX(id) FROM projectinfo
+	</select>
+	
+	<select id="getProjectInfoCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.projectinfo.domain.ProjectInfo">
+		SELECT COUNT(id) FROM projectinfo
+	</select>	
+	<insert id="insertProjectInfo" parameterClass="com.wtwd.sys.projectinfo.domain.ProjectInfo">
+		INSERT INTO projectinfo (id,project_no,project_name,channel_id,company_id,add_time,remark,status) VALUES 
+		(#id#,#projectNo#,#projectName#,#channelId#,#companyId#,#addTime#,#remark#,#status#)
+	</insert>
+	
+	<insert id="insertRelevanceInfo2" parameterClass="com.wtwd.sys.projectinfo.domain.ProjectInfo">
+		INSERT INTO relevanceinfo(company_id,channel_id) VALUES (#companyId#,#channelId#)
+	</insert>
+	
+</sqlMap>

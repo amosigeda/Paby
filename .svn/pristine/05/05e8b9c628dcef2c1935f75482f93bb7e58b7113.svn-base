@@ -1,0 +1,59 @@
+package com.wtwd.pet.app.notify;
+
+public class DistanceTest {
+	// 鍦扮悆鍗婂緞
+	public final static double EARTH_RADIUS = 6378.137;
+	
+	public static double getDistance(double lat1, double lng1, double lat2,
+			double lng2) {
+
+		double radlat1 = getRadian(lat1);
+		double radlat2 = getRadian(lat2);
+
+		double lat_distance = radlat1 - radlat2; // 绾害宸�
+		double lng_distance = getRadian(lng1) - getRadian(lng2); // 缁忓害宸�
+
+		double distance = Math.asin(Math.sqrt(Math.pow(
+				Math.sin(lat_distance / 2), 2)
+				+ Math.cos(radlat1)
+				* Math.cos(radlat2)
+				* Math.pow(Math.sin(lng_distance / 2), 2)));
+
+		distance = 2 * distance * EARTH_RADIUS * 1000;
+		
+		return distance;
+	}
+
+	private static double getRadian(double degree) {
+		return degree * Math.PI / 180;
+
+	}
+	
+    public static void main(String[] args)
+    {
+        //System.out.println("默认时区：" + getLocalTimeId());
+        //System.out.println("时区列表：" + getZoneList());
+        
+    	
+    	String day1 = "2017-02-17 12:00:00".substring(0, 10);
+    	System.out.println("test day string is:" + day1);
+    	
+        //原时区的时间
+    	double lat1, lat2, lng1,lng2;
+    	/*
+    	lat1 = 22.4990058;
+    	lng1 = 113.9212104;
+    	lat2 = 22.5071303;	//22.5069794;
+    	lng2 = 113.9163178;	//113.9163327;
+    	*/
+    	lat1 = 22.4994607;	//22.4989817;	//22.4982115;
+    	lng1 = 113.9200681;	//113.9211323;	//113.9214391;
+    	lat2 = 22.4975429;	//22.499165;	//22.4990824951;	//22.4988938;	//22.5069794;
+    	lng2 = 113.9265101;	//113.920703;	//113.9208422352;	//113.9212074;	//113.9163327;
+
+    	double res = getDistance(lat1, lng1, lat2, lng2);
+    	System.out.print("distance is:" + res);
+        
+    }	
+
+}

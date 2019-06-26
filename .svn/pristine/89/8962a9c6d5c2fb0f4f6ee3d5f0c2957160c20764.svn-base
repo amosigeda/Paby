@@ -1,0 +1,61 @@
+package com.wtwd.sys.checkinfo.domain;
+
+import java.io.Serializable;
+
+import com.godoing.rose.http.PublicVoBean;
+
+public class CheckInfo extends PublicVoBean implements Serializable{
+	
+	private int id;
+	private String packageName;
+	private String versionName;
+	private Integer versionCode;
+	private String downloadPath;
+	private String functionCap;
+	private String belongProject;
+	
+	public String getBelongProject() {
+		return belongProject;
+	}
+	public void setBelongProject(String belongProject) {
+		this.belongProject = belongProject;
+	}
+	public String getFunctionCap() {
+		return functionCap;
+	}
+	public void setFunctionCap(String functionCap) {
+		this.functionCap = functionCap;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getPackageName() {
+		return packageName;
+	}
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+	public String getVersionName() {
+		return versionName;
+	}
+	public void setVersionName(String versionName) {
+		this.versionName = versionName;
+	}
+	public Integer getVersionCode() {
+		return versionCode;
+	}
+	public void setVersionCode(Integer versionCode) {
+		this.versionCode = versionCode;
+	}
+	public String getDownloadPath() {
+		return downloadPath;
+	}
+	public void setDownloadPath(String downloadPath) {
+		this.downloadPath = downloadPath;
+	}
+	
+
+}

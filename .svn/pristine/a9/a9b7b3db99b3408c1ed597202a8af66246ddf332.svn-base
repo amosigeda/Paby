@@ -1,0 +1,133 @@
+package com.wtwd.sys.interfaces;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.lang.DataMap;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+import com.wtwd.sys.mediainfo.domain.MediaInfo;
+
+public class deviceSendMediaAction extends BaseAction{
+	
+	Log logger = LogFactory.getLog(deviceSendMediaAction.class);
+	
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		JSONObject json = new JSONObject();
+		String href= request.getServletPath();
+		Date start = new Date();
+		try{
+			logger.info("dateTime--1----------------"+(new Date().getTime() - start.getTime()));
+			System.out.println("dateTime--1----------------"+(new Date().getTime() - start.getTime()));
+			String deviceImei = request.getParameter("device_imei");
+			logger.info("dateTime--2----------------"+(new Date().getTime() - start.getTime()));
+			System.out.println("dateTime--2----------------"+(new Date().getTime() - start.getTime()));
+			String msgContent = request.getParameter("msg_content");
+			logger.info("dateTime--3----------------"+(new Date().getTime() - start.getTime()));
+			System.out.println("dateTime--3----------------"+(new Date().getTime() - start.getTime()));
+			String timeLength = request.getParameter("time_length");
+			logger.info("dateTime--4----------------"+(new Date().getTime() - start.getTime()));
+			System.out.println("dateTime--4----------------"+(new Date().getTime() - start.getTime()));
+			String belongProject = request.getParameter("b_g");
+			logger.info("dateTime--5----------------"+(new Date().getTime() - start.getTime()));
+			System.out.println("dateTime--5----------------"+(new Date().getTime() - start.getTime()));
+//			String sendTime = request.getParameter("send_time");
+			
+			//System.out.println("deviceImei="+deviceImei+"&msgContent="+msgContent+"&timeLength="+timeLength+"&belongProject="+belongProject);
+			if(deviceImei != null && msgContent != null && timeLength != null && belongProject != null){
+				DeviceActiveInfo da = new DeviceActiveInfo();
+				da.setCondition("device_imei='"+deviceImei+ "' and belong_project='"+belongProject+"'");
+				logger.info("dateTime-1----------------"+(new Date().getTime() - start.getTime()));
+				List<DataMap> daList = ServiceBean.getInstance().getDeviceActiveInfoFacade().getDeviceActiveInfo(da);
+				logger.info("dateTime-2----------------"+(new Date().getTime() - start.getTime()));
+				if(daList.size() > 0){
+					String userId = (String)daList.get(0).getAt("user_id");
+					
+					String path = request.getSession(true).getServletContext().getRealPath("/upload/user/media/") + userId;				
+					
+					String fileName = Constant.getUniqueCode(String.valueOf(userId)) + ".amr";
+					logger.info("dateTime0----------------"+(new Date().getTime() - start.getTime()));
+					byte[] content = Base64.decodeBase64(msgContent);
+					logger.info("base64Content--------------"+content);
+					logger.info("dateTime1----------------"+(new Date().getTime() - start.getTime()));
+					Constant.createFileContent(path, fileName, content);
+					logger.info("dateTime2----------------"+(new Date().getTime() - start.getTime()));
+					String url = "http://" +getServerName() +":";
+					int port = request.getServerPort();
+					String downloadpath = request.getContextPath() + "/upload/user/media/" + userId + "/" +fileName;				
+					
+					msgContent = Constant.getDownloadPath(url, String.valueOf(port), downloadpath);					
+					
+					MediaInfo vo = new MediaInfo();
+					vo.setFromId(deviceImei);
+					vo.setToId(userId);
+					vo.setMsgContent(msgContent);
+					vo.setSendType("0");
+					vo.setSendTime(new Date());
+					vo.setTimeLength(timeLength);
+					vo.setBelongProject(belongProject);
+					ServiceBean.getInstance().getMediaInfoFacade().insertMediaInfo(vo);
+					result = Constant.SUCCESS_CODE;
+				}
+			}
+			
+			insertVisit(href, belongProject, deviceImei, 1,start,new Date());
+		}catch(Exception e){
+			e.printStackTrace();	
+			StringBuffer sb = new StringBuffer();
+			Writer writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Throwable cause = e.getCause();		
+			while (cause != null) {
+				cause.printStackTrace(printWriter);
+				cause = cause.getCause();
+			}
+			printWriter.close();
+			String resultSb = writer.toString();
+			sb.append(resultSb);
+			
+			logger.error(e);
+			result = Constant.EXCEPTION_CODE;
+			json.put(Constant.EXCEPTION, sb.toString());
+		}
+		json.put("request", href);
+		json.put(Constant.RESULTCODE, result);
+		response.setCharacterEncoding("UTF-8");	
+		response.getWriter().write(json.toString());
+		
+		return null;
+	}
+
+	public String getServerName() throws Exception {
+		String serverName = "";
+		Properties pros = new Properties();
+		pros.load(this.getClass().getClassLoader().getResourceAsStream("server.properties"));
+		serverName = pros.getProperty("servername");
+		return serverName;
+	}
+
+}

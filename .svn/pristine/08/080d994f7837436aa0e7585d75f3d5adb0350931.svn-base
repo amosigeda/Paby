@@ -1,0 +1,15 @@
+package com.wtwd.pet.app.service;
+
+import com.wtwd.pet.app.entity.WDeviceEsafe;
+
+
+public interface WDeviceEsafeService {
+	
+	public int insertData(WDeviceEsafe data);
+	public WDeviceEsafe getById(Integer data);
+    public int update(WDeviceEsafe entity);
+
+    public int updateMsgInfoFlag(WDeviceEsafe data);
+    public int insertSelectiveMsgInfo(WDeviceEsafe data);
+    
+}

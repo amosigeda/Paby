@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="WappUsers">
+
+	<delete id="deleteUsers" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		DELETE FROM wappusers
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+	
+	<select id="getWappUsers" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT * FROM wappusers
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getWappUsersCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+	   SELECT COUNT(*) FROM wappusers
+		<dynamic prepend="where"> 			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+		
+	<insert id="insertWappUsers" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		INSERT INTO wappusers(email,passwd,nickname,born_date,sex,create_time,lastlogin_time,belong_project,
+		bind_count, app_token, user_type, time_zone,ios_real, 
+		device_token, app_version, ext1, ios_token, login_status, passmd) 
+		VALUES (#user_name#,#user_password#,#user_nick#,#user_born#,#user_sex#,#create_time#,
+		#lastlogin_time#,#belong_project#,#bind_count#, 
+		#app_token#, #user_type#, #time_zone#,#ios_real#, 
+		#device_token#, #app_version#, #ext1#, #ios_token#, #login_status#, #passmd#)
+	</insert>
+	
+	<update id="updateWappUsers" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		UPDATE wappusers
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="user_password">
+				passwd=#user_password#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="passmd">
+				passmd=#passmd#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="user_nick">
+				nickname=#user_nick#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="user_born">
+				born_date=#user_born#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="user_sex">
+				sex=#user_sex#
+			</isNotEmpty>		
+			<isNotEmpty prepend="," property="lastlogin_time">
+				lastlogin_time=#lastlogin_time#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="user_photo">
+				photo=#user_photo#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="belong_project">
+				belong_project=#belong_project#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="login_status">
+				login_status=#login_status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="phone_mac">
+				phone_mac=#phone_mac#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="user_name">
+				email=#user_name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="signtext">
+				signtext=#signtext#
+			</isNotEmpty>						
+			<isNotEmpty prepend="," property="firstname">
+				firstname=#firstname#
+			</isNotEmpty>						
+			<isNotEmpty prepend="," property="lastname">
+				lastname=#lastname#
+			</isNotEmpty>						
+			<isNotEmpty prepend="," property="app_token">
+				app_token=#app_token#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="photo_time_stamp">
+				photo_time_stamp=#photo_time_stamp#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+				status=#status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="act_device_id">
+				act_device_id=#act_device_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="device_token">
+				device_token=#device_token#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="time_zone">
+				time_zone=#time_zone#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="app_version">
+				app_version=#app_version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ext1">
+				ext1=#ext1#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ios_token">
+				ios_token=#ios_token#
+			</isNotEmpty>			
+			<isNotEmpty prepend="," property="ios_real">
+				ios_real=#ios_real#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="badge">
+				badge=#badge#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="lang">
+				lang=#lang#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="udu">
+				udu=#udu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="phone">
+				phone=#phone#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dfg">
+				dfg=#dfg#
+			</isNotEmpty>
+			
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+
+	<update id="clearToken" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		UPDATE wappusers
+		<dynamic prepend="set">
+			app_token=""
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	
+	<select id="getWappUsersGroupByTime" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT COUNT(user_id) AS user_id,create_time FROM wappusers 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY SUBSTRING(create_time,1,10)
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+			limit
+			<isNotEmpty prepend=" " property="from">
+				$from$
+			</isNotEmpty>
+			,
+			<isNotEmpty prepend=" " property="pageSize">
+			$pageSize$
+			</isNotEmpty>
+	</select>
+
+	
+	<select id="getWappUsersCountGroupByTime" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT COUNT(DISTINCT(SUBSTRING(create_time,1,10))) FROM wappusers
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+  <select id="getWappUsersByEmailAndPassword" resultClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+    SELECT
+      *
+    FROM wappusers
+    WHERE email = #user_name#
+      AND passwd = #user_password#
+  </select>
+
+  <insert id="insertWappUsersSignon" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+    INSERT INTO wappusers (email,passwd)
+    VALUES (#user_name#, #user_password#)
+  </insert>
+	
+</sqlMap>

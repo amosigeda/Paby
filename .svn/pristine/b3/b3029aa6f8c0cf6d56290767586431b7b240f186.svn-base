@@ -1,0 +1,27 @@
+package com.wtwd.pet.app.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wtwd.pet.app.dao.WeFencingDao;
+import com.wtwd.pet.app.entity.WeFencing;
+import com.wtwd.pet.app.service.WeFencingService;
+
+@Service("weFencingService")
+public class WeFencingServiceImpl implements WeFencingService {
+	
+	@Autowired
+	private WeFencingDao weFencingDao;
+	
+	public List<WeFencing> getDataById(int deviceId) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("deviceId", deviceId);
+		paramMap.put("ifActive", 1);
+		return weFencingDao.listBy(paramMap);
+	}
+
+}

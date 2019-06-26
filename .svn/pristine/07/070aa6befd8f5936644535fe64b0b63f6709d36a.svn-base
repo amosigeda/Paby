@@ -1,0 +1,58 @@
+package com.wtwd.sys.mediainfo.dao.ibatis;
+
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+
+import com.godoing.rose.lang.DataMap;
+import com.wtwd.sys.mediainfo.dao.MediaInfoDao;
+import com.wtwd.sys.mediainfo.domain.MediaInfo;
+
+public class SqlMapMediaInfoDao extends SqlMapClientDaoSupport implements MediaInfoDao{
+	
+	Log logger = LogFactory.getLog(SqlMapMediaInfoDao.class);
+
+	public int deleteMediaInfo(MediaInfo vo) throws DataAccessException {
+		// TODO Auto-generated method stub
+		logger.debug("deleteMediaInfo(MediaInfo vo)");
+		return getSqlMapClientTemplate().update("deleteMediaInfo", vo);
+	}
+
+	public Integer getMediaInfoCount(MediaInfo vo) throws DataAccessException {
+		// TODO Auto-generated method stub
+		logger.debug("getMediaInfoCount(MediaInfo vo)");
+		return (Integer)getSqlMapClientTemplate().queryForObject("getMediaInfoCount", vo);
+	}
+
+	public List<DataMap> getMediaInfoList(MediaInfo vo)
+			throws DataAccessException {
+		// TODO Auto-generated method stub
+		logger.debug("getMediaInfoList(MediaInfo vo)");
+		return getSqlMapClientTemplate().queryForList("getMediaInfoList", vo);
+	}
+
+	public List<DataMap> getMediaInfoListByVo(MediaInfo vo)
+			throws DataAccessException {
+		// TODO Auto-generated method stub
+		logger.debug("getMediaInfoListByVo(MediaInfo vo)");
+		return getSqlMapClientTemplate().queryForList("getMediaInfoListByVo", vo);
+	}
+
+	public int insertMediaInfo(MediaInfo vo) throws DataAccessException {
+		// TODO Auto-generated method stub
+		logger.debug("insertMediaInfo(MediaInfo vo)");
+		return getSqlMapClientTemplate().update("insertMediaInfo", vo);
+	}
+
+	public int updateMediaInfo(MediaInfo vo) throws DataAccessException {
+		// TODO Auto-generated method stub
+		logger.debug("updateMediaInfo(MediaInfo vo)");
+		return getSqlMapClientTemplate().update("updateMediaInfo", vo);
+	}
+	
+	
+
+}

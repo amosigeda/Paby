@@ -1,0 +1,671 @@
+﻿package com.wtwd.sys.interfaces;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.log.LogFactory;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.http.HttpRequest;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.common.lang.Tools;
+import com.wtwd.sys.appuserinfo.domain.AppUserInfo;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+import com.wtwd.sys.deviceactiveinfo.domain.logic.DeviceActiveInfoFacade;
+import com.wtwd.sys.locationinfo.domain.LocationInfo;
+import com.wtwd.sys.mediainfo.domain.MediaInfo;
+import com.wtwd.sys.msginfo.domain.MsgInfo;
+import com.wtwd.sys.phoneinfo.domain.PhoneInfo;
+import com.wtwd.sys.phoneinfo.domain.logic.PhoneInfoFacade;
+import com.wtwd.sys.relativecallinfo.domain.RelativeCallInfo;
+import com.wtwd.sys.safearea.domain.SafeArea;
+import com.wtwd.sys.settinginfo.domain.SettingInfo;
+
+public class heartbeatAction extends BaseAction {
+
+	Log logger = LogFactory.getLog(heartbeatAction.class);
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		Date start = new Date();
+		JSONObject json = new JSONObject();
+		String href = request.getServletPath();
+		String listen = "0";
+		int warn = 0;
+		int f_m = 0;
+		int y_y = 0;
+		String phoneNumber = "";
+		JSONArray mediaArr = new JSONArray();
+		try {
+			String serieNo = request.getParameter("no");
+			String locationType = request.getParameter("type"); // 1表示GPS,0表示基站,2表示wifi
+			String battery = request.getParameter("battery");
+			String belongProject = request.getParameter("b_g");
+			String fall = request.getParameter("f");   //1表示戴上,0表示脱落
+
+			LocationInfo vo = new LocationInfo();
+
+			// System.out.println("serie_no="+serieNo+"' and belong_project='"+belongProject+","+locationType);
+			double lng1 = 0;
+			double lat1 = 0;
+
+			if ("1".equals(locationType)) {
+				String longitude = request.getParameter("lon");
+				String latitude = request.getParameter("lat");
+				String accuracy = request.getParameter("acc");
+
+				if (serieNo != null && !serieNo.equals("") && battery != null
+						&& !battery.equals("") && longitude != null
+						&& !longitude.equals("") && latitude != null
+						&& !latitude.equals("") && accuracy != null
+						&& !accuracy.equals("") && locationType != null
+						&& !locationType.equals("")) {
+
+					lng1 = Double.parseDouble(longitude);
+					lat1 = Double.parseDouble(latitude);
+					if (lng1 != 0 && lat1 != 90) { // 直接过滤
+						if (belongProject != null && !"".equals(belongProject)) {
+							vo.setCondition("serie_no ='" + serieNo
+									+ "' and belong_project='" + belongProject
+									+ "'");
+						} else {
+							vo.setCondition("serie_no ='" + serieNo + "'");
+						}
+
+						vo.setOrderBy("id");
+						vo.setSort("1"); // 按id降序
+						vo.setFrom(0);
+						vo.setPageSize(1); // 0至1
+
+						List<DataMap> locationList = ServiceBean.getInstance()
+								.getLocationInfoFacade().getLocationInfo(vo);
+						boolean bool_is_update = true;
+						String id = "0";
+						if (locationList.size() > 0) { // 说明有数据
+							id = "" + locationList.get(0).getAt("id");
+							double lng2 = Double.parseDouble(""
+									+ locationList.get(0).getAt("longitude"));
+							double lat2 = Double.parseDouble(""
+									+ locationList.get(0).getAt("latitude"));
+
+							// System.out.println("为转换前的经纬度="+lng1+","+lat1);
+							// System.out.println("为转换后的经纬度="+lng2+","+lat2);
+
+//							bool_is_update = Constant.getDistance(lat1, lng1,
+//									lat2, lng2, Constant.EFFERT_DATA); // 若为true表示有效数据
+						}
+
+						vo.setSerieNo(serieNo);
+						vo.setBattery(Integer.parseInt(battery));
+						vo.setLongitude(longitude);
+						vo.setLatitude(latitude);
+						vo.setAccuracy(Float.parseFloat(accuracy));
+						vo.setLocationType(locationType);
+						vo.setUploadTime(new Date());
+						vo.setFall(fall);
+						if (belongProject != null && !"".equals(belongProject)) {
+							vo.setBelongProject(belongProject);
+						} else {
+							vo.setBelongProject("1");
+						}
+						String resultCode = HttpRequest
+								.sendGet(
+										"http://restapi.amap.com/v3/assistant/coordinate/convert",
+										"locations="
+												+ longitude
+												+ ","
+												+ latitude
+												+ "&coordsys=gps&output=json&key=801df1e9132e2151cd9ad435ecc59858");
+						if ("-1".equals(resultCode)) {
+							result = Constant.FAIL_CODE;
+							vo.setChangeLongitude("0");
+							vo.setChangeLatitude("0");
+						} else {
+							JSONObject object = JSONObject
+									.fromObject(resultCode);
+							String location = object.getString("locations");
+							String[] str = location.split(",");
+							if (str.length == 2) {
+								vo.setChangeLongitude(str[0]);
+								vo.setChangeLatitude(str[1]);
+							}
+						}
+						if (bool_is_update) { // 有效数据
+							ServiceBean.getInstance().getLocationInfoFacade()
+									.insertLocationInfo(vo);
+						} else {
+							vo.setCondition("id ='" + id + "'");
+							ServiceBean.getInstance().getLocationInfoFacade()
+									.updateLocationInfo(vo);
+						}
+						result = Constant.SUCCESS_CODE;
+					} else {
+						result = Constant.FAIL_CODE;
+					}
+				}
+
+			} else if ("0".equals(locationType)) {
+				String network = request.getParameter("network");
+				String cdma = request.getParameter("cdma");
+//				String imei = request.getParameter("imei");
+				String smac = request.getParameter("smac");
+				String bts = request.getParameter("bts");
+				String nearbts = request.getParameter("nearbts");
+				// String key = request.getParameter("key");
+				String serverip = request.getParameter("serverip");
+
+				LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+
+				map.put("accesstype", "0");
+				map.put("network", network);
+				map.put("cdma", cdma);
+				map.put("imei", serieNo);
+				map.put("smac", smac);
+				map.put("bts", bts);
+				map.put("nearbts", nearbts);
+				map.put("key", Constant.KEY);
+				if (serverip != null && !"".equals(serverip)) {
+					map.put("serverip", serverip);
+				} else {
+					map.put("serverip", Constant.SERVER_IP);
+				}
+
+				String jsonToString = HttpRequest.sendGetToGaoDe(
+						Constant.LOCATION_URL, map);
+				logger.info("jsonToString++" + jsonToString);
+				if ("-1".equals(jsonToString)) {
+					result = Constant.FAIL_CODE;
+				} else {
+					JSONObject jsons = JSONObject.fromObject(jsonToString);
+					String status = jsons.getString("status"); // ???
+					if (status.equals("1")) { // ???
+						String results = jsons.getString("result"); // result���
+						JSONObject jsonResult = JSONObject.fromObject(results);
+						String location = jsonResult.has("location")?jsonResult.getString("location"):null; // ??��??????
+						if (location != null) {
+							if (belongProject != null
+									&& !"".equals(belongProject)) {
+								vo.setCondition("serie_no ='" + serieNo
+										+ "' and belong_project='"
+										+ belongProject
+										+ "' and location_type ='"
+										+ locationType + "'");
+							} else {
+								vo.setCondition("serie_no ='" + serieNo
+										+ "' and location_type ='"
+										+ locationType + "'");
+							}
+
+							vo.setOrderBy("id");
+							vo.setSort("1"); // 按id降序
+							vo.setFrom(0);
+							vo.setPageSize(1); // 0至1
+
+							List<DataMap> locationList = ServiceBean
+									.getInstance().getLocationInfoFacade()
+									.getLocationInfo(vo);
+							boolean bool_is_update = true;
+							String[] locations = location.split(",");
+							String id = "0";
+							if (locationList.size() > 0) { // 说明有数据
+								id = "" + locationList.get(0).getAt("id");
+								double lng2 = Double.parseDouble(""
+										+ locationList.get(0)
+												.getAt("longitude"));
+								double lat2 = Double
+										.parseDouble(""
+												+ locationList.get(0).getAt(
+														"latitude"));
+
+								lng1 = Double.parseDouble(locations[0]);
+								lat1 = Double.parseDouble(locations[1]);
+
+								// System.out.println("为转换前的经纬度="+lng1+","+lat1);
+								// System.out.println("为转换后的经纬度="+lng2+","+lat2);
+
+//								bool_is_update = Constant.getDistance(lat1,
+//										lng1, lat2, lng2, Constant.EFFERT_DATA); // 若为true表示有效数据
+							}
+
+							vo.setSerieNo(serieNo);
+							vo.setBattery(Integer.parseInt(battery));
+							vo.setLongitude(locations[0]);
+							vo.setLatitude(locations[1]);
+							vo.setChangeLongitude(locations[0]);
+							vo.setChangeLatitude(locations[1]);
+							vo.setAccuracy(Float.parseFloat("10.0"));
+							vo.setLocationType(locationType);
+							vo.setUploadTime(new Date());
+							vo.setFall(fall);
+							if (belongProject != null
+									&& !"".equals(belongProject)) {
+								vo.setBelongProject(belongProject);
+							} else {
+								vo.setBelongProject("1");
+							}
+							if (bool_is_update) {
+								ServiceBean.getInstance()
+										.getLocationInfoFacade()
+										.insertLocationInfo(vo);
+							} else {
+								vo.setCondition("id ='" + id + "'");
+								ServiceBean.getInstance()
+										.getLocationInfoFacade()
+										.updateLocationInfo(vo);
+							}
+							result = Constant.SUCCESS_CODE;
+						}
+					} else if (status.equals("0")) { // ʧ��
+						result = Constant.FAIL_CODE;
+					} else if (status.equals("-1")) {
+						result = Constant.FAIL_CODE;
+					}
+				}
+			} else if ("2".equals(locationType)) {// wifi
+//				String imei = request.getParameter("imei");
+				String smac = request.getParameter("smac");
+				String mmac = request.getParameter("mmac");
+				String macs = request.getParameter("macs");
+				// String key = request.getParameter("key");
+				String serverip = request.getParameter("serverip");
+
+				LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+
+				map.put("accesstype", "1");
+				map.put("imei", serieNo);
+				map.put("smac", smac);
+				map.put("mmac", mmac);
+				map.put("macs", macs);
+				map.put("key", Constant.KEY);
+				if (serverip != null && !"".equals(serverip)) {
+					map.put("serverip", serverip);
+				} else {
+					map.put("serverip", Constant.SERVER_IP);
+				}
+
+				String jsonToString = HttpRequest.sendGetToGaoDe(
+						Constant.LOCATION_URL, map);
+				// System.out.println("jsonToString++"+jsonToString);
+				if ("-1".equals(jsonToString)) {
+					result = Constant.FAIL_CODE;
+				} else {
+					JSONObject jsons = JSONObject.fromObject(jsonToString);
+					String status = jsons.getString("status"); // ???
+					if (status.equals("1")) { // ???
+						String results = jsons.getString("result"); // result���
+						JSONObject jsonResult = JSONObject.fromObject(results);
+						String location = jsonResult.getString("location"); // ??��??????
+						if (location != null) {
+							if (belongProject != null
+									&& !"".equals(belongProject)) {
+								vo.setCondition("serie_no ='" + serieNo
+										+ "' and belong_project='"
+										+ belongProject
+										+ "' and location_type ='"
+										+ locationType + "'");
+							} else {
+								vo.setCondition("serie_no ='" + serieNo
+										+ "' and location_type ='"
+										+ locationType + "'");
+							}
+							vo.setOrderBy("id");
+							vo.setSort("1"); // 按id降序
+							vo.setFrom(0);
+							vo.setPageSize(1); // 0至1
+
+							List<DataMap> locationList = ServiceBean
+									.getInstance().getLocationInfoFacade()
+									.getLocationInfo(vo);
+							boolean bool_is_update = true;
+							String[] locations = location.split(",");
+							String id = "0";
+							if (locationList.size() > 0) { // 说明有数据
+								id = "" + locationList.get(0).getAt("id");
+								double lng2 = Double.parseDouble(""
+										+ locationList.get(0)
+												.getAt("longitude"));
+								double lat2 = Double
+										.parseDouble(""
+												+ locationList.get(0).getAt(
+														"latitude"));
+
+								lng1 = Double.parseDouble(locations[0]);
+								lat1 = Double.parseDouble(locations[1]);
+
+								// System.out.println("为转换前的经纬度="+lng1+","+lat1);
+								// System.out.println("为转换后的经纬度="+lng2+","+lat2);
+//
+//								bool_is_update = Constant.getDistance(lat1,
+//										lng1, lat2, lng2, Constant.EFFERT_DATA); // 若为true表示有效数据
+							}
+
+							vo.setSerieNo(serieNo);
+							vo.setBattery(Integer.parseInt(battery));
+							vo.setLongitude(locations[0]);
+							vo.setLatitude(locations[1]);
+							vo.setChangeLongitude(locations[0]);
+							vo.setChangeLatitude(locations[1]);
+							vo.setAccuracy(Float.parseFloat("10.0"));
+							vo.setLocationType(locationType);
+							vo.setUploadTime(new Date());
+							vo.setFall(fall);
+							if (belongProject != null
+									&& !"".equals(belongProject)) {
+								vo.setBelongProject(belongProject);
+							} else {
+								vo.setBelongProject("1");
+							}
+							if (bool_is_update) {
+								ServiceBean.getInstance()
+										.getLocationInfoFacade()
+										.insertLocationInfo(vo);
+							} else {
+								vo.setCondition("id ='" + id + "'");
+								ServiceBean.getInstance()
+										.getLocationInfoFacade()
+										.updateLocationInfo(vo);
+							}
+							result = Constant.SUCCESS_CODE;
+						}
+					} else if (status.equals("0")) { // ʧ��
+						result = Constant.FAIL_CODE;
+					} else if (status.equals("-1")) {
+						result = Constant.FAIL_CODE;
+					}
+				}
+
+			}
+			// 获取警报
+			PhoneInfoFacade phoneInfofacade = ServiceBean.getInstance()
+					.getPhoneInfoFacade();
+			PhoneInfo phoneInfo = new PhoneInfo();
+			if (belongProject != null && !"".equals(belongProject)) {
+				phoneInfo.setCondition("serie_no='" + serieNo
+						+ "' and belong_project='" + belongProject + "'");
+			} else {
+				phoneInfo.setCondition("serie_no='" + serieNo + "'");
+			}
+			
+			String relativeCallStatus = "0";
+			List<DataMap> list = phoneInfofacade.getPhoneInfo(phoneInfo);
+			if (list.size() > 0) {
+				String type = (String) list.get(0).getAt("alarm_bell_type");
+				relativeCallStatus = (String)list.get(0).getAt("relative_call_status");
+				if (type.equals("1")) {// 有警报
+					warn = 1;
+					phoneInfo.setAlarmBellType("0");
+					// phoneInfo.setSerieNo(serieNo);
+					phoneInfofacade.updatePhoneInfo(phoneInfo);
+				}
+			} else {
+				phoneInfo.setSerieNo(serieNo);
+				phoneInfo.setStatus("1"); // 上报
+				phoneInfo.setUploadTime(new Date());
+				phoneInfo.setInputTime(new Date());
+				phoneInfo.setAlarmBellType("0"); // 没有警报
+				phoneInfo.setBelongProject(belongProject);
+
+				phoneInfofacade.insertPhoneInfo(phoneInfo);
+			}
+			SettingInfo svo = new SettingInfo();
+			if (belongProject != null && !"".equals(belongProject)) {
+				svo.setCondition("serie_no = '" + serieNo
+						+ "' and belong_project ='" + belongProject + "'");
+			} else {
+				svo.setCondition("serie_no = '" + serieNo + "'");
+			}
+			
+			String user_id = "0";
+			// ����
+			DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+			DeviceActiveInfoFacade facade = ServiceBean.getInstance()
+					.getDeviceActiveInfoFacade();
+			if (belongProject != null && !"".equals(belongProject)) {
+				deviceActiveInfo.setCondition("device_imei='" + serieNo
+						+ "' and belong_project ='" + belongProject
+						+ "' and listen_type='1' and device_disable='1'");
+			} else {
+				deviceActiveInfo.setCondition("device_imei='" + serieNo
+						+ "' and listen_type='1' and device_disable='1'");
+			}
+			boolean isBond = true;  //默认绑定
+			List<DataMap> deviceActiveList = facade
+					.getDeviceActiveInfo(deviceActiveInfo);
+			if (deviceActiveList.size() > 0) {
+				user_id = (String) deviceActiveList.get(0).getAt("user_id");
+				AppUserInfo appUser = new AppUserInfo();
+				appUser.setCondition("id='" + user_id + "'");
+				List<DataMap> appUserList = ServiceBean.getInstance()
+						.getAppUserInfoFacade().getAppUserInfo(appUser);
+				if (appUserList.size() > 0) {
+					phoneNumber = (String) appUserList.get(0).getAt(
+							"user_name");
+					listen = "1";
+
+					// �ظ�������е�type��Ϊ0
+					deviceActiveInfo.setListenType("0");
+					facade.updateDeviceActiveInfo(deviceActiveInfo);
+				}
+			}
+			if (belongProject != null && !"".equals(belongProject)) {
+				deviceActiveInfo.setCondition("device_imei='" + serieNo
+						+ "' and belong_project ='" + belongProject
+						+ "' and device_disable='1'");
+			} else {
+				deviceActiveInfo.setCondition("device_imei='" + serieNo
+						+ "' and device_disable='1'");
+			}
+			List<DataMap> deviceActiveLists = facade.getDeviceActiveInfo(deviceActiveInfo);
+			if(deviceActiveLists.size() > 0){
+				user_id = (String)deviceActiveLists.get(0).getAt("user_id");
+			}else{
+				isBond = false; // 解绑了
+			}
+
+			if (lat1 != 0 && lng1 != 0 && !user_id.equals("0")) {
+				SafeArea safeArea = new SafeArea();
+				if (belongProject != null && !"".equals(belongProject)) {
+					safeArea.setCondition("seri_no ='" + serieNo
+							+ "' and belong_project = '" + belongProject + "'"); // 查询这个设备的所有围栏
+				} else {
+					safeArea.setCondition("seri_no ='" + serieNo + "'"); // 查询这个设备的所有围栏
+				}
+
+				List<DataMap> safeList = ServiceBean.getInstance()
+						.getSafeAreaFacade().getSafeArea(safeArea);
+				int length = safeList.size(); // 电子围栏个数
+				for (int i = 0; i < length; i++) {
+					double lng2 = Double.parseDouble(""
+							+ safeList.get(i).getAt("longitude"));
+					double lat2 = Double.parseDouble(""
+							+ safeList.get(i).getAt("latitude"));
+					double safe_range = Double.parseDouble(""
+							+ safeList.get(i).getAt("safe_range"));
+					String status = "" + safeList.get(i).getAt("status"); // 1表示进入,0表示正常,-1表示出去
+					String area_name = "" + safeList.get(i).getAt("area_name");
+
+					boolean flag = Constant.getDistance(lat1, lng1, lat2, lng2,
+							safe_range); // 说明超出范围
+					if (flag && status.equals("1")) { // 超出这个范围,并且进入这个区域
+						MsgInfo msgInfo = new MsgInfo();
+						msgInfo.setToId(user_id);
+						msgInfo.setFromId(user_id);
+						msgInfo.setIsHandler("0"); // 未处理
+						msgInfo.setMsgLevel("1"); // 级别较高
+						msgInfo.setMsgContent("3@" + serieNo + "@" + area_name);
+						msgInfo.setMsgHandlerDate(new Date());
+						msgInfo.setBelongProject(belongProject);
+
+						ServiceBean.getInstance().getMsgInfoFacade()
+								.insertMsgInfo(msgInfo);
+
+						safeArea.setStatus("-1"); // 已出这个范围
+						ServiceBean.getInstance().getSafeAreaFacade()
+								.updateSafeArea(safeArea);
+					} else if (!flag && !status.equals("1")) { // 表示没有超出范围,并且是正常和出去状态
+						MsgInfo msgInfo = new MsgInfo();
+						msgInfo.setToId(user_id);
+						msgInfo.setFromId(user_id);
+						msgInfo.setIsHandler("0"); // 未处理
+						msgInfo.setMsgLevel("1"); // 级别较高
+						msgInfo.setMsgContent("2@" + serieNo + "@" + area_name);
+						msgInfo.setMsgHandlerDate(new Date());
+						msgInfo.setBelongProject(belongProject);
+
+						ServiceBean.getInstance().getMsgInfoFacade()
+								.insertMsgInfo(msgInfo);
+						
+						safeArea.setStatus("1"); // 已出这个范围
+						ServiceBean.getInstance().getSafeAreaFacade()
+								.updateSafeArea(safeArea);
+					}
+				}
+			}
+
+			if (Integer.valueOf(battery) <= 30) {
+				
+				MsgInfo msgInfo = new MsgInfo();
+				msgInfo.setToId(user_id);
+				msgInfo.setFromId(user_id);
+				msgInfo.setIsHandler("0"); // 未处理
+				msgInfo.setMsgLevel("1"); // 级别较高
+				msgInfo.setMsgContent("4@" + serieNo + "@" + "0");
+				msgInfo.setMsgHandlerDate(new Date());
+				msgInfo.setBelongProject(belongProject);
+
+				ServiceBean.getInstance().getMsgInfoFacade()
+						.insertMsgInfo(msgInfo);
+			}
+			RelativeCallInfo relativeCallInfo = new RelativeCallInfo();
+			relativeCallInfo.setCondition("serie_no ='" + serieNo
+					+ "' and belong_project = '" + belongProject
+					+ "' and status ='1'"); // 表示有变化
+			if (ServiceBean.getInstance().getRelativeCallInfoFacade()
+					.getRelativeCallInfoCount(relativeCallInfo) <= 0) {
+				if(!isBond){
+					if(relativeCallStatus.equals("1")){
+						f_m = 1;
+						phoneInfo.setRelativeCallStatus("0");
+						phoneInfofacade.updatePhoneInfo(phoneInfo);
+					}
+				}
+			} else {
+				f_m = 1;			
+			}
+			
+			MediaInfo mi = new MediaInfo();
+			mi.setCondition("to_id='"+serieNo+"' and belong_project='"+belongProject+"' and send_type='0'");
+			List<DataMap> miList = ServiceBean.getInstance().getMediaInfoFacade().getMediaInfoList(mi);
+			String fromId = "";
+			String content = "";
+			if(miList.size() > 0){
+				JSONObject js = new JSONObject();
+				AppUserInfo aui = new AppUserInfo();
+				String sendTime;
+				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				deviceActiveInfo.setCondition("device_imei='"+serieNo+"' and belong_project='"+belongProject+"'");
+				List<DataMap> li = ServiceBean.getInstance().getDeviceActiveInfoFacade().getDeviceActiveInfo(deviceActiveInfo);
+				Integer deviceId = (Integer)li.get(0).getAt("id");
+				for(int i=0; i<miList.size(); i++){
+					fromId = (String)miList.get(i).getAt("from_id");
+										
+					aui.setCondition("id ='"+fromId+"'");
+					List<DataMap> auiList = ServiceBean.getInstance().getAppUserInfoFacade().getAppUserInfo(aui);
+					if(auiList.size() > 0){
+						js.accumulate("nick_name", auiList.get(0).getAt("nick_name"));
+					}else{
+						json.accumulate("nick_name", "");
+					}
+					sendTime = format.format((Date)miList.get(i).getAt("send_time"));
+					js.accumulate("user_id", fromId);
+					js.accumulate("time_length", miList.get(i).getAt("time_length"));
+					js.accumulate("d_t", sendTime);
+					
+					String path = (String)miList.get(i).getAt("msg_content");
+					String dir = request.getSession(true).getServletContext().getRealPath("/upload/device/media/" + deviceId + "/");
+					String downloadPath = dir + path.substring(path.lastIndexOf("/")+1);
+					
+					/*BufferedReader br = new BufferedReader(new FileReader(downloadPath));
+					String str = new String();
+					if((str = br.readLine()) != null){
+						str += str;
+					}
+					br.close();*/
+					String msgContent = Base64.encodeBase64String(Tools.getContent(downloadPath));
+					js.accumulate("msg", msgContent);
+					js.accumulate("msg_length", msgContent.length());
+					
+					mediaArr.add(js);
+					js.clear();
+				}
+				y_y = 1;
+				
+				mi.setSendType("1");//发送后将状态置为1
+				ServiceBean.getInstance().getMediaInfoFacade().updateMediaInfo(mi);
+				
+			}
+			
+			insertVisit(href, belongProject, serieNo, 1, start, new Date());
+		} catch (Exception e) {
+			e.printStackTrace();
+			StringBuffer sb = new StringBuffer();
+			Writer writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Throwable cause = e.getCause();
+			while (cause != null) {
+				cause.printStackTrace(printWriter);
+				cause = cause.getCause();
+			}
+			printWriter.close();
+			String resultSb = writer.toString();
+			sb.append(resultSb);
+
+			logger.error(e);
+			result = Constant.EXCEPTION_CODE;
+		}
+		json.put("request", href);
+		json.put(Constant.RESULTCODE, result);
+		json.put("warn", warn);
+		if(listen.equals("1")){
+			json.put("listen", phoneNumber);
+		}else{
+			json.put("listen", listen);
+		}
+		json.put("f_m", f_m);
+		if(y_y == 1){//语音状态为1，发送语音
+			json.put("y_y", mediaArr);
+		}else{
+			json.put("y_y", "0");
+		}
+		json.put("time", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(start));
+		json.put("end", "1");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json.toString());
+
+		return null;
+	}
+
+}

@@ -1,0 +1,107 @@
+package com.wtwd.sys.relativecallinfo.action;
+
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.http.common.PagePys;
+import com.godoing.rose.http.common.Result;
+import com.godoing.rose.lang.DataList;
+import com.godoing.rose.lang.SystemException;
+import com.godoing.rose.log.LogFactory;
+import com.wtwd.common.config.Config;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.lang.CommUtils;
+import com.wtwd.sys.relativecallinfo.domain.RelativeCallInfo;
+import com.wtwd.sys.relativecallinfo.domain.logic.RelativeCallInfoFacade;
+import com.wtwd.sys.relativecallinfo.form.RelativeCallInfoForm;
+
+public class RelativeCallInfoAction extends BaseAction{
+	
+	Log logger = LogFactory.getLog(RelativeCallInfoAction.class);
+	
+	public ActionForward queryRelativeCallInfo(ActionMapping mapping,
+			ActionForm actionForm, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		Date start = new Date();
+		String href= request.getServletPath();		 
+		Result result = new Result();//���
+		PagePys pys = new PagePys();//ҳ������
+		DataList list = null; //����ҳ��List  ��logic itrate��ȡ��
+		StringBuffer sb = new StringBuffer();//�����ַ�����
+		RelativeCallInfoFacade info = ServiceBean.getInstance().getRelativeCallInfoFacade();//����userApp������ȡ��user�ֵ䣩
+		try {
+			RelativeCallInfoForm form = (RelativeCallInfoForm) actionForm;
+			RelativeCallInfo vo = new RelativeCallInfo(); 
+			String startTime = request.getParameter("startTime");
+			String endTime   = request.getParameter("endTime");
+			String serieNo = request.getParameter("serieNo");
+			String phoneNumber   = request.getParameter("phoneNumber");			
+
+			/*���û������ֶ�*/
+            form.setOrderBy("id"); 
+            form.setSort("1"); 
+
+			if(serieNo != null && !"".equals(serieNo)){
+				sb.append("serie_no like '%"+serieNo+"%'");
+			}
+			if(phoneNumber != null && !"".equals(phoneNumber)){
+				if(sb.length() > 0){
+					sb.append(" and ");
+				}
+				sb.append("phone_number like '%"+phoneNumber+"%'");
+			}
+			if(startTime != null && !"".equals(startTime)){
+				if(sb.length() > 0){
+					sb.append(" and ");
+				}
+				sb.append("substring(add_time,1,10) >= '"+startTime+"'");
+			}
+			if(endTime != null && !"".equals(endTime)){
+				if(sb.length() > 0){
+					sb.append(" and ");
+				}
+				sb.append("substring(add_time,1,10) <= '"+endTime+"'");
+			}
+			request.setAttribute("fNow_date", startTime);
+		    request.setAttribute("now_date", endTime);
+			request.setAttribute("serieNo", serieNo);
+		    request.setAttribute("phoneNumber", phoneNumber);
+		    
+			vo.setCondition(sb.toString());
+			
+         	BeanUtils.copyProperties(vo,form);			
+         	list = info.getRelativeCallInfoListByVo(vo);  
+			BeanUtils.copyProperties(pys, form); 
+			pys.setCounts(list.getTotalSize());   
+			/* ���û������ֶ� */ 
+			 
+		} catch (Exception e) { 
+			e.printStackTrace();
+			logger.debug(request.getQueryString() + "  " + e);
+			result.setBackPage(Config.ABOUT_PAGE); /* ����Ϊ����ҳ�棬���Գ������ת��ϵͳĬ��ҳ�� */
+			if (e instanceof SystemException) { /* ����֪�쳣���н��� */
+				result.setResultCode(((SystemException) e).getErrCode());
+				result.setResultType(((SystemException) e).getErrType());
+			} else { /* ��δ֪�쳣���н�������ȫ�������δ֪�쳣 */
+				result.setResultCode("noKnownException");
+				result.setResultType("sysRunException"); 
+			}
+		} finally {
+			request.setAttribute("result", result);
+			request.setAttribute("pageList", list);
+			request.setAttribute("PagePys", pys);
+		}
+		CommUtils.getIntervalTime(start, new Date(), href); 
+		return mapping.findForward("queryRelativeCallInfo");
+	}
+
+}

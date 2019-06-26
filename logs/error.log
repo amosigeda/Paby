@@ -1,0 +1,15 @@
+[ERROR] 2019-03-18 10:33:17,192(274) --> [resin-50] com.alibaba.druid.pool.DruidDataSource.init(DruidDataSource.java:407): mysql should not use 'PoolPreparedStatements'  
+[ERROR] 2019-03-18 10:33:52,380(35462) --> [resin-50] com.alibaba.druid.pool.DruidDataSource.init(DruidDataSource.java:407): mysql should not use 'PoolPreparedStatements'  
+[ERROR] 2019-03-18 11:11:09,251(2272333) --> [resin-port-8087-58] com.wtwd.sys.appinterfaces.innerw.WTSignupAction.execute(WTSignupAction.java:266): javax.mail.MessagingException: Could not connect to SMTP host: smtp.gmail.com, port: 465;
+  nested exception is:
+	java.net.ConnectException: Connection timed out: connect  
+[ERROR] 2019-03-18 11:13:47,100(2430182) --> [resin-port-8087-58] com.wtwd.sys.appinterfaces.innerw.WTSignupAction.execute(WTSignupAction.java:266): javax.mail.MessagingException: Could not connect to SMTP host: smtp.gmail.com, port: 465;
+  nested exception is:
+	java.net.ConnectException: Connection timed out: connect  
+[ERROR] 2019-03-18 11:17:26,809(2649891) --> [resin-port-8087-18] com.wtwd.sys.appinterfaces.innerw.WTFindPasswordAction.execute(WTFindPasswordAction.java:184): javax.mail.MessagingException: Could not connect to SMTP host: smtp.gmail.com, port: 465;
+  nested exception is:
+	java.net.ConnectException: Connection timed out: connect  
+[ERROR] 2019-03-18 11:19:10,375(2753457) --> [resin-port-8087-18] com.wtwd.sys.appinterfaces.innerw.WTFindPasswordAction.execute(WTFindPasswordAction.java:184): javax.mail.MessagingException: Could not connect to SMTP host: smtp.gmail.com, port: 465, response: -1  
+[ERROR] 2019-03-18 11:29:04,895(3347977) --> [resin-port-8087-61] com.wtwd.sys.appinterfaces.innerw.WTSignupAction.execute(WTSignupAction.java:266): javax.mail.MessagingException: Could not connect to SMTP host: smtp.gmail.com, port: 465;
+  nested exception is:
+	java.net.ConnectException: Connection timed out: connect  

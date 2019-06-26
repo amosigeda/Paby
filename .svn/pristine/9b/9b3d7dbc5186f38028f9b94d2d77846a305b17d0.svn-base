@@ -1,0 +1,104 @@
+package com.wtwd.sys.msginfo.action;
+
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.http.common.PagePys;
+import com.godoing.rose.http.common.Result;
+import com.godoing.rose.lang.DataList;
+import com.godoing.rose.lang.SystemException;
+import com.godoing.rose.log.LogFactory;
+import com.wtwd.common.config.Config;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.lang.CommUtils;
+import com.wtwd.sys.msginfo.domain.MsgInfo;
+import com.wtwd.sys.msginfo.domain.logic.MsgInfoFacade;
+import com.wtwd.sys.msginfo.form.MsgInfoForm;
+
+public class MsgInfoAction extends BaseAction{
+	
+	Log logger = LogFactory.getLog(MsgInfoAction.class);
+	
+	public ActionForward queryMsgInfo(ActionMapping mapping,
+			ActionForm actionForm, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		Date start = new Date();
+		String href= request.getServletPath();		 
+		Result result = new Result();//���
+		PagePys pys = new PagePys();//ҳ������
+		DataList list = null; //����ҳ��List  ��logic itrate��ȡ��
+		StringBuffer sb = new StringBuffer();//�����ַ�����
+		MsgInfoFacade info = ServiceBean.getInstance().getMsgInfoFacade();//����userApp������ȡ��user�ֵ䣩
+		try {
+			MsgInfoForm form = (MsgInfoForm) actionForm;
+			MsgInfo vo = new MsgInfo(); 
+			String startTime = request.getParameter("startTime");
+			String endTime   = request.getParameter("endTime");	
+			String userId = request.getParameter("userId");
+			String toUserId = request.getParameter("toUserId");
+			String status = request.getParameter("statusSelect");
+
+			/*���û������ֶ�*/
+            form.setOrderBy("msg_handler_date"); 
+            form.setSort("1"); 
+
+            sb.append("1=1");
+            if(userId != null && !"".equals(userId)){
+				sb.append(" and from_id = '"+userId+"'");
+			}
+            if(toUserId != null && !"".equals(toUserId)){
+				sb.append(" and to_id = '"+toUserId+"'");
+			}
+			if(startTime != null && !"".equals(startTime)){				
+				sb.append(" and substring(msg_handler_date,1,10) >= '"+startTime+"'");
+			}
+			if(endTime != null && !"".equals(endTime)){				
+				sb.append(" and substring(msg_handler_date,1,10) <= '"+endTime+"'");
+			}			
+			if(status != null && !"".equals(status)){
+				sb.append(" and is_handler ='"+status+"'");
+				request.setAttribute("statusSelect", CommUtils.getSelectMess("statusSelect", Integer.parseInt(status)));
+			}
+			request.setAttribute("fNow_date", startTime);
+		    request.setAttribute("now_date", endTime);
+		    request.setAttribute("userId", userId);
+		    request.setAttribute("toUserId", toUserId);
+		    
+			vo.setCondition(sb.toString());
+			
+         	BeanUtils.copyProperties(vo,form);			
+         	list = info.getMsgInfoListByVo(vo); 
+			BeanUtils.copyProperties(pys, form); 
+			pys.setCounts(list.getTotalSize());   
+			/* ���û������ֶ� */ 
+			 
+		} catch (Exception e) { 
+			e.printStackTrace();
+			logger.debug(request.getQueryString() + "  " + e);
+			result.setBackPage(Config.ABOUT_PAGE); /* ����Ϊ����ҳ�棬���Գ������ת��ϵͳĬ��ҳ�� */
+			if (e instanceof SystemException) { /* ����֪�쳣���н��� */
+				result.setResultCode(((SystemException) e).getErrCode());
+				result.setResultType(((SystemException) e).getErrType());
+			} else { /* ��δ֪�쳣���н�������ȫ�������δ֪�쳣 */
+				result.setResultCode("noKnownException");
+				result.setResultType("sysRunException"); 
+			}
+		} finally {
+			request.setAttribute("result", result);
+			request.setAttribute("pageList", list);
+			request.setAttribute("PagePys", pys);
+		}
+		CommUtils.getIntervalTime(start, new Date(), href); 
+		return mapping.findForward("queryMsgInfo");
+	}
+
+}

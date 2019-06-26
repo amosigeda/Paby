@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WPetMoveInfo">
+	
+	<select id="getDaySugMoveManInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+		<!-- SELECT wm.speed,wm.start_time,wm.end_time FROM wpets ws 
+		LEFT JOIN wpet_move_info wm ON ws.pet_id = wm.pets_pet_id 
+		LEFT JOIN wdevice_active_info wd ON ws.device_id = wd.device_id 
+
+        wd.device_disable = 1 
+-->
+		select a.pet_id, a.move_type as recMoveType, a.move_time as recMoveTime from wPetSugMove a  		
+		<dynamic prepend="where">
+			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<delete id="delDaySugMoveManInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+		delete from wPetSugMove
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+
+<!-- 
+    select a.pet_id, a.per_move, a.route, a.step_number as step_move, 
+    a.calories, a.exec_time, a.up_time  
+         from wPetSugMoveDescRep a left join wPetSugMove b on a.pet_id = b.pet_id 
+         and DATE_FORMAT(a.up_time,'%Y-%m-%d') = DATE_FORMAT(b.up_time,'%Y-%m-%d') left join 
+         wpets c on a.pet_id = c.pet_id
+
+ -->
+	<select id="getOneSugExec" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+    select a.pet_id, a.per_move, a.route, a.step_number as step_move, 
+    a.calories, a.exec_time, a.up_time, a.dexec_time, a.lexec_time, a.tot_sleep, 
+    a.tot_dsleep, a.tot_lsleep, a.max_unit_steps   
+         from wPetSugMoveDescRep a
+		<dynamic prepend="where">			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getOneSugExecDataList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+       select move_type, steps, 
+       DATE_FORMAT(start_time,'%Y-%m-%d %T') as start_time, 
+       DATE_FORMAT(end_time,'%Y-%m-%d %T')  as end_time from wPetSugMoveRepActivity
+		<dynamic prepend="where">			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getOneSleepExecDataList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+       select sleep_type, 
+       DATE_FORMAT(start_time,'%Y-%m-%d %T') as start_time, 
+       DATE_FORMAT(end_time,'%Y-%m-%d %T')  as end_time from wPetSugMoveRepSleep
+		<dynamic prepend="where">			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+	<select id="getMoveList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+      select pets_pet_id, sum(step_number) as tot_move, sum(calories) as tot_energy, 
+      sum(route) as tot_route,sum(UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) 
+      as tot_time from wpet_move_info group by pets_pet_id
+		<dynamic prepend="where">			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getMoveListDataList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+      select * from wpet_move_info
+		<dynamic prepend="where">			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getMoveDataListSum" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WPetMoveInfo">
+      select sum(step_number) as tot_move, sum(calories) as tot_energy, 
+      sum(route) as tot_route, sum( TIMESTAMPDIFF( SECOND, start_time, end_time  )) as tot_time from wpet_move_info
+		<dynamic prepend="where">			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	
+</sqlMap>

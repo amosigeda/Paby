@@ -1,0 +1,12 @@
+package com.wtwd.pet.app.dao.impl;
+
+import org.springframework.stereotype.Repository;
+
+import com.wtwd.pet.app.base.BaseDaoImpl;
+import com.wtwd.pet.app.dao.LocationInfoDao;
+import com.wtwd.pet.app.entity.LocationInfo;
+
+@Repository("locationInfoDao")
+public class LocationInfoDaoImpl extends BaseDaoImpl<LocationInfo> implements LocationInfoDao {
+
+}

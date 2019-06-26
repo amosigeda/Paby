@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+    "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<sqlMap resource="com/wtwd/sys/userinfo/dao/ibatis/maps/userInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/funcinfo/dao/ibatis/maps/funcInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/roleinfo/dao/ibatis/maps/roleInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/rolefuncinfo/dao/ibatis/maps/roleFuncInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/sysloginfo/dao/ibatis/maps/sysLogInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/monitorinfo/dao/ibatis/maps/monitorInfo.xml"/> 
+	<sqlMap resource="com/wtwd/sys/phoneinfo/dao/ibatis/maps/phoneInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/appuserinfo/dao/ibatis/maps/appUserInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/locationinfo/dao/ibatis/maps/locationInfo.xml" />
+	<sqlMap resource="com/wtwd/sys/deviceactiveinfo/dao/ibatis/maps/deviceActiveInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/directiveinfo/dao/ibatis/maps/directiveInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/companyinfo/dao/ibatis/maps/companyInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/channelinfo/dao/ibatis/maps/channelInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/projectinfo/dao/ibatis/maps/projectInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/saleinfo/dao/ibatis/maps/saleInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/userlogininfo/dao/ibatis/maps/userLoginInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/deviceLogin/dao/ibatis/maps/device_login.xml"/>
+
+	<!-- wappusers -->
+	<sqlMap resource="com/wtwd/sys/innerw/wappusers/dao/ibatis/maps/wappUsers.xml"/>
+
+	<!-- wdeviceActiveInfo 20160625 lbl-->
+	<sqlMap resource="com/wtwd/sys/innerw/wdeviceActiveInfo/dao/ibatis/maps/wdeviceActiveInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/wpetMoveInfo/dao/ibatis/maps/wpetMoveInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/wfciPetKind/dao/ibatis/maps/wfciPetKind.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/wappuserverify/dao/ibatis/maps/wappuserVerify.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/wshareInfo/dao/ibatis/maps/wshareInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/wpet/dao/ibatis/maps/wpet.xml"/>
+	
+    <sqlMap resource="com/wtwd/sys/innerw/wpetwifirange/dao/ibatis/maps/WpetWifiRange.xml"/>
+    <sqlMap resource="com/wtwd/sys/innerw/wupfirmware/dao/ibatis/maps/wupFirmware.xml"/>
+
+	<!-- liufeng -->
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/QuestionInfo.xml"/>
+	
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WShareInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WappLocationInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WappWiFiInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WeFencing.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WDeviceActiveInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WCheckVersionInfo.xml"/>
+
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WSuggestion.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WPetMoveInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WMsgInfo.xml"/>
+	<sqlMap resource="com/wtwd/sys/innerw/liufeng/dao/ibatis/maps/WSoundInfo.xml"/>
+
+
+</sqlMapConfig>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WSoundInfo">
+	
+	<select id="queryDevicePetByUserId" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WSoundInfo">
+		SELECT 
+			ws.id,ws.user_id,ws.device_id,wp.pet_id,wp.nickname 
+		FROM wshare_info ws  
+		LEFT JOIN wpets wp ON ws.device_id = wp.device_id  
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<insert id="insertPetSoundInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WSoundInfo">
+		INSERT INTO wSoundInfo(device_id,call_file,up_time) 
+		VALUES(#device_id#,#call_file#,#up_time#) 
+	</insert>
+	
+</sqlMap>

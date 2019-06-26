@@ -1,0 +1,12 @@
+package com.wtwd.pet.app.dao;
+
+import java.util.Map;
+
+import com.wtwd.pet.app.base.BaseDao;
+import com.wtwd.pet.app.entity.WDeviceEsafe;
+
+public interface WDeviceEsafeMapper extends BaseDao<WDeviceEsafe> {
+    public int updateMsgInfoFlag(WDeviceEsafe data);
+    public int insertSelectiveMsgInfo(WDeviceEsafe data);
+    
+}

@@ -1,0 +1,12 @@
+package com.wtwd.pet.app.dao.impl;
+
+import org.springframework.stereotype.Repository;
+
+import com.wtwd.pet.app.base.BaseDaoImpl;
+import com.wtwd.pet.app.dao.WeFencingDao;
+import com.wtwd.pet.app.entity.WeFencing;
+
+@Repository("weFencingDao")
+public class WeFencingDaoImpl extends BaseDaoImpl<WeFencing> implements WeFencingDao {
+
+}

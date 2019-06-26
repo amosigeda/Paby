@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WupFirmware">
+
+	<select id="getWupFirmware" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wupfirmware.domain.WupFirmware">
+		SELECT * FROM wupfirmware
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<insert id="insertWupFirmware" parameterClass="com.wtwd.sys.innerw.wupfirmware.domain.WupFirmware">
+		INSERT INTO wupfirmware
+		(project_name,version_us,version_eu,version_cn,update_time)
+		 VALUES 
+		(#project_name#,#version_us#,#version_eu#,#version_cn#,#update_time#)
+	</insert>
+	
+	<update id="updateWupFirmware" parameterClass="com.wtwd.sys.innerw.wupfirmware.domain.WupFirmware">
+		UPDATE wupfirmware
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="project_name">
+				project_name=#project_name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="version_us">
+				version_us=#version_us#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="version_eu">
+				version_eu=#version_eu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="version_cn">
+				version_cn=#version_cn#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="update_time">
+				update_time=#update_time#
+			</isNotEmpty>									
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update> 
+
+</sqlMap>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+<struts-config>
+	<form-beans>
+		<form-bean name="publicForm" type="com.godoing.rose.http.PublicFormBean" />
+		<form-bean name="userInfoForm" type="com.wtwd.sys.userinfo.form.UserInfoForm" />
+		<form-bean name="funcInfoForm" type="com.wtwd.sys.funcinfo.form.FuncInfoForm" />
+		<form-bean name="roleInfoForm" type="com.wtwd.sys.roleinfo.form.RoleInfoForm" />
+		<form-bean name="sysLogInfoForm"
+			type="com.wtwd.sys.sysloginfo.form.SysLogInfoForm" />
+		<form-bean name="MonitorForm"
+			type="com.wtwd.sys.monitorinfo.form.MonitorInfoForm" />
+
+	</form-beans>
+
+	<global-forwards>
+		<forward contextRelative="true" name="error" path="/include/errormsg.jsp" />
+		<forward contextRelative="true" name="result" path="/public/Result.jsp" />
+		<forward contextRelative="true" name="abouts" path="About.htm" />
+	</global-forwards>
+
+	<action-mappings>
+		<action name="publicForm" path="/login" scope="request"
+			type="com.wtwd.common.http.LoginAction" validate="true">
+		</action>
+		<action name="userInfoForm" path="/sysAdmin/userInfo/doUserInfo"
+			scope="request" type="com.wtwd.sys.userinfo.action.UserInfoAction"
+			parameter="method">
+			<forward name="queryUserInfo" path="/sysAdmin/userInfo/userMain.jsp" />
+			<forward name="insertUserInfo" path="/sysAdmin/userInfo/userAdd.jsp" />
+			<forward name="updateUserInfo" path="/sysAdmin/userInfo/userUpdate.jsp" />
+			<forward name="updateUserPwdInfo" path="/sysAdmin/userInfo/userUpdatePwd.jsp" />
+			<forward name="channelPower" path="/sysAdmin/userInfo/channelPower.jsp" />
+			<forward name="adverPower" path="/sysAdmin/userInfo/adverPower.jsp" />
+		</action>
+		<action name="funcInfoForm" path="/sysAdmin/funcInfo/doFuncInfo"
+			scope="request" type="com.wtwd.sys.funcinfo.action.DoFuncInfoAction"
+			parameter="method">
+			<forward name="queryFuncInfo" path="/sysAdmin/funcInfo/funcInfoMain.jsp" />
+			<forward name="insertFuncInfo" path="/sysAdmin/funcInfo/funcInfoAdd.jsp" />
+			<forward name="updateFuncInfo" path="/sysAdmin/funcInfo/funcInfoUpdate.jsp" />
+		</action>
+		<action name="roleInfoForm" path="/sysAdmin/roleInfo/doRoleInfo"
+			scope="request" type="com.wtwd.sys.roleinfo.action.DoRoleInfoAction"
+			parameter="method">
+			<forward name="queryRoleInfo" path="/sysAdmin/roleInfo/roleInfoMain.jsp" />
+			<forward name="roleFuncInfo" path="/sysAdmin/roleInfo/roleFuncPop.jsp" />
+			<forward name="insertRoleInfo" path="/sysAdmin/roleInfo/roleInfoAdd.jsp" />
+			<forward name="updateRoleInfo" path="/sysAdmin/roleInfo/roleInfoUpdate.jsp" />
+		</action>
+
+		<action name="sysLogInfoForm" path="/sysAdmin/sysLogInfo/doSysLogInfo"
+			scope="request" type="com.wtwd.sys.sysloginfo.action.DoSysLogInfoAction"
+			parameter="method">
+			<forward name="querySysLogInfo" path="/sysAdmin/sysLogInfo/sysLogInfoMain.jsp" />
+			<forward name="queryBeifenRecord" path="/sysAdmin/sysLogInfo/sysLogDelInfoMain.jsp"></forward>
+		</action>
+		<action name="MonitorForm" path="/sysAdmin/monitorInfo/doMonitorInfo"
+			scope="request" type="com.wtwd.sys.monitorinfo.action.DoMonitorInfoAction"
+			parameter="method">
+			<forward name="queryMonitorInfo" path="/sysAdmin/monitorInfo/monitorInfoMain.jsp"></forward>
+			<forward name="queryAppVisit" path="/sysAdmin/monitorInfo/appVisitMain.jsp"></forward>
+			<forward name="queryDeviceVisit" path="/sysAdmin/monitorInfo/deviceVisitMain.jsp"></forward>
+		</action>
+
+		<action path="/doLogin" type="com.wtwd.sys.appinterfaces.LoginAction"></action>
+		<action path="/doRefreshLogin" type="com.wtwd.sys.appinterfaces.ExitLoginAction"></action>
+		<action path="/doRegister" type="com.wtwd.sys.appinterfaces.RegisterAction"></action>
+		<action path="/doModifyUser" type="com.wtwd.sys.appinterfaces.updateUserAction"></action>
+		<action path="/doAddDevice" type="com.wtwd.sys.appinterfaces.BondBaoBeiAction"></action>
+		<action path="/doVerifyDevice" type="com.wtwd.sys.appinterfaces.VerifyDeviceAction"></action>
+		<action path="/doListen" type="com.wtwd.sys.appinterfaces.ListenAction"></action>
+		<action path="/doLocation" type="com.wtwd.sys.appinterfaces.LocationAction"></action>
+		<action path="/doQueryDeviceTrack"
+			type="com.wtwd.sys.appinterfaces.QueryDeviceTrackAction"></action>
+		<action path="/doFindBaby" type="com.wtwd.sys.appinterfaces.FindBabyAction"></action>
+		<action path="/doModifyDeviceSafeArea"
+			type="com.wtwd.sys.appinterfaces.ModifyDeviceSafeAreaAction"></action>
+		<action path="/doDeleteDeviceSafeArea"
+			type="com.wtwd.sys.appinterfaces.DeleteDeviceSafeAreaAction"></action>
+		<action path="/doAddDeviceFamily"
+			type="com.wtwd.sys.appinterfaces.AddDeviceFamilyAction"></action>
+		<action path="/doDeleteDeviceFamily"
+			type="com.wtwd.sys.appinterfaces.DeleteDeviceFamilyAction"></action>
+		<action path="/doModifyDeviceFamily"
+			type="com.wtwd.sys.appinterfaces.ModifyDeviceFamilyAction"></action>
+		<action path="/doDeleteDevice" type="com.wtwd.sys.appinterfaces.DeleteDeviceAction"></action>
+		<action path="/doDownLoadDeviceData"
+			type="com.wtwd.sys.appinterfaces.DownloadDeviceDataAction"></action>
+		<action path="/doFeedback" type="com.wtwd.sys.appinterfaces.FeedBackAction"></action>
+		<action path="/doUpdateApp" type="com.wtwd.sys.appinterfaces.DoAppUpdateAction"></action>
+		<action path="/doGetDeviceSafeArea"
+			type="com.wtwd.sys.appinterfaces.DoGetDeviceSafeAreaAction"></action>
+		<action path="/doShareDevice" type="com.wtwd.sys.appinterfaces.ShareDeviceAction"></action>
+		<action path="/doMsgHandler" type="com.wtwd.sys.appinterfaces.MsgHandlerAction"></action>
+		<action path="/doGetMsg" type="com.wtwd.sys.appinterfaces.doGetMsgAction"></action>
+		<action path="/doFindPassword"
+			type="com.wtwd.sys.appinterfaces.doFindPasswordAction"></action>
+		<action path="/doGetFall" type="com.wtwd.sys.appinterfaces.doGetFallAction"></action>
+		<action path="/REMOTE" type="com.wtwd.sys.appinterfaces.doRemoteAction"></action>
+		<action path="/SET_DISTURB" type="com.wtwd.sys.appinterfaces.doDisturbAction"></action>
+		<action path="/GET_LOWELECTRICITY" type="com.wtwd.sys.appinterfaces.doGetLowAction"></action>
+		<action path="/SET_CLOCK" type="com.wtwd.sys.appinterfaces.doClockAction"></action>
+		<action path="/SET_SLEEP" type="com.wtwd.sys.appinterfaces.doSleepAction"></action>
+		<action path="/GET_CLOCK" type="com.wtwd.sys.appinterfaces.getClockAction"></action>
+		<action path="/GET_SLEEP" type="com.wtwd.sys.appinterfaces.getSleepAction"></action>
+		<action path="/GET_DISTURB" type="com.wtwd.sys.appinterfaces.getDisturbAction"></action>
+		<action path="/GET_PHONE" type="com.wtwd.sys.appinterfaces.getPhoneAction"></action>
+		<action path="/QUERYTRACECOUNT" type="com.wtwd.sys.appinterfaces.getTraceCountAction"></action>
+		<action path="/doSendMedia" type="com.wtwd.sys.appinterfaces.userSendMediaAction"></action>
+		<action path="/doGetMedia" type="com.wtwd.sys.appinterfaces.userGetMediaAction"></action>
+		<action path="/doDeleteShareDevice"
+			type="com.wtwd.sys.appinterfaces.DoDeleteShareDeviceAction"></action>
+		<action path="/upLoadSportData" type="com.wtwd.sys.appinterfaces.UploadStepData"></action>
+		<action path="/downLoadSportData" type="com.wtwd.sys.appinterfaces.DownloadStepData"></action>
+		<action path="/upLoadTemperature" type="com.wtwd.sys.appinterfaces.UploadTemperature"></action>
+		<action path="/downLoadTemperature" type="com.wtwd.sys.appinterfaces.DownloadTemperature"></action>
+		<action path="/upLoadHeatrate" type="com.wtwd.sys.appinterfaces.UploadHeatrate"></action>
+		<action path="/downloadHeatrate" type="com.wtwd.sys.appinterfaces.DownloadHeatrate"></action>
+		<action path="/doGetBpData" type="com.wtwd.sys.appinterfaces.GetBpData"></action>
+		<action path="/doServiceHelper" type="com.wtwd.sys.appinterfaces.ServerHelperAction"></action>
+		<action path="/doGetSOSData" type="com.wtwd.sys.appinterfaces.ServerHelperAction"></action>
+		<action path="/doGetOldFallData" type="com.wtwd.sys.appinterfaces.OldHelperAction"></action>
+		<action path="/doGetSleepData" type="com.wtwd.sys.appinterfaces.GetSleepDataAction"></action>
+		<action path="/doGetDeviceType" type="com.wtwd.sys.appinterfaces.GetDeviceTypeAction"></action>
+		<action path="/doUpdateSosStatus"
+			type="com.wtwd.sys.appinterfaces.UpdateSosStatusAction"></action>
+		<action path="/doUpdateFallStatus"
+			type="com.wtwd.sys.appinterfaces.UpdateFallStatusAction"></action>
+		<!-- 设备通讯接口 -->
+		<action path="/DEVICE_UP_DEVICEINFO" type="com.wtwd.sys.interfaces.upPhoneInfoAction"></action>
+		<action path="/MSG_DEVICE_FAMILY_PHONE"
+			type="com.wtwd.sys.interfaces.msgDeviceFamilyPhoneAction"></action>
+		<action path="/HEARTBEAT" type="com.wtwd.sys.interfaces.heartbeatAction"></action>
+		<action path="/DEVICE_SEND_MEDIA" type="com.wtwd.sys.interfaces.deviceSendMediaAction"></action>
+
+		<!-- wappusers yonghu 20160625 label-->
+		<action path="/doWTSignin" type="com.wtwd.sys.appinterfaces.innerw.WTSigninAction"></action>
+		<action path="/doWTSignup" type="com.wtwd.sys.appinterfaces.innerw.WTSignupAction"></action>
+		<action path="/doWTSignedit" type="com.wtwd.sys.appinterfaces.innerw.WTSigneditAction"></action>
+		<action path="/doWTFindPassword" type="com.wtwd.sys.appinterfaces.innerw.WTFindPasswordAction"></action>
+		<action path="/doWTSignquit" type="com.wtwd.sys.appinterfaces.innerw.WTSignquitAction"></action>
+		<action path="/doWTAppDeviceMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppDeviceManAction"></action>
+		<action path="/doWTAppPetMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppPetManAction"></action>
+		<action path="/doWTUpload" type="com.wtwd.sys.appinterfaces.innerw.WTUploadAction"></action>
+		<action path="/doWTDownload" type="com.wtwd.sys.appinterfaces.innerw.WTDownloadAction"></action>
+
+		<action path="/doWTAppGpsMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppGpsManAction"></action>
+		<action path="/doWTAppUserGpsMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppUserGpsManAction"></action>
+		<action path="/doWTAppDevWifiSrcMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppDevWifiSrcManAction"></action>
+		<action path="/doWTAppSafeAreaMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppSafeAreaManAction"></action>
+		<action path="/doWTAppDiscoveryMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppDiscoveryManAction"></action>
+		<action path="/doWTDevSeta" type="com.wtwd.sys.appinterfaces.innerw.WTDevSetaAction"></action>
+		<action path="/doWTAppMsgMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppMsgManAction"></action>
+		<action path="/doWTAppFeed" type="com.wtwd.sys.appinterfaces.innerw.WTAppFeedAction"></action>
+		<action path="/doWTSugMoveMan" type="com.wtwd.sys.appinterfaces.innerw.WTSugMoveManAction"></action>
+		<action path="/doWTAppCallbackMan" type="com.wtwd.sys.appinterfaces.innerw.WTAppCallbackManAction"></action>
+		<action path="/doWTAppQuestionMan" type="com.wtwd.sys.appinterfaces.liufeng.action.WTAppQuestionManAction"></action>
+		<!-- sim-wei-sim卡的激活注销 -->
+		<action path="/doSimOperate" type="com.wtwd.sys.appinterfaces.doSimOperateAction"></action>
+		<action path="/doSelectFlowData" type="com.wtwd.sys.appinterfaces.doSeletFlowData"></action>
+         <!-- payfor 支付接口 -->
+		<action path="/payfor" type="com.wtwd.sys.appinterfaces.payforAction"></action>
+        <!-- 取消订阅 -->
+		<action path="/cancelSubscription" type="com.wtwd.sys.appinterfaces.cancelSubscriptionAction"></action>
+		   <!-- 修改订阅计划 -->
+		<action path="/updateSubscription" type="com.wtwd.sys.appinterfaces.weitechao.updatePayforAction"></action>
+		<!-- 查看到期日期 -->
+		<action path="/queryExpireDate" type="com.wtwd.sys.appinterfaces.queryExpireDateAction"></action>
+		<!-- 查询是否有绑定iccid -->
+		<action path="/selectBindIccid" type="com.wtwd.sys.appinterfaces.selectBindIccidAction"></action>
+        <!-- 负载均衡 设备现在需要使用的接口 -->
+        <action path="/deviceEnterServer" type="com.wtwd.sys.appinterfaces.weitechao.DeviceEnterServerAction"></action>		
+        <!-- 负载均衡 APP现在需要使用的接口 -->
+        <action path="/appSelectDeviceInnetIp" type="com.wtwd.sys.appinterfaces.weitechao.AppSelectDeviceInnetIp"></action>	
+        <!-- 查询imei的默认iccid状态接口 -->
+        <action path="/doWTAppGpsManIccid" type="com.wtwd.sys.appinterfaces.weitechao.WTAppGpsManAction"></action>
+        <!-- 负载均衡设备交互指令接口 -->
+		<action path="/doWTDevGW" type="com.wtwd.sys.appinterfaces.innerw.WTDevGWAction"></action>
+
+        <!-- 查询设备状态接口 -->
+		<action path="/doWTDevStat" type="com.wtwd.sys.appinterfaces.innerw.WTDevStatAction"></action>		
+		
+		<!-- 查询iccid 是否为有效的iccid-->
+		<action path="/validIccid" type="com.wtwd.sys.appinterfaces.weitechao.validIccidAction"></action>
+		 <!-- payfor 支付接口 -->
+		<action path="/payforIccid" type="com.wtwd.sys.appinterfaces.weitechao.payforIccidAction"></action>
+        <!-- 临时协议，注意不能长期提供，设备定位上报方式接口 -->
+		<action path="/doWTDevLCTOpt" type="com.wtwd.sys.appinterfaces.innerw.WTDevLCTOptAction"></action>
+		 <!--根据时区来获取套餐价格  -->
+		<action path="/byTimeZoneGetMeal" type="com.wtwd.sys.appinterfaces.weitechao.ByTimeZoneGetMealAction"></action>
+
+        <!-- 设置用户首选距离单位 -->
+		<action path="/doUDU" type="com.wtwd.sys.appinterfaces.innerw.WTUduAction"></action>		
+
+        <!-- 电子围栏新增或者修改，包括围栏缩略图 -->
+		<action path="/doWTSFMn" type="com.wtwd.sys.appinterfaces.innerw.WTSFMnAction"></action>		
+        
+		<!-- 查询优惠码是否有效 -->
+		<action path="/selectPromotionCode" type="com.wtwd.sys.appinterfaces.weitechao.validPromotionCode"></action>
+		<!-- 优惠支付 -->
+		<action path="/specialPayforIccid" type="com.wtwd.sys.appinterfaces.weitechao.specialPayforIccidAction"></action>
+        
+
+        <!-- 内部高德定位接口 -->
+		<action path="/doWTGaodeInner" type="com.wtwd.sys.appinterfaces.innerw.WTGaodeInnerAction"></action>		
+
+        
+	</action-mappings>
+	<message-resources parameter="ApplicationResources" />
+</struts-config>

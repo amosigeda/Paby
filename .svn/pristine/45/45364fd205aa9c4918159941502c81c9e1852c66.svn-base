@@ -1,0 +1,36 @@
+package com.wtwd.pet.app.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wtwd.pet.app.dao.WDeviceEsafeMapper;
+import com.wtwd.pet.app.entity.WDeviceEsafe;
+import com.wtwd.pet.app.service.WDeviceEsafeService;
+
+@Service("wDeviceEsafeService")
+public class WDeviceEsafeServiceImpl implements WDeviceEsafeService {
+	
+	@Autowired
+	private WDeviceEsafeMapper deviceEsafeDao;
+	
+	public int insertData(WDeviceEsafe data) {
+		return deviceEsafeDao.insert(data);
+	}
+
+	public WDeviceEsafe getById(Integer data) {
+		return deviceEsafeDao.getById(data);
+	}
+
+    public int update(WDeviceEsafe entity) {
+    	return deviceEsafeDao.update(entity);
+    }
+
+    public int updateMsgInfoFlag(WDeviceEsafe data) {
+    	return deviceEsafeDao.updateMsgInfoFlag(data);
+    }
+    
+    public int insertSelectiveMsgInfo(WDeviceEsafe data) {
+    	return deviceEsafeDao.insertSelectiveMsgInfo(data);
+    }
+    
+}

@@ -1,0 +1,26 @@
+package com.wtwd.msger;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+
+import com.wtwd.pet.app.notify.App;
+
+@SuppressWarnings("serial")
+public class PetMsgerServlet extends HttpServlet {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -893584316979500075L;
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		// TODO Auto-generated method stub
+		super.init(config);
+		String dirBase  = config.getServletContext().getRealPath("/p12/");
+		App.start(dirBase);
+		
+	}
+
+}

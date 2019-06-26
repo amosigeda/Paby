@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <!-- liufeng -->
+    <bean id="wtAppQuestionInfoManDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapQuestionInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wtAppQuestionInfoManFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.WTAppQuestionInfoManFacadeImpl">
+				<property name="wtAppQuestionInfoManDao" ref="wtAppQuestionInfoManDao" />
+			</bean>
+		</property>
+	</bean>
+    
+    
+    <bean id="appUserDeviceLocationDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapAppUserDeviceLocationDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="appUserDeviceLocationFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.AppUserDeviceLocationFacadeImpl">
+				<property name="appUserDeviceLocationDao" ref="appUserDeviceLocationDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appUserDeviceTrackDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapAppUserDeviceTrackDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="appUserDeviceTrackFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.AppUserDeviceTrackFacadeImpl">
+				<property name="appUserDeviceTrackDao" ref="appUserDeviceTrackDao" />
+			</bean>
+		</property>
+	</bean>
+    
+    <bean id="appUserUploadLocationDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapAppUserUploadLocationDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="appUserUploadLocationFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.AppUserUploadLocationFacadeImpl">
+				<property name="appUserUploadLocationDao" ref="appUserUploadLocationDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appUserWiFiInfoDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapAppUserWiFiInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="appUserWiFiInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.AppUserWiFiInfoFacadeImpl">
+				<property name="appUserWiFiInfoDao" ref="appUserWiFiInfoDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appSafeAreaManDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapAppSafeAreaManDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="appSafeAreaManFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.AppSafeAreaManFacadeImpl">
+				<property name="appSafeAreaManDao" ref="appSafeAreaManDao" />
+			</bean>
+		</property>
+	</bean>
+    
+    <bean id="appDeviceDiscoveryManDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapAppDeviceDiscoveryManDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="appDeviceDiscoveryManFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.AppDeviceDiscoveryManFacadeImpl">
+				<property name="appDeviceDiscoveryManDao" ref="appDeviceDiscoveryManDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="wtDevSetaDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapDevSetaDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wtDevSetaFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.WTDevSetaFacadeImpl">
+				<property name="wtDevSetaDao" ref="wtDevSetaDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="wtCheckVersionDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapCheckVersionDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wtCheckVersionFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.WTCheckVersionFacadeImpl">
+				<property name="wtCheckVersionDao" ref="wtCheckVersionDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- feedbackinfo liufeng -->
+	<bean id="wSuggestionDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapSuggestionDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wSuggestionFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.WSuggestionFacadeImpl">
+				<property name="wSuggestionDao" ref="wSuggestionDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="wPetMoveInfoDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapWPetMoveInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wPetMoveInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.WPetMoveInfoFacadeImpl">
+				<property name="wPetMoveInfoDao" ref="wPetMoveInfoDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="wtAppMsgManDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapAppMsgManDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wtAppMsgManFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.WTAppMsgManFacadeImpl">
+				<property name="wtAppMsgManDao" ref="wtAppMsgManDao" />
+			</bean>
+		</property>
+	</bean>
+    
+    <bean id="wtSoundInfoDao"
+		class="com.wtwd.sys.innerw.liufeng.dao.ibatis.SqlMapWSoundInfoDao">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	<bean id="wSoundInfoFacade" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.wtwd.sys.innerw.liufeng.domain.logic.WSoundInfoFacadeImpl">
+				<property name="wtSoundInfoDao" ref="wtSoundInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+    
+</beans>

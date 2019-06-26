@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MediaInfo">
+
+	<select id="getMediaInfo_PK" resultClass="java.lang.String">
+		SELECT to_char(seq_MediaInfo.nextval,'0000000000') FROM DUAL;
+	</select>
+
+	<select id="getMediaInfoList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.mediainfo.domain.MediaInfo">
+		SELECT * FROM mediainfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>		
+	</select>
+
+	<select id="getMediaInfoListByVo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.mediainfo.domain.MediaInfo">
+		SELECT * FROM mediainfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+		     limit
+			<isNotEmpty prepend=" " property="from">
+				$from$
+			</isNotEmpty>
+				,
+			<isNotEmpty prepend=" " property="pageSize">
+				$pageSize$
+			</isNotEmpty>
+	</select>
+
+	<select id="getMediaInfoCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.mediainfo.domain.MediaInfo">
+		SELECT COUNT(*) FROM mediainfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<update id="updateMediaInfo" parameterClass="com.wtwd.sys.mediainfo.domain.MediaInfo">
+		UPDATE mediainfo
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="sendType">
+				send_type=#sendType#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+				status=#status#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<insert id="insertMediaInfo" parameterClass="com.wtwd.sys.mediainfo.domain.MediaInfo">
+		INSERT INTO mediainfo
+		(msg_content,from_id,to_id,send_type,send_time,status,time_length,belong_project) 
+		VALUES 
+		(#msgContent#,#fromId#,#toId#,#sendType#,#sendTime#,#status#,#timeLength#,#belongProject#)
+	</insert>
+
+	<delete id="deleteMediaInfo" parameterClass="com.wtwd.sys.mediainfo.domain.MediaInfo">
+		DELETE FROM mediainfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+</sqlMap>

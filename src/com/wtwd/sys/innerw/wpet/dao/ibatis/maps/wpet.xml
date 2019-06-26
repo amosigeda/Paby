@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="Wpet">
+	
+	<select id="getDogDataList" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		SELECT a.*, b.device_imei FROM wpets a left join 
+		wdevice_active_info b on a.device_id = b.device_id 
+		where pet_type >= "0"
+		<dynamic prepend="and"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getDogDataListByDevice" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		SELECT a.* FROM wpets a, wdevice_active_info b WHERE a.device_id = b.device_id AND a.pet_type >= "0"
+		<dynamic prepend="and"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getDogCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		SELECT COUNT(*) FROM wpets where pet_type >= "0"
+		<dynamic prepend="and"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>		
+	
+	<insert id="insertDog" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		INSERT INTO wpets (device_id, photo, nickname, born_date, sex, weight, sport_level, 
+			fat_level, fci_detail_all_catid, other_desc, weight_level_1_catid, sheight, sensitivity, 
+			user_id, is_healthy, time_zone, pet_type, weight_type) 
+		values ( #device_id#, #photo#, #nickname#,#born_date#, #sex#, #weight#, #sport_level#, 
+			#fat_level#, #fci_detail_all_catid#, #other_desc#, #weight_level_1_catid#, #sheight#,
+			#sensitivity#, #user_id#, #is_healthy#, #time_zone#, #pet_type#, #weight_type#)
+	</insert>
+
+	<update id="updateDogDeviceId" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		UPDATE wpets
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="device_id">
+				device_id=#device_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="photo">
+				photo=#photo#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="nickname">
+				nickname=#nickname#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="born_date">
+				born_date=#born_date#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sex">
+				sex=#sex#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sport_level">
+				sport_level=#sport_level#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fat_level">
+				fat_level=#fat_level#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fci_detail_all_catid">
+				fci_detail_all_catid=#fci_detail_all_catid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="weight_level_1_catid">
+				weight_level_1_catid=#weight_level_1_catid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="photo_time_stamp">
+				photo_time_stamp=#photo_time_stamp#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sheight">
+				sheight=#sheight#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sensitivity">
+				sensitivity=#sensitivity#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="is_healthy">
+				is_healthy=#is_healthy#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="time_zone">
+				time_zone=#time_zone#
+			</isNotEmpty>			
+			<isNotEmpty prepend="," property="pet_type">
+				pet_type=#pet_type#
+			</isNotEmpty>									
+		</dynamic>		
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	<update id="updateDog" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		UPDATE wpets
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="device_id">
+				device_id=#device_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="photo">
+				photo=#photo#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="nickname">
+				nickname=#nickname#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="born_date">
+				born_date=#born_date#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sex">
+				sex=#sex#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="weight">
+				weight=#weight#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="weight_type">
+				weight_type=#weight_type#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sport_level">
+				sport_level=#sport_level#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fat_level">
+				fat_level=#fat_level#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fci_detail_all_catid">
+				fci_detail_all_catid=#fci_detail_all_catid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fci_detail_all_catid">
+				other_desc=#other_desc#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="weight_level_1_catid">
+				weight_level_1_catid=#weight_level_1_catid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="photo_time_stamp">
+				photo_time_stamp=#photo_time_stamp#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sheight">
+				sheight=#sheight#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sensitivity">
+				sensitivity=#sensitivity#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="is_healthy">
+				is_healthy=#is_healthy#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="time_zone">
+				time_zone=#time_zone#
+			</isNotEmpty>			
+			<isNotEmpty prepend="," property="pet_type">
+				pet_type=#pet_type#
+			</isNotEmpty>									
+		</dynamic>		
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	<delete id="delPet" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		delete from wpets
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+	<delete id="delPetInfo" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		delete from wpets_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+	<delete id="delPetMoveInfo" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		delete from wpet_move_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+	<delete id="delPetSleepInfo" parameterClass="com.wtwd.sys.innerw.wpet.domain.Wpet">
+		delete from wpet_sleep_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+
+</sqlMap>

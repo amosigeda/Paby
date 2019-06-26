@@ -1,0 +1,502 @@
+package com.wtwd.sys.client.handler.helper;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.codec.binary.Base64;
+
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.lang.SystemException;
+import com.wtwd.common.bean.other.AppUserInfoAdr;
+import com.wtwd.common.bean.request.ReqJsonData;
+import com.wtwd.common.bean.response.RespJsonData;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.sys.appuserinfo.domain.AppUserInfo;
+import com.wtwd.sys.appuserinfo.domain.logic.AppUserInfoFacade;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+import com.wtwd.sys.deviceactiveinfo.domain.logic.DeviceActiveInfoFacade;
+import com.wtwd.sys.msginfo.domain.MsgInfo;
+import com.wtwd.sys.msginfo.domain.logic.MsgInfoFacade;
+import com.wtwd.sys.phoneinfo.domain.PhoneInfo;
+import com.wtwd.sys.phoneinfo.domain.logic.PhoneInfoFacade;
+import com.wtwd.sys.relativecallinfo.domain.RelativeCallInfo;
+import com.wtwd.sys.relativecallinfo.domain.logic.RelativeCallInfoFacade;
+import com.wtwd.sys.safearea.domain.SafeArea;
+import com.wtwd.sys.safearea.domain.logic.SafeAreaFacade;
+import com.wtwd.sys.saleinfo.domain.SaleInfo;
+import com.wtwd.sys.settinginfo.domain.SettingInfo;
+import com.wtwd.sys.settinginfo.domain.logic.SettingInfoFacade;
+import com.wtwd.sys.shareinfo.domain.ShareInfo;
+import com.wtwd.sys.shareinfo.domain.logic.ShareInfoFacade;
+import com.wtwd.sys.userlogininfo.domain.UserLoginInfo;
+import com.wtwd.utils.IPSeeker;
+
+public class AdragonUserHandlerHelper {
+	
+	private static ServiceBean serviceBean = ServiceBean.getInstance();
+	
+	//注册
+	public static RespJsonData userAdrRegister(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;	
+		Date date = new Date();
+		
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userName = reqJsonData.getUser_name();
+		String password = reqJsonData.getUser_password();
+		String userImei = reqJsonData.getUser_imei();
+		if(userImei==null || "".equals(userImei)){
+			userImei = "000000000000000";
+		}	
+		String phone_model = reqJsonData.getPhone_model();
+		String phone_version = reqJsonData.getPhone_version();
+		String app_version = reqJsonData.getApp_version();
+		String user_phone = reqJsonData.getUser_phone();
+		AppUserInfo userInfo = new AppUserInfo();
+		if(userName!=null && !"".equals(userName)){
+			userInfo.setCondition("user_name='"+userName+"'");
+		}	
+		AppUserInfoFacade appUserInfoFacade =serviceBean.getAppUserInfoFacade();
+		List<DataMap> appUserInfos = appUserInfoFacade.getAppUserInfo(userInfo);
+		if(appUserInfos.size()<=0){
+			userInfo.setHead("0");
+			userInfo.setAge("2015-12-12");
+			userInfo.setNickName(userName);
+			userInfo.setPassword(password);						
+			userInfo.setCreateTime(date);
+			userInfo.setLastLoginTime(date);
+			userInfo.setSex("0");
+			userInfo.setStatus("1");
+			userInfo.setUserHeight("160");
+			userInfo.setUserName(userName);
+			userInfo.setUserWeight("70");
+			userInfo.setBelongProject("1"); //暂时设定为1
+			userInfo.setBindCount("0");
+			appUserInfoFacade.insertAppUserInfo(userInfo);
+						
+			List<DataMap> appUserInfo = appUserInfoFacade.getAppUserInfo(userInfo);
+			if(!appUserInfo.isEmpty()){
+				String user_id = appUserInfo.get(0).getAt("id").toString();
+				respJsonData.setUser_id(user_id);
+			}
+			String ip="";
+			String province = "";						
+			SaleInfo saleInfo = new SaleInfo();		
+			saleInfo.setUserName(userName);		
+			saleInfo.setImei(userImei);		
+			saleInfo.setImsi(userImei);		
+			saleInfo.setPhone(user_phone);		
+			saleInfo.setPhoneModel(phone_model);		
+			saleInfo.setSysVersion(phone_version);		
+			saleInfo.setDateTime(new Date());		
+			saleInfo.setIp(ip);		
+			saleInfo.setProvince(province);		
+			saleInfo.setBelongProject("1");		
+			saleInfo.setAppVersion(app_version);		
+					
+			ServiceBean.getSaleInfoFacade().insertSaleInfo(saleInfo);
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//登录
+	public static RespJsonData userAdrLogin(ReqJsonData reqJsonData) throws SystemException{
+		int result=0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userName = reqJsonData.getUser_name();
+		String password = reqJsonData.getUser_password();
+		String belongProject = reqJsonData.getB_g();
+		if(belongProject==null||belongProject==""){
+			belongProject = "0";
+		}
+		String userImei = reqJsonData.getUser_imei();
+		if(userImei==null||userImei==""){
+			userImei = "0";
+		}
+		String userImsi = reqJsonData.getUser_imsi();
+		if(userImsi==null||userImsi==""){
+			userImsi = "0";
+		}
+		String phoneModel = reqJsonData.getPhone_model();
+		String phoneVersion = reqJsonData.getPhone_version();
+		String appVersion = reqJsonData.getApp_version();
+		String type = reqJsonData.getType();
+		
+		AppUserInfo appUserInfo = new AppUserInfo();
+		if(userName!=null && !"".equals(userName)){
+			appUserInfo.setCondition("user_name ='"+userName+"' and belong_project=+'"+belongProject+"'");
+		}
+		AppUserInfoFacade appUserInfoFacade = serviceBean.getAppUserInfoFacade();
+		List<DataMap> appUserInfos = appUserInfoFacade.getAppUserInfo(appUserInfo);
+		
+		String userId="";
+		if(appUserInfos.size()>0){
+			appUserInfos.clear();
+			appUserInfo.setCondition("user_name='"+userName+"' and password='"+password+"' and belong_project = '"+belongProject+"'");
+			appUserInfos = appUserInfoFacade.getAppUserInfo(appUserInfo);
+			if(appUserInfos.size()>0){
+				AppUserInfoAdr appUserInfoAdr = new AppUserInfoAdr();
+				List<AppUserInfoAdr> appUserInfoAdrs = new ArrayList<AppUserInfoAdr>();
+				userId = appUserInfos.get(0).getAt("id").toString();
+				appUserInfoAdr.setUser_id(userId);
+				appUserInfoAdr.setUser_nick(appUserInfos.get(0).getAt("nick_name").toString());
+				appUserInfoAdr.setUser_sex(appUserInfos.get(0).getAt("sex").toString());
+				appUserInfoAdr.setUser_age(appUserInfos.get(0).getAt("age").toString());
+				appUserInfoAdr.setUser_height(appUserInfos.get(0).getAt("height").toString());
+				appUserInfoAdr.setUser_weight(appUserInfos.get(0).getAt("weight").toString());
+				appUserInfoAdr.setUser_head(appUserInfos.get(0).getAt("head").toString());
+				appUserInfoAdrs.add(appUserInfoAdr);
+				
+				respJsonData.setAppUserInfo(appUserInfoAdrs);
+				result = Constant.SUCCESS_CODE;
+				
+				String dir = "";
+				String fileName = ""; //找到文件的名字
+		 	    IPSeeker ipSeeker = new IPSeeker(fileName,dir);   //ip数据库的地址和要存储的地址  
+				String ip ="";
+				String province = ipSeeker.getIPLocation(ip).getCountry();
+				
+				UserLoginInfo userLogin = new UserLoginInfo();
+				userLogin.setUserId(Integer.parseInt(userId));
+				userLogin.setLoginTime(new Date());
+				userLogin.setImei(userImei);
+				userLogin.setImsi(userImsi);
+				userLogin.setPhoneModel(phoneModel);
+				userLogin.setPhoneVersion(phoneVersion);
+				userLogin.setAppVersion(appVersion);
+				userLogin.setIp(ip);
+				userLogin.setProvince(province);
+				userLogin.setBelongProject(belongProject);
+				serviceBean.getUserLoginInfoFacade().insertUserLoginInfo(userLogin);
+			}else{
+				result = Constant.FAIL_CODE;
+			}		
+		}else{
+			result = 2;
+		}	
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;		
+	}
+	
+	//用户信息修改
+	public static RespJsonData modifyAdrUser(ReqJsonData reqJsonData,String serviceName) throws Exception{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userId = reqJsonData.getUser_id();
+		String userName = reqJsonData.getUser_name();
+		String head = reqJsonData.getUser_head();
+		String sex = reqJsonData.getUser_sex();
+		String age = reqJsonData.getUser_age();
+		String height = reqJsonData.getUser_height();
+		String weight = reqJsonData.getUser_weight();
+		
+		AppUserInfo appUserInfo = new AppUserInfo();		
+		if(!"0".equals(head)){
+			String path = "" + userId;
+			Constant.deleteFile(path);  
+			
+			String fileName = Constant.getUniqueCode(userId) + ".png";		
+			Constant.createFileContent(path, fileName, Base64.decodeBase64(head));
+			
+			String url = "http://" +serviceName +":";
+			int port = 0;
+			String downloadpath = "" + Constant.USER_SAVE + userId + "/" +fileName;
+			head = Constant.getDownloadPath(url, String.valueOf(port), downloadpath);
+			appUserInfo.setHead(head);						
+		}
+		
+		userName = Constant.transCodingToUtf(userName); 
+		appUserInfo.setNickName(userName);
+		appUserInfo.setSex(sex);
+		appUserInfo.setAge(age);
+		appUserInfo.setUserHeight(height);
+		appUserInfo.setUserWeight(weight);	
+		
+		int num = serviceBean.getAppUserInfoFacade().updateAppUserInfo(appUserInfo);
+		if(num > 0){
+			result = Constant.SUCCESS_CODE;					
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//设备验证
+	public static RespJsonData verifyAdrDevice(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userId = reqJsonData.getUser_id();
+		String deviceImei = reqJsonData.getSerie_no();
+		String belongProject = reqJsonData.getB_g();
+		if(userId!=null && !"".equals(userId) && deviceImei!=null && !"".equals(deviceImei)){
+			
+			AppUserInfo appUser = new AppUserInfo();
+			appUser.setCondition("id='"+userId+"'");
+			List<DataMap> appUserList = serviceBean.getAppUserInfoFacade().getAppUserInfo(appUser);
+			if(appUserList.size() > 0){
+				PhoneInfo phoneInfo = new PhoneInfo(); 
+				DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+				ShareInfo shareInfo = new ShareInfo(); 
+				PhoneInfoFacade phoneInfoFacade = serviceBean.getPhoneInfoFacade();																				
+				phoneInfo.setCondition("serie_no = '"+deviceImei+"' and belong_project='"+belongProject+"'");
+				List<DataMap> phoneInfos = phoneInfoFacade.getPhoneInfo(phoneInfo);
+				
+				deviceActiveInfo.setCondition("device_imei='"+deviceImei+"' and belong_project='"+belongProject+"'");
+				DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+				List<DataMap> deviceActiveInfos = deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+				if(phoneInfos.size()<0){
+					result = Constant.BOND_FAIL_NO; 
+				}else{
+					if(deviceActiveInfos.size()>0){
+						String deviceDisable =""+deviceActiveInfos.get(0).getAt("device_disable");
+						String count = ""+deviceActiveInfos.get(0).getAt("count").toString();
+						
+						if("1".equals(deviceDisable)){
+							result =Constant.BOND_FAIL_ALREADY;
+						}else if("0".equals(deviceDisable)){
+							deviceActiveInfo.setCount(String.valueOf(Integer.valueOf(count)+1));
+							deviceActiveInfo.setDeviceDisable("1");
+							deviceActiveInfo.setUserId(userId);
+							deviceActiveInfoFacade.updateDeviceActiveInfo(deviceActiveInfo);
+							
+							phoneInfo.setStatus("2"); 
+							phoneInfo.setSerieNo(deviceImei);
+							phoneInfoFacade.updatePhoneInfo(phoneInfo);
+							
+							shareInfo.setDeviceId(deviceImei);
+							shareInfo.setUserId(userId);
+							shareInfo.setToUserId(userId);
+							shareInfo.setIsPriority("1");
+							shareInfo.setShareDate(new Date());
+							shareInfo.setBelongProject(belongProject);
+							serviceBean.getShareInfoFacade().insertShareInfo(shareInfo);
+							
+							SettingInfo settingInfo = new SettingInfo();
+							settingInfo.setSerieNo(deviceImei);
+							settingInfo.setVolume(30);
+							settingInfo.setLight("0");
+							settingInfo.setMap("0");
+							settingInfo.setFallOn("0");
+							settingInfo.setGps_on("0");   //默认关闭
+							settingInfo.setBelongProject(belongProject);
+							settingInfo.setAutoMute("0");
+							settingInfo.setPowerOff("0");
+							ServiceBean.getInstance().getSettingInfoFacade().insertSettingInfo(settingInfo);
+							result = Constant.SUCCESS_CODE;									
+						}
+					}else{
+						String device_phone = ""+ phoneInfos.get(0).getAt("phone");				
+						deviceActiveInfo.setDeviceAge("2015-12-12");
+						deviceActiveInfo.setDeviceDisable("1");
+						deviceActiveInfo.setCount("1");
+						deviceActiveInfo.setDeviceHead("0");
+						deviceActiveInfo.setDeviceHeight("170");
+						deviceActiveInfo.setDeviceImei(deviceImei);
+						deviceActiveInfo.setDeviceName("0");
+						deviceActiveInfo.setDevicePhone(device_phone);
+						deviceActiveInfo.setDeviceSex("0");
+						deviceActiveInfo.setDeviceUpdateTime(new Date());
+						deviceActiveInfo.setDeviceWeight("170");
+						deviceActiveInfo.setUserId(userId);
+						deviceActiveInfo.setBelongProject(belongProject);
+						deviceActiveInfoFacade.insertDeviceActiveInfo(deviceActiveInfo);
+														
+						phoneInfo.setStatus("2"); 
+						phoneInfo.setSerieNo(deviceImei);
+						serviceBean.getPhoneInfoFacade().updatePhoneInfo(phoneInfo);
+						List<DataMap> deviceInfos = serviceBean.getDeviceActiveInfoFacade().getDeviceActiveInfo(deviceActiveInfo);
+						if(deviceInfos.size()>0){
+							
+						}
+						
+						shareInfo.setDeviceId(deviceImei);
+						shareInfo.setUserId(userId);
+						shareInfo.setToUserId(userId);  
+						shareInfo.setIsPriority("1");    
+						shareInfo.setShareDate(new Date());  
+						shareInfo.setBelongProject(belongProject);
+						
+						serviceBean.getShareInfoFacade().insertShareInfo(shareInfo);								
+					}
+				}
+				
+				if(result == 1){
+					if(appUserList.size() > 0){
+						String bindCount = (String)appUserList.get(0).getAt("bind_count");
+						appUser.setBindCount(String.valueOf(Integer.parseInt(bindCount) + 1));
+						serviceBean.getAppUserInfoFacade().updateAppUserInfo(appUser);
+					}
+						
+					DeviceActiveInfo da = new DeviceActiveInfo();
+					da.setDeviceImei(deviceImei);
+					da.setBelongProject(belongProject);
+					da.setUserId(userId);
+					da.setDeviceDisable("1");
+					da.setDeviceUpdateTime(new Date());
+					serviceBean.getDeviceActiveInfoFacade().insertDeviceActiveHistory(da);
+				}
+			}
+		
+		}	
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;		
+	}
+	
+	//添加宝贝
+	public static RespJsonData addAdragonDevice(ReqJsonData reqJsonData,String serverName) throws IOException, SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String deviceImei = reqJsonData.getDevice_imei();
+		String deviceName = reqJsonData.getDevice_name();
+		String devicePhone = reqJsonData.getDevice_phone();
+		String head = reqJsonData.getUser_head();
+		String sex = reqJsonData.getUser_sex();
+		String age = reqJsonData.getUser_age();
+		String height = reqJsonData.getUser_height();
+		String weight = reqJsonData.getUser_weight();
+		String belongProject = reqJsonData.getB_g();
+		
+		if (sex == null) sex = "0";
+		if (age == null) age = "2015-12-12";
+		if (height == null) height = "170";
+		if (weight == null) weight = "100";
+		
+		if(userId!=null && !"".equals(userId) && deviceImei!=null && !"".equals(deviceImei)){
+			
+			deviceName = Constant.transCodingToUtf(deviceName);
+			
+			PhoneInfo phoneInfo = new PhoneInfo();
+			phoneInfo.setCondition("serie_no ='"+deviceImei+"'");
+			PhoneInfoFacade phoneInfoFacade = serviceBean.getPhoneInfoFacade();
+			List<DataMap> phoneInfos = phoneInfoFacade.getPhoneInfo(phoneInfo);
+			if(phoneInfos.size()<=0){
+				result = Constant.BOND_FAIL_NO;
+			}else{
+				DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+				deviceActiveInfo.setCondition("device_imei ='"+deviceImei+"' and belong_project='"+belongProject+"' and device_disable = '1'");
+				DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+				List<DataMap> deviceActiveInfos =deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+				if(deviceActiveInfos.size()>0){
+					if(!"0".equals(head)){
+						String path ="";
+						Constant.deleteFile(path); 
+						
+						String fileName = Constant.getUniqueCode(deviceImei) + ".png";			
+						Constant.createFileContent(path, fileName, Base64.decodeBase64(head));
+						
+						String url = "http://" +serverName +":";
+						deviceActiveInfo.setDeviceHead(head);
+					}		
+					deviceActiveInfo.setDeviceAge(age);
+					deviceActiveInfo.setDeviceHeight(height);
+					deviceActiveInfo.setDeviceName(deviceName);
+					deviceActiveInfo.setDeviceSex(sex);
+					deviceActiveInfo.setDeviceWeight(weight);		
+					deviceActiveInfo.setDevicePhone(devicePhone);
+					deviceActiveInfoFacade.updateDeviceActiveInfo(deviceActiveInfo);
+					phoneInfo.setPhone(devicePhone);
+					phoneInfoFacade.updatePhoneInfo(phoneInfo);
+					result = Constant.SUCCESS_CODE;  
+				}
+			}
+		}
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//删除宝贝
+	public static RespJsonData deleteAdrDevice(ReqJsonData reqJsonData) throws SystemException{
+		int result=0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String deviceImei = reqJsonData.getDevice_imei();
+		String belongProject = reqJsonData.getB_g();
+		
+		DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+		deviceActiveInfo.setDeviceDisable("0");
+		deviceActiveInfo.setDeviceAge("2015-12-12");
+		deviceActiveInfo.setDeviceHead("0");
+		deviceActiveInfo.setDeviceHeight("170");
+		deviceActiveInfo.setDeviceName("0");
+		deviceActiveInfo.setDevicePhone("0");
+		deviceActiveInfo.setDeviceSex("0");
+		deviceActiveInfo.setDeviceWeight("170");
+		deviceActiveInfo.setUserId("0");
+		
+		deviceActiveInfo.setCondition("user_id='"+userId+"' and device_imei='"+deviceImei+"' and belong_project='"+belongProject+"'");		
+		DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+		deviceActiveInfoFacade.updateDeviceActiveInfo(deviceActiveInfo);
+		
+		RelativeCallInfo relativeCallInfo = new RelativeCallInfo();
+		relativeCallInfo.setCondition("user_id ='"+userId+"' and serie_no ='"+deviceImei+"' and belong_project='"+belongProject+"'");
+		RelativeCallInfoFacade relativeCallInfoFacade = serviceBean.getRelativeCallInfoFacade();
+		relativeCallInfoFacade.deleteRelativeCallInfo(relativeCallInfo);
+		
+		SafeArea safeArea = new SafeArea();
+		safeArea.setCondition("user_id ='"+userId+"' and seri_no ='"+deviceImei+"' and belong_project='"+belongProject+"'");
+		SafeAreaFacade safeAreaFacade = serviceBean.getSafeAreaFacade();
+		safeAreaFacade.deleteSafeArea(safeArea);
+		
+		SettingInfo settingInfo = new SettingInfo();
+		settingInfo.setCondition("serie_no ='"+deviceImei+"' and belong_project='"+belongProject+"'");
+		SettingInfoFacade settingInfoFacade = serviceBean.getSettingInfoFacade();
+		settingInfoFacade.deleteSettingInfo(settingInfo);
+		
+		ShareInfo shareInfo = new ShareInfo();
+		shareInfo.setCondition("user_id ='"+userId+"' and device_imei='"+deviceImei+"' and belong_project='"+belongProject+"'");
+		ShareInfoFacade shareInfoFacade = serviceBean.getShareInfoFacade();
+		shareInfoFacade.deleteShareInfo(shareInfo);
+		
+		
+		String deletePath ="";
+		Constant.deleteFile(deletePath);
+		
+		PhoneInfo phoneInfo = new PhoneInfo();
+		phoneInfo.setStatus("3");   
+		phoneInfo.setRelativeCallStatus("1");
+		phoneInfo.setCondition("serie_no='"+deviceImei+"' and belong_project='"+belongProject+"'");
+		PhoneInfoFacade phoneInfoFacade = ServiceBean.getInstance().getPhoneInfoFacade();
+		phoneInfoFacade.updatePhoneInfo(phoneInfo);
+		
+		result = Constant.SUCCESS_CODE;
+				
+		MsgInfo msgInfo = new MsgInfo();
+		msgInfo.setToId(userId);
+		msgInfo.setFromId(userId);
+		msgInfo.setIsHandler("0"); // 未处理
+		msgInfo.setMsgLevel("1"); // 级别较高
+		msgInfo.setMsgContent("1@" + deviceImei + "@" + "0");
+		msgInfo.setMsgHandlerDate(new Date());
+		msgInfo.setBelongProject(belongProject);
+		MsgInfoFacade msgInfoFacade = serviceBean.getMsgInfoFacade();
+		msgInfoFacade.insertMsgInfo(msgInfo);
+			
+		deviceActiveInfo = new DeviceActiveInfo();
+		deviceActiveInfo.setDeviceImei(deviceImei);
+		deviceActiveInfo.setBelongProject(belongProject);
+		deviceActiveInfo.setUserId(userId);
+		deviceActiveInfo.setDeviceDisable("0");
+		deviceActiveInfo.setDeviceUpdateTime(new Date());		
+		deviceActiveInfoFacade.insertDeviceActiveInfo(deviceActiveInfo);
+		
+		return respJsonData;
+	}
+}

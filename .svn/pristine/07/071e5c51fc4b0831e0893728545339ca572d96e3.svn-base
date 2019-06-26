@@ -1,0 +1,20 @@
+package com.wtwd.pet.app.service;
+
+import java.util.List;
+
+import com.wtwd.pet.app.entity.WDeviceActiveInfo;
+
+public interface WDeviceActiveInfoService {
+
+	public List<WDeviceActiveInfo> queryDataList();
+	public int updateOffline();
+	public List<WDeviceActiveInfo> searchOffline();
+
+    public List<WDeviceActiveInfo> getShareUser(Integer id);
+    public List<WDeviceActiveInfo> getPetUserr(Integer id);
+        
+    public List<WDeviceActiveInfo> getUnpushMsg();
+
+    public int updateMsgPushStatus(Integer[] data);
+    
+}

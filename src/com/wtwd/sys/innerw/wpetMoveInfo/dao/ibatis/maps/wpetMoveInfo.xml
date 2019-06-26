@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="WpetMoveInfo">
+
+    <!-- 返回结果集 -->  
+
+
+	
+	<select id="getWpetMoveInfoData" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetMoveInfo">
+		select a.*, c.device_imei FROM wpet_move_info  a left join wpets b on b.pet_id = a.pets_pet_id left join wdevice_active_info c on b.device_id = c.device_id 
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getWpetMoveInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetMoveInfo">
+		SELECT * FROM wpet_move_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>	
+	
+	<insert id="insertWpetMoveInfo" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetMoveInfo">
+		INSERT INTO wpet_move_info(pets_pet_id,step_number,route,calories,speed,up_time,start_time,end_time) 
+		VALUES (#pets_pet_id#,#step_number#,#route#,#calories#,#speed#,#up_time#,#start_time#,#end_time#)
+	</insert>
+	
+	<insert id="insertWpetMoveInfoBatch" parameterClass="java.util.List">
+		INSERT INTO wpet_move_info(pets_pet_id,step_number,route,calories,speed,up_time,start_time,end_time) VALUES
+		<iterate conjunction=",">
+		(#voList[].pets_pet_id#,#voList[].step_number#,#voList[].route#,#voList[].calories#,#voList[].speed#,#voList[].up_time#,#voList[].start_time#,#voList[].end_time#)
+		</iterate>
+	</insert>
+
+
+    <!-- 不需要使用 -->  
+	<insert id="insertWpetMoveInfoBatchMT" parameterClass="java.util.List">
+		INSERT INTO wpet_move_info(pets_pet_id,step_number,route,calories,speed,up_time,start_time,end_time) VALUES
+		<iterate conjunction=",">
+		(#voList[].pets_pet_id#,#voList[].step_number#,#voList[].route#,#voList[].calories#,#voList[].speed#,#voList[].up_time#,#voList[].start_time#,#voList[].end_time#)
+		</iterate>
+	</insert>
+
+	
+    <update id="updateWpetMoveInfo" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetMoveInfo">
+		UPDATE wpet_move_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="step_number">
+				step_number=#step_number#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="route">
+				route=#route#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="calories">
+				calories=#calories#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="speed">
+				speed=#speed#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="up_time">
+				up_time=#up_time#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="start_time">
+				start_time=#start_time#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="end_time">
+				end_time=#end_time#
+			</isNotEmpty>												
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update> 
+	
+    
+    <parameterMap id="ParameterMap" class="java.util.HashMap">  
+        <parameter property="rpet_id" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rup_time" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rrecMoveType" jdbcType="VARCHAR" javaType="java.lang.String" mode="OUT"/>  
+        <parameter property="rrecMoveTime" jdbcType="INTEGER" javaType="java.lang.Integer" mode="OUT"/>  
+    </parameterMap>  
+
+    <procedure id="call_calcSugMove" parameterMap="ParameterMap"> 
+        {call calcSugMove(?,?,?,?)} 
+    </procedure>
+
+    <parameterMap id="ParameterSugExec" class="java.util.HashMap">  
+        <parameter property="rpet_id" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rup_time" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+    </parameterMap>  
+
+    <parameterMap id="ParameterSugExecSe" class="java.util.HashMap">  
+        <parameter property="rpet_id" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rstime" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="retime" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+    </parameterMap>  
+
+    <procedure id="call_calcSugExec" parameterMap="ParameterSugExec"> 
+        {call calcSugExec(?,?)} 
+    </procedure>
+
+    <procedure id="call_calcSugExecSe" parameterMap="ParameterSugExecSe"> 
+        {call calcSugExecSe(?,?,?)} 
+    </procedure>
+
+    <procedure id="mycatCalcSugExecSe" resultClass="java.lang.Integer"  parameterMap="ParameterSugExecSe">  <!-- statementType="CALLABLE" -->  
+       /*!mycat:sql=select * from wdevice_active_info where device_id > 0 */{call calcSugExecSe(?,?,?)};   
+    </procedure> 
+
+	
+    <parameterMap id="ParameterSugExecList" class="java.util.HashMap">  
+        <parameter property="rpet_id" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rstart_day" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rend_day" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+    </parameterMap>  
+
+    <procedure id="call_calcSugExecList" parameterMap="ParameterSugExecList"> 
+        {call calcSugExecList(?,?,?)} 
+    </procedure>
+
+    <parameterMap id="ParameterSugExecListSe" class="java.util.HashMap">  
+        <parameter property="rpet_id" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rend_day" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+    </parameterMap>  
+
+    <procedure id="call_calcSugExecListSe" parameterMap="ParameterSugExecListSe"> 
+        {call calcSugExecListSe(?,?)} 
+    </procedure>
+
+    <procedure id="mycatCalcSugExecListSe" resultClass="java.lang.Integer"  parameterMap="ParameterSugExecListSe">  <!-- statementType="CALLABLE" -->  
+       /*!mycat:sql=select * from wdevice_active_info where device_id > 0 */{call calcSugExecListSe(?,?)};   
+    </procedure> 
+
+    
+    <parameterMap id="ParameterSugExecMon" class="java.util.HashMap">  
+        <parameter property="rpet_id" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rstart_mon" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+        <parameter property="rend_mon" jdbcType="VARCHAR" javaType="java.lang.String" mode="IN"/>  
+    </parameterMap>  
+
+    <procedure id="call_calcSugExecMon" parameterMap="ParameterSugExecMon"> 
+        {call calcSugExecByMonth(?,?,?)} 
+    </procedure>
+
+    <procedure id="call_calcSugExecMonSe" parameterMap="ParameterSugExecMon"> 
+        {call calcSugExecByMonthSe(?,?,?)} 
+    </procedure>
+
+    <procedure id="mycatCalcSugExecMonSe" resultClass="java.lang.Integer"  parameterMap="ParameterSugExecMon">  <!-- statementType="CALLABLE" -->  
+       /*!mycat:sql=select * from wdevice_active_info where device_id > 0 */{call calcSugExecByMonthSe(?,?,?)};   
+    </procedure> 
+
+
+	<select id="getOneSugExecByMon" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetMoveInfo">
+		select pet_id, step_number as step_move, DATE_FORMAT(monStr,'%Y-%m') as mon from wPetSugMoveMonRep 
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+<!-- table: wpet_sleep_info -->
+	<select id="getWpetSleepInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetSleepInfo">
+		SELECT * FROM wpet_sleep_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>	
+	
+	<insert id="insertWpetSleepInfo" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetSleepInfo">
+		INSERT INTO wpet_sleep_info(pets_pet_id,step_number,speed,up_time,start_time,end_time) 
+		VALUES (#pets_pet_id#,#step_number#,#speed#,#up_time#,#start_time#,#end_time#)
+	</insert>
+	
+	<insert id="insertWpetSleepInfoBatch" parameterClass="java.util.List">
+		INSERT INTO wpet_sleep_info(pets_pet_id,step_number,speed,up_time,start_time,end_time) VALUES
+		<iterate conjunction=",">
+		(#voList[].pets_pet_id#,#voList[].step_number#,#voList[].speed#,#voList[].up_time#,#voList[].start_time#,#voList[].end_time#)
+		</iterate>
+	</insert>
+
+    <update id="updateWpetSleepInfo" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetSleepInfo">
+		UPDATE wpet_sleep_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="step_number">
+				step_number=#step_number#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="speed">
+				speed=#speed#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="up_time">
+				up_time=#up_time#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="start_time">
+				start_time=#start_time#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="end_time">
+				end_time=#end_time#
+			</isNotEmpty>												
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update> 
+
+	<select id="getPetMoveMsgStatus" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetMoveInfo">
+		SELECT distinct pet_id, msg_type, up_time FROM wPetMoveMsgStatus
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>	
+	<insert id="insertPetMoveMsgStatus" parameterClass="com.wtwd.sys.innerw.wpetMoveInfo.domain.WpetMoveInfo">
+		INSERT INTO wPetMoveMsgStatus(pet_id,msg_type,up_time) 
+		VALUES (#pet_id#,#msg_type#,#up_time#)
+	</insert>
+	
+
+</sqlMap>

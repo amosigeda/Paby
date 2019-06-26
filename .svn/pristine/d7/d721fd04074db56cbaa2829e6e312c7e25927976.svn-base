@@ -1,0 +1,146 @@
+package com.wtwd.sys.appinterfaces;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.log.LogFactory;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+import com.wtwd.sys.directiveinfo.domain.DirectiveInfo;
+import com.wtwd.sys.directiveinfo.domain.logic.DirectiveInfoFacade;
+import com.wtwd.sys.phoneinfo.domain.PhoneInfo;
+import com.wtwd.sys.phoneinfo.domain.logic.PhoneInfoFacade;
+import com.wtwd.sys.settinginfo.domain.SettingInfo;
+import com.wtwd.sys.settinginfo.domain.logic.SettingInfoFacade;
+
+public class doGetFallAction extends BaseAction {
+	Log logger = LogFactory.getLog(ListenAction.class);
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		String href = request.getServletPath();
+		Date start = new Date();
+		JSONObject json = new JSONObject();
+		try {
+			ServletInputStream input = request.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					input));
+			StringBuffer sb = new StringBuffer();
+			String online = "";
+			while ((online = reader.readLine()) != null) {
+				sb.append(online);
+			}
+			JSONObject object = JSONObject.fromObject(sb.toString());
+			String user_id = object.has("user_id") ? object
+					.getString("user_id") : "-1";
+			String serial_number = object.getString("serie_no");
+			String belongProject = object.getString("belong_project");
+			String fallOn = object.has("fallOn") ? object.getString("fallOn") : "0"; // 之前版本兼容,0表示关闭,1表示打开
+
+			if (user_id.equals("-1")) {
+				DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+				deviceActiveInfo.setCondition("device_imei ='" + serial_number
+						+ "' and belong_project='" + belongProject + "'"); // 鍒ゅ畾鏉′欢
+				List<DataMap> deviceList = ServiceBean.getInstance()
+						.getDeviceActiveInfoFacade()
+						.getDeviceActiveInfo(deviceActiveInfo);
+				int size = deviceList.size();
+				if (size > 0) {
+					user_id = "" + deviceList.get(0).getAt("user_id");
+				}
+			}
+			if(!user_id.equals("-1")){
+				SettingInfo vo = new SettingInfo();
+				vo.setCondition("serie_no = '" + serial_number
+						+ "' and belong_project='" + belongProject + "'");
+				DirectiveInfo dvo = new DirectiveInfo();
+				dvo.setCondition("serie_no = '" + serial_number
+						+ "' and belong_project='" + belongProject + "'");
+				PhoneInfo pvo = new PhoneInfo();
+				pvo.setCondition("serie_no = '" + serial_number
+						+ "' and belong_project='" + belongProject + "'");
+				json.put("request", href);
+
+				SettingInfoFacade facade = ServiceBean.getInstance()
+						.getSettingInfoFacade();
+				DirectiveInfoFacade dfacade = ServiceBean.getInstance()
+						.getDirectiveInfoFacade();
+				PhoneInfoFacade pfacade = ServiceBean.getInstance()
+						.getPhoneInfoFacade();
+				
+				List<DataMap> list = facade.getSettingInfo(vo);// �������Ƿ������
+				if (list.size() > 0) {
+					vo.setFallOn(fallOn);
+					facade.updateSettingInfo(vo);
+					
+					String fall = (String) list.get(0).getAt("fall");
+					String gps_on = (String) list.get(0).getAt("gps_on");
+					json.put("fall", fall); // 1表示戴上,0表示脱落
+					json.put("gps_on", gps_on);
+					List<DataMap> dlist = dfacade.getDirectiveInfo(dvo);
+					if (dlist.size() > 0) {
+						String isLow = (String) dlist.get(0).getAt("isLow");
+						String lowelectricity = (String) dlist.get(0).getAt(
+								"lowelectricity");
+						json.put("lowelectricity", lowelectricity);
+						json.put("isLow", isLow);
+					}
+					List<DataMap> plist = pfacade.getPhoneInfo(pvo);
+					if (plist.size() > 0) {
+						String repellent = (String) plist.get(0).getAt(
+								"repellent");
+						json.put("repellent", repellent);
+					}
+					result = Constant.SUCCESS_CODE;
+				} else {
+					result = Constant.SUCCESS_CODE;
+				}
+			}
+			
+			insertVisit(href, belongProject, user_id, 0, start, new Date());			
+		} catch (Exception e) {
+			e.printStackTrace();
+			StringBuffer sb = new StringBuffer();
+			Writer writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Throwable cause = e.getCause();
+			while (cause != null) {
+				cause.printStackTrace(printWriter);
+				cause = cause.getCause();
+			}
+			printWriter.close();
+			String resultSb = writer.toString();
+			sb.append(resultSb);
+
+			logger.error(e);
+			result = Constant.EXCEPTION_CODE;
+			json.put(Constant.EXCEPTION, sb.toString());
+		}
+		json.put(Constant.RESULTCODE, result);
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json.toString());
+		return null;
+	}
+
+}

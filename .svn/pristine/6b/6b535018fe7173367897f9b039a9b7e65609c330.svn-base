@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="WdeviceActiveInfo">
+	
+
+<!-- 
+     <select id="getTestCount" parameterMap="getTestCountMap" statementType="CALLABLE">
+         CALL new_procedure(?,?)
+     </select>
+     <parameterMap type="java.util.Map" id="getTestCountMap">
+         <parameter property="sexid" mode="IN" jdbcType="STRING"/>
+         <parameter property="usercount" mode="OUT" jdbcType="INTEGER"/>
+     </parameterMap>
+
+
+    <select id="getTestCount" parameterType="java.util.Map" statementType="CALLABLE"  
+   resultMap="nameResult">  
+   {call new_procedure(  
+     #{sexid,jdbcType=INTEGER,mode=IN},  
+     #{usercount,jdbcType=INTEGER,mode=OUT})}  
+   </select>  
+  -->
+  
+  <!-- 存储过程示例，OK 
+  <parameterMaps>  
+   <parameterMap id="user_req" class="java.util.HashMap">  
+       <parameter property="sexid" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>  
+       <parameter property="usercount" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>  
+    </parameterMap>
+  </parameterMaps>  
+  -->   
+
+
+	<select id="getData" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		SELECT * FROM wdevice_active_info 
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="device_disable">
+				device_disable = $device_disable$
+			</isNotEmpty>			
+		</dynamic>
+	</select>
+     <parameterMap id="user_req" class="java.util.HashMap">  
+       <parameter property="sex_id" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>  
+       <parameter property="user_count" javaType="java.lang.Integer" jdbcType="INT" mode="OUT"/>  
+    </parameterMap>
+    <procedure id="getTestCount" parameterMap="user_req"> 
+        {call new_procedure(?,?)} 
+    </procedure>
+
+
+<select id="getWdeviceActiveInfo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		SELECT a.*, b.esafe_on,b.app_status, b.dev_status, 
+		b.charging_status, b.sig_level, b.acc,
+		b.lct_type, b.eco_mode, b.debug_mode,
+		b.esafe_wifi ssid_esafe_state,  b.bssid_wifi mac,
+		b.estat_wifi, b.sos_led_on sos_led_on,
+		b.ssid_wifi, b.autopdn_status, b.time_pon, b.time_poff,
+		date_format(a.device_update_time, "%Y-%m-%d %T") dus_time				 
+		FROM wdevice_active_info a 
+		left join wDeviceExtra b on a.device_id = b.device_id
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="device_disable">
+				device_disable = $device_disable$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getwDeviceExtra" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		SELECT id, device_id, esafe_on, prev_eid, cur_eid, 
+		prev_time, app_timestamp, app_status,
+		dev_timestamp, dev_status,
+		charging_status, sig_level, acc, lct_type, 
+		eco_mode, debug_mode,
+		ssid_wifi, bssid_wifi 
+		FROM wDeviceExtra
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	
+	<insert id="insertWdeviceActiveInfo" 
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		insert into wdevice_active_info
+		(device_phone,device_imei,device_name,device_disable,belong_project,device_type,is_sos,gps_on,temperature_on,heatout_on,led_on,flight_mode,urgent_mode,battery,is_lowbat)
+		VALUES
+		(#device_phone#,#device_imei#,#device_name#,#device_disable#,#belong_project#,#device_type#,#is_sos#,#gps_on#,#temperature_on#,#heatout_on#,#led_on#,#flight_mode#,#urgent_mode#,#battery#,#is_lowbat#)
+	</insert>
+
+	<insert id="insertwDeviceExtra" 
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		insert into wDeviceExtra
+		(device_id,esafe_on,prev_eid,cur_eid,prev_time, app_timestamp, app_status, dev_timestamp, dev_status, charging_status, sig_level, acc, lct_type, eco_mode, debug_mode)
+		VALUES
+		(#device_id#,#esafe_on#,#prev_eid#,#cur_eid#,#prev_time#, #app_timestamp#, #app_status#, #dev_timestamp#, #dev_status#, #charging_status#, #sig_level#, #acc#, #lct_type#, #eco_mode#, #debug_mode#)
+	</insert>
+
+	<update id="updatewDeviceExtra"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		update wDeviceExtra
+		<dynamic prepend="set">
+		    <isNotEmpty prepend="," property="device_id">
+				device_id=#device_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="esafe_on">
+				esafe_on=#esafe_on#
+			</isNotEmpty>
+			
+			<isNotEmpty prepend="," property="dev_timestamp">
+				dev_timestamp=#dev_timestamp#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dev_status">
+				dev_status=#dev_status#
+			</isNotEmpty>
+			
+			<isNotEmpty prepend="," property="charging_status">
+				charging_status=#charging_status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sig_level">
+				sig_level=#sig_level#
+			</isNotEmpty>
+						<isNotEmpty prepend="," property="acc">
+				acc=#acc#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="lct_type">
+				lct_type=#lct_type#
+			</isNotEmpty>
+			
+			<isNotEmpty prepend="," property="eco_mode">
+				eco_mode=#eco_mode#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="debug_mode">
+				debug_mode=#debug_mode#
+			</isNotEmpty>
+			
+<isNotEmpty prepend="," property="sleep_status">
+				sleep_status=#sleep_status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="esafe_wifi">
+				esafe_wifi=#esafe_wifi#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ssid_wifi">
+				ssid_wifi=#ssid_wifi#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="bssid_wifi">
+				bssid_wifi=#bssid_wifi#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="estat_wifi">
+				estat_wifi=#estat_wifi#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sos_led_on">
+				sos_led_on=#sos_led_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ufirm_stat">
+				ufirm_stat=#ufirm_stat#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="autopdn_status">
+				autopdn_status=#autopdn_status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="time_pon">
+				time_pon=#time_pon#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="time_poff">
+				time_poff=#time_poff#
+			</isNotEmpty>			
+			<isNotEmpty prepend="," property="tm_flag">
+				tm_flag=#tm_flag#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="tm_dur">
+				tm_dur=#tm_dur#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	<update id="updatewDeviceExtraEsafeArea"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		update wDeviceExtra
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="prev_eid">
+				prev_eid=#prev_eid#
+			</isNotEmpty>		
+			<isNotEmpty prepend="," property="prev_time">
+				prev_time=#prev_time#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+
+	<update id="updatewDeviceExtraDevStatus"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		update wDeviceExtra
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="dev_timestamp">
+				dev_timestamp=#dev_timestamp#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dev_status">
+				dev_status=#dev_status#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+
+	<update id="updatewDeviceExtraAppStatus"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		update wDeviceExtra
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="app_timestamp">
+				app_timestamp=#app_timestamp#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="app_status">
+				app_status=#app_status#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+
+	
+	<update id="updateWdeviceActiveInfo"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		update wdevice_active_info
+		<dynamic prepend="set">
+		    <isNotEmpty prepend="," property="device_phone">
+				device_phone=#device_phone#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="device_name">
+				device_name=#device_name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="device_disable">
+				device_disable=#device_disable#
+			</isNotEmpty>		
+			<isNotEmpty prepend="," property="belong_project">
+				belong_project=#belong_project#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="device_type">
+				device_type=#device_type#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="is_sos">
+				is_sos=#is_sos#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gps_on">
+				gps_on=#gps_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="temperature_on">
+				temperature_on=#temperature_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="heatout_on">
+				heatout_on=#heatout_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="led_on">
+				led_on=#led_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="flight_mode">
+				flight_mode=#flight_mode#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="urgent_mode">
+				urgent_mode=#urgent_mode#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="battery">
+				battery=#battery#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="is_lowbat">
+				is_lowbat=#is_lowbat#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="," property="bind_count">
+				bind_count=#bind_count#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="time_zone">
+				time_zone=#time_zone#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="longitude">
+				longitude=#longitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="latitude">
+				latitude=#latitude#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="device_update_time">
+				device_update_time=#device_update_time#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="callback_on">
+				callback_on=#callback_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="iccid">
+				iccid=#iccid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dynIccid">
+				dynIccid=#dynIccid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ulfq">
+				ulfq=#ulfq#
+			</isNotEmpty>			
+			<isNotEmpty prepend="," property="uLTe">
+				uLTe=#uLTe#
+			</isNotEmpty>			
+			<isNotEmpty prepend="," property="test_status">
+				test_status=#test_status#
+			</isNotEmpty>			
+						
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	<delete id="deleteWdeviceActiveInfo" parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		delete from wdevice_active_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+	<insert id="insertwdevLogFile" 
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		insert into wdevLogFile
+		(device_id,log_file,up_time)
+		VALUES
+		(#device_id#,#log_file#,#up_time#)
+	</insert>
+
+	<select id="getwdevLogFile" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		SELECT id, device_id, log_file, up_time  
+		FROM wdevLogFile
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+    <!-- 获取紧急模式倒计时 -->
+	<select id="getDevDiscovery" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdevDiscovery">
+		SELECT device_id, date_format(action_time_utc, "%Y-%m-%d %T") as action_time, how_long, action_time_utc  
+		FROM wDeviceExtra
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<insert id="insertDevDiscovery" 
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdevDiscovery">
+		insert into wDevDiscovery
+		(user_id, device_id,action_time,how_long, action_time_utc)
+		VALUES
+		(#user_id#, #device_id#,#action_time#,#how_long#, #action_time_utc#)
+	</insert>
+	<update id="updateDevDiscovery"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdevDiscovery">
+		update wDeviceExtra
+		<dynamic prepend="set">
+		    <isNotEmpty prepend="," property="how_long">
+				how_long=#how_long#
+			</isNotEmpty>
+		    <isNotEmpty prepend="," property="action_time_utc">
+				action_time_utc=#action_time_utc#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+<!-- 
+
+CREATE TEMPORARY TABLE ttt (
+		SELECT a.device_id  		 
+		FROM wdevice_active_info a 
+		LEFT JOIN sim_info b ON a.iccid = b.iccid WHERE b.card_status =1 
+		AND a.`time_zone` != 'Asia/Shanghai'			
+
+)
+
+
+		SELECT a.device_id 		 
+		FROM wdevice_active_info a 
+		LEFT JOIN sim_info b ON a.iccid = b.iccid WHERE b.card_status =1 
+		AND a.`time_zone` != 'Asia/Shanghai' AND a.test_status = 1;
+
+
+UPDATE wdevice_active_info SET test_status = 0 WHERE 
+			device_id IN (SELECT device_id FROM ttt)
+
+
+
+ -->
+	<select id="getWdevPayInfo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		SELECT a.*, b.card_status 		 
+		FROM wdevice_active_info a 
+		left join sim_info b on a.iccid = b.iccid
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getWdevPayInfoDyn" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		SELECT a.*, b.card_status 		 
+		FROM wdevice_active_info a 
+		left join sim_info b on a.dynIccid = b.iccid
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+ 
+</sqlMap>

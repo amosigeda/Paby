@@ -1,0 +1,873 @@
+package com.wtwd.pet.app.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.wtwd.pet.app.base.BaseEntity;
+
+public class WDeviceActiveInfo extends BaseEntity implements Serializable {
+    
+	private static final long serialVersionUID = -1711207522857261277L;
+
+	private Integer deviceId;
+
+    private String devicePhone;
+
+    private String deviceImei;
+
+    private String deviceName;
+
+    private Date deviceUpdateTime;
+
+    private String deviceDisable;
+
+    private String listenType;
+
+    private Integer belongProject;
+
+    private String isphonehelp;
+
+    private String isserverhelp;
+
+    private Date deadline;
+
+    private String brandname;
+
+    private String fallOn;
+
+    private String deviceType;
+
+    private String connType;
+
+    private String isSos;
+
+    private String selMode;
+
+    private String gpsOn;
+
+    private String callbackOn;
+
+    private String temperatureOn;
+
+    private String heatoutOn;
+
+    private String ledOn;
+
+    private String flightMode;
+
+    private String urgentMode;
+
+    private Integer battery;
+
+    private String isLowbat;
+
+    private String dataMute;
+
+    private String dataVolume;
+
+    private String dataPower;
+
+    private Integer bindCount;
+
+    private String wifirInterval;
+
+    private String wifirFlag;
+
+	private String time_zone;
+
+    private String esafeOn;
+
+    private Integer prevEid;
+
+    private Integer curEid;
+
+    private Date prevTime;
+    
+    private Date app_timestamp;
+    private Date dev_timestamp;
+    private String app_status;
+    private String dev_status;
+    private String longitude;
+    private String latitude;
+    
+    private Integer from_usrid;
+    private Integer user_id;
+    private Integer pet_id;
+    private String ios_token;
+
+    private Integer to_usrid;
+    private Integer msg_type;
+    private Integer msg_ind_id;
+    private String msg_date;
+    
+    private String msg_content;
+    private Integer fence_id;
+    private Integer status;
+    private Integer share_id;
+    private Integer push_status;
+    
+    private String from_email;
+    private String from_nick;
+    private String to_email;
+    private String to_nick;
+    private String msg_txt;		//消息备注
+    
+    private String app_type;
+    private String device_token;
+    private Integer msg_id;
+    
+    private String pet_nick;
+    private String ios_real;
+    
+    private String summary;
+    
+
+    
+    
+    public Integer getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(Integer deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getDevicePhone() {
+        return devicePhone;
+    }
+
+    public void setDevicePhone(String devicePhone) {
+        this.devicePhone = devicePhone == null ? null : devicePhone.trim();
+    }
+
+    public String getDeviceImei() {
+        return deviceImei;
+    }
+
+    public void setDeviceImei(String deviceImei) {
+        this.deviceImei = deviceImei == null ? null : deviceImei.trim();
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName == null ? null : deviceName.trim();
+    }
+
+    public Date getDeviceUpdateTime() {
+        return deviceUpdateTime;
+    }
+
+    public void setDeviceUpdateTime(Date deviceUpdateTime) {
+        this.deviceUpdateTime = deviceUpdateTime;
+    }
+
+    public String getDeviceDisable() {
+        return deviceDisable;
+    }
+
+    public void setDeviceDisable(String deviceDisable) {
+        this.deviceDisable = deviceDisable == null ? null : deviceDisable.trim();
+    }
+
+    public String getListenType() {
+        return listenType;
+    }
+
+    public void setListenType(String listenType) {
+        this.listenType = listenType == null ? null : listenType.trim();
+    }
+
+    public Integer getBelongProject() {
+        return belongProject;
+    }
+
+    public void setBelongProject(Integer belongProject) {
+        this.belongProject = belongProject;
+    }
+
+    public String getIsphonehelp() {
+        return isphonehelp;
+    }
+
+    public void setIsphonehelp(String isphonehelp) {
+        this.isphonehelp = isphonehelp == null ? null : isphonehelp.trim();
+    }
+
+    public String getIsserverhelp() {
+        return isserverhelp;
+    }
+
+    public void setIsserverhelp(String isserverhelp) {
+        this.isserverhelp = isserverhelp == null ? null : isserverhelp.trim();
+    }
+
+    public Date getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
+    }
+
+    public String getBrandname() {
+        return brandname;
+    }
+
+    public void setBrandname(String brandname) {
+        this.brandname = brandname == null ? null : brandname.trim();
+    }
+
+    public String getFallOn() {
+        return fallOn;
+    }
+
+    public void setFallOn(String fallOn) {
+        this.fallOn = fallOn == null ? null : fallOn.trim();
+    }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType == null ? null : deviceType.trim();
+    }
+
+    public String getConnType() {
+        return connType;
+    }
+
+    public void setConnType(String connType) {
+        this.connType = connType == null ? null : connType.trim();
+    }
+
+    public String getIsSos() {
+        return isSos;
+    }
+
+    public void setIsSos(String isSos) {
+        this.isSos = isSos == null ? null : isSos.trim();
+    }
+
+    public String getSelMode() {
+        return selMode;
+    }
+
+    public void setSelMode(String selMode) {
+        this.selMode = selMode == null ? null : selMode.trim();
+    }
+
+    public String getGpsOn() {
+        return gpsOn;
+    }
+
+    public void setGpsOn(String gpsOn) {
+        this.gpsOn = gpsOn == null ? null : gpsOn.trim();
+    }
+
+    public String getCallbackOn() {
+        return callbackOn;
+    }
+
+    public void setCallbackOn(String callbackOn) {
+        this.callbackOn = callbackOn == null ? null : callbackOn.trim();
+    }
+
+    public String getTemperatureOn() {
+        return temperatureOn;
+    }
+
+    public void setTemperatureOn(String temperatureOn) {
+        this.temperatureOn = temperatureOn == null ? null : temperatureOn.trim();
+    }
+
+    public String getHeatoutOn() {
+        return heatoutOn;
+    }
+
+    public void setHeatoutOn(String heatoutOn) {
+        this.heatoutOn = heatoutOn == null ? null : heatoutOn.trim();
+    }
+
+    public String getLedOn() {
+        return ledOn;
+    }
+
+    public void setLedOn(String ledOn) {
+        this.ledOn = ledOn == null ? null : ledOn.trim();
+    }
+
+    public String getFlightMode() {
+        return flightMode;
+    }
+
+    public void setFlightMode(String flightMode) {
+        this.flightMode = flightMode == null ? null : flightMode.trim();
+    }
+
+    public String getUrgentMode() {
+        return urgentMode;
+    }
+
+    public void setUrgentMode(String urgentMode) {
+        this.urgentMode = urgentMode == null ? null : urgentMode.trim();
+    }
+
+    public Integer getBattery() {
+        return battery;
+    }
+
+    public void setBattery(Integer battery) {
+        this.battery = battery;
+    }
+
+    public String getIsLowbat() {
+        return isLowbat;
+    }
+
+    public void setIsLowbat(String isLowbat) {
+        this.isLowbat = isLowbat == null ? null : isLowbat.trim();
+    }
+
+    public String getDataMute() {
+        return dataMute;
+    }
+
+    public void setDataMute(String dataMute) {
+        this.dataMute = dataMute == null ? null : dataMute.trim();
+    }
+
+    public String getDataVolume() {
+        return dataVolume;
+    }
+
+    public void setDataVolume(String dataVolume) {
+        this.dataVolume = dataVolume == null ? null : dataVolume.trim();
+    }
+
+    public String getDataPower() {
+        return dataPower;
+    }
+
+    public void setDataPower(String dataPower) {
+        this.dataPower = dataPower == null ? null : dataPower.trim();
+    }
+
+    public Integer getBindCount() {
+        return bindCount;
+    }
+
+    public void setBindCount(Integer bindCount) {
+        this.bindCount = bindCount;
+    }
+
+    public String getWifirInterval() {
+        return wifirInterval;
+    }
+
+    public void setWifirInterval(String wifirInterval) {
+        this.wifirInterval = wifirInterval == null ? null : wifirInterval.trim();
+    }
+
+    public String getWifirFlag() {
+        return wifirFlag;
+    }
+
+    public void setWifirFlag(String wifirFlag) {
+        this.wifirFlag = wifirFlag == null ? null : wifirFlag.trim();
+    }
+
+	/**
+	 * @return the time_zone
+	 */
+	public String getTime_zone() {
+		return time_zone;
+	}
+
+	/**
+	 * @param time_zone the time_zone to set
+	 */
+	public void setTime_zone(String time_zone) {
+		this.time_zone = time_zone;
+	}
+
+	/**
+	 * @return the esafeOn
+	 */
+	public String getEsafeOn() {
+		return esafeOn;
+	}
+
+	/**
+	 * @param esafeOn the esafeOn to set
+	 */
+	public void setEsafeOn(String esafeOn) {
+		this.esafeOn = esafeOn;
+	}
+
+	/**
+	 * @return the prevEid
+	 */
+	public Integer getPrevEid() {
+		return prevEid;
+	}
+
+	/**
+	 * @param prevEid the prevEid to set
+	 */
+	public void setPrevEid(Integer prevEid) {
+		this.prevEid = prevEid;
+	}
+
+	/**
+	 * @return the curEid
+	 */
+	public Integer getCurEid() {
+		return curEid;
+	}
+
+	/**
+	 * @param curEid the curEid to set
+	 */
+	public void setCurEid(Integer curEid) {
+		this.curEid = curEid;
+	}
+
+	/**
+	 * @return the prevTime
+	 */
+	public Date getPrevTime() {
+		return prevTime;
+	}
+
+	/**
+	 * @param prevTime the prevTime to set
+	 */
+	public void setPrevTime(Date prevTime) {
+		this.prevTime = prevTime;
+	}
+
+	/**
+	 * @return the app_timestamp
+	 */
+	public Date getApp_timestamp() {
+		return app_timestamp;
+	}
+
+	/**
+	 * @param app_timestamp the app_timestamp to set
+	 */
+	public void setApp_timestamp(Date app_timestamp) {
+		this.app_timestamp = app_timestamp;
+	}
+
+	/**
+	 * @return the dev_timestamp
+	 */
+	public Date getDev_timestamp() {
+		return dev_timestamp;
+	}
+
+	/**
+	 * @param dev_timestamp the dev_timestamp to set
+	 */
+	public void setDev_timestamp(Date dev_timestamp) {
+		this.dev_timestamp = dev_timestamp;
+	}
+
+	/**
+	 * @return the app_status
+	 */
+	public String getApp_status() {
+		return app_status;
+	}
+
+	/**
+	 * @param app_status the app_status to set
+	 */
+	public void setApp_status(String app_status) {
+		this.app_status = app_status;
+	}
+
+	/**
+	 * @return the dev_status
+	 */
+	public String getDev_status() {
+		return dev_status;
+	}
+
+	/**
+	 * @param dev_status the dev_status to set
+	 */
+	public void setDev_status(String dev_status) {
+		this.dev_status = dev_status;
+	}
+
+	/**
+	 * @return the longitude
+	 */
+	public String getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
+	/**
+	 * @return the latitude
+	 */
+	public String getLatitude() {
+		return latitude;
+	}
+
+	/**
+	 * @param latitude the latitude to set
+	 */
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	/**
+	 * @return the from_usrid
+	 */
+	public Integer getFrom_usrid() {
+		return from_usrid;
+	}
+
+	/**
+	 * @param from_usrid the from_usrid to set
+	 */
+	public void setFrom_usrid(Integer from_usrid) {
+		this.from_usrid = from_usrid;
+	}
+
+	/**
+	 * @return the user_id
+	 */
+	public Integer getUser_id() {
+		return user_id;
+	}
+
+	/**
+	 * @param user_id the user_id to set
+	 */
+	public void setUser_id(Integer user_id) {
+		this.user_id = user_id;
+	}
+
+	/**
+	 * @return the pet_id
+	 */
+	public Integer getPet_id() {
+		return pet_id;
+	}
+
+	/**
+	 * @param pet_id the pet_id to set
+	 */
+	public void setPet_id(Integer pet_id) {
+		this.pet_id = pet_id;
+	}
+
+	/**
+	 * @return the ios_token
+	 */
+	public String getIos_token() {
+		return ios_token;
+	}
+
+	/**
+	 * @param ios_token the ios_token to set
+	 */
+	public void setIos_token(String ios_token) {
+		this.ios_token = ios_token;
+	}
+
+	/**
+	 * @return the to_usrid
+	 */
+	public Integer getTo_usrid() {
+		return to_usrid;
+	}
+
+	/**
+	 * @param to_usrid the to_usrid to set
+	 */
+	public void setTo_usrid(Integer to_usrid) {
+		this.to_usrid = to_usrid;
+	}
+
+	/**
+	 * @return the msg_ind_id
+	 */
+	public Integer getMsg_ind_id() {
+		return msg_ind_id;
+	}
+
+	/**
+	 * @param msg_ind_id the msg_ind_id to set
+	 */
+	public void setMsg_ind_id(Integer msg_ind_id) {
+		this.msg_ind_id = msg_ind_id;
+	}
+
+	/**
+	 * @return the msg_type
+	 */
+	public Integer getMsg_type() {
+		return msg_type;
+	}
+
+	/**
+	 * @param msg_type the msg_type to set
+	 */
+	public void setMsg_type(Integer msg_type) {
+		this.msg_type = msg_type;
+	}
+
+	/**
+	 * @return the msg_date
+	 */
+	public String getMsg_date() {
+		return msg_date;
+	}
+
+	/**
+	 * @param msg_date the msg_date to set
+	 */
+	public void setMsg_date(String msg_date) {
+		this.msg_date = msg_date;
+	}
+
+	/**
+	 * @return the msg_content
+	 */
+	public String getMsg_content() {
+		return msg_content;
+	}
+
+	/**
+	 * @param msg_content the msg_content to set
+	 */
+	public void setMsg_content(String msg_content) {
+		this.msg_content = msg_content;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public Integer getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the fence_id
+	 */
+	public Integer getFence_id() {
+		return fence_id;
+	}
+
+	/**
+	 * @param fence_id the fence_id to set
+	 */
+	public void setFence_id(Integer fence_id) {
+		this.fence_id = fence_id;
+	}
+
+	/**
+	 * @return the share_id
+	 */
+	public Integer getShare_id() {
+		return share_id;
+	}
+
+	/**
+	 * @param share_id the share_id to set
+	 */
+	public void setShare_id(Integer share_id) {
+		this.share_id = share_id;
+	}
+
+	/**
+	 * @return the push_status
+	 */
+	public Integer getPush_status() {
+		return push_status;
+	}
+
+	/**
+	 * @param push_status the push_status to set
+	 */
+	public void setPush_status(Integer push_status) {
+		this.push_status = push_status;
+	}
+
+	/**
+	 * @return the from_email
+	 */
+	public String getFrom_email() {
+		return from_email;
+	}
+
+	/**
+	 * @param from_email the from_email to set
+	 */
+	public void setFrom_email(String from_email) {
+		this.from_email = from_email;
+	}
+
+	/**
+	 * @return the from_nick
+	 */
+	public String getFrom_nick() {
+		return from_nick;
+	}
+
+	/**
+	 * @param from_nick the from_nick to set
+	 */
+	public void setFrom_nick(String from_nick) {
+		this.from_nick = from_nick;
+	}
+
+	/**
+	 * @return the to_email
+	 */
+	public String getTo_email() {
+		return to_email;
+	}
+
+	/**
+	 * @param to_email the to_email to set
+	 */
+	public void setTo_email(String to_email) {
+		this.to_email = to_email;
+	}
+
+	/**
+	 * @return the to_nick
+	 */
+	public String getTo_nick() {
+		return to_nick;
+	}
+
+	/**
+	 * @param to_nick the to_nick to set
+	 */
+	public void setTo_nick(String to_nick) {
+		this.to_nick = to_nick;
+	}
+
+	/**
+	 * @return the msg_txt
+	 */
+	public String getMsg_txt() {
+		return msg_txt;
+	}
+
+	/**
+	 * @param msg_txt the msg_txt to set
+	 */
+	public void setMsg_txt(String msg_txt) {
+		this.msg_txt = msg_txt;
+	}
+
+	/**
+	 * @return the app_type
+	 */
+	public String getApp_type() {
+		return app_type;
+	}
+
+	/**
+	 * @param app_type the app_type to set
+	 */
+	public void setApp_type(String app_type) {
+		this.app_type = app_type;
+	}
+
+	/**
+	 * @return the device_token
+	 */
+	public String getDevice_token() {
+		return device_token;
+	}
+
+	/**
+	 * @param device_token the device_token to set
+	 */
+	public void setDevice_token(String device_token) {
+		this.device_token = device_token;
+	}
+
+	/**
+	 * @return the msg_id
+	 */
+	public Integer getMsg_id() {
+		return msg_id;
+	}
+
+	/**
+	 * @param msg_id the msg_id to set
+	 */
+	public void setMsg_id(Integer msg_id) {
+		this.msg_id = msg_id;
+	}
+
+	/**
+	 * @return the pet_nick
+	 */
+	public String getPet_nick() {
+		return pet_nick;
+	}
+
+	/**
+	 * @param pet_nick the pet_nick to set
+	 */
+	public void setPet_nick(String pet_nick) {
+		this.pet_nick = pet_nick;
+	}
+
+	/**
+	 * @return the ios_real
+	 */
+	public String getIos_real() {
+		return ios_real;
+	}
+
+	/**
+	 * @param ios_real the ios_real to set
+	 */
+	public void setIos_real(String ios_real) {
+		this.ios_real = ios_real;
+	}
+
+	/**
+	 * @return the summary
+	 */
+	public String getSummary() {
+		return summary;
+	}
+
+	/**
+	 * @param summary the summary to set
+	 */
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+}

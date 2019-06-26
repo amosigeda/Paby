@@ -1,0 +1,1332 @@
+package com.wtwd.pet.app.notify;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.alibaba.fastjson.JSON;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.profile.IClientProfile;
+import com.aliyuncs.push.model.v20150827.PushMessageToAndroidRequest;
+import com.aliyuncs.push.model.v20150827.PushMessageToAndroidResponse;
+import com.aliyuncs.push.model.v20150827.PushMessageToiOSRequest;
+import com.aliyuncs.push.model.v20150827.PushMessageToiOSResponse;
+import com.aliyuncs.push.model.v20150827.PushNoticeToiOSRequest;
+import com.aliyuncs.push.model.v20150827.PushNoticeToiOSResponse;
+import com.google.gson.Gson;
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsNotification;
+import com.notnoop.apns.ApnsService;
+import com.wtwd.pet.app.entity.LocationInfo;
+import com.wtwd.pet.app.entity.WDeviceActiveInfo;
+import com.wtwd.pet.app.entity.WDeviceEsafe;
+import com.wtwd.pet.app.entity.WMsgInfo;
+import com.wtwd.pet.app.entity.WeFencing;
+import com.wtwd.pet.app.service.LocationInfoService;
+import com.wtwd.pet.app.service.WDeviceActiveInfoService;
+import com.wtwd.pet.app.service.WDeviceEsafeService;
+import com.wtwd.pet.app.service.WeFencingService;
+import com.wtwd.pet.app.util.Distribution;
+import com.wtwd.pet.app.util.MQProducer;
+import com.wtwd.pet.app.util.PropDo;
+
+/**
+ * 消息启动类
+ * @author liufeng
+ * @date 2016-09-13
+ */
+public class App {
+	public static String dirBase = "D:\\Workspaces\\wtwd_notify_liu\\";
+
+	public static String PROTOCOL_VER  = "1.6";
+	
+	
+	private static final Log log = LogFactory.getLog(App.class);
+	
+	private static ClassPathXmlApplicationContext context;
+	
+	private static ThreadPoolTaskExecutor threadPool;
+	
+	private static WDeviceActiveInfoService wdeviceActiveInfoService;
+	
+	private static WeFencingService weFencingService;
+	
+	private static LocationInfoService locationInfoService;
+	private static WDeviceEsafeService deviceEsafeService;
+	
+	private static MQProducer mqProducer;
+	
+	private static WDeviceActiveInfo curDev;
+	
+	public final static String iosP12FileName = "pushDevelop.p12";
+	public final static String iosP12FileNameOnline = "pushOnline.p12";
+
+	//	public final static String iosToken = "1822cddbfe2ecdcb3f6e46b6d3e0db9a06adca16fefcc9cf792602e11904e4f8";
+	                                     //1822cddbfe2ecdcb3f6e46b6d3e0db9a06adca16fefcc9cf792602e11904e4f8
+	public final static int CST_MSG_IND_APPLY_SHARE = 5;		//设备分享消息
+	public final static int CST_MSG_IND_AGREE_SHARE = 6;		//同意分享设备消息
+	public final static int CST_MSG_IND_DENY_SHARE = 7;		//拒绝分享设备消息
+	public final static int CST_MSG_IND_HOST_DEL_SHARE = 13;		//主人取消设备分享
+
+	public final static int CST_MSG_IND_DEV_OUT_EFENCE = 1;		//离开电子围栏
+	public final static int CST_MSG_IND_DEV_IN_EFENCE = 2;		//进入电子围栏
+	public final static int CST_MSG_IND_DEV_LOW_BATTERY = 4;		//设备低电报警
+	public final static int CST_MSG_IND_DEV_LOGOUT = 8;		//设备退出登录
+	
+	public final static int CST_MSG_IND_DEV_LOGIN = 9;		//设备上线，即联网	
+	public final static int CST_MSG_IND_APP_LOGOUT = 10;		//app用户退出登录
+	public final static int CST_MSG_IND_APP_LOGIN = 11;		//app用户登录
+	public final static int CST_MSG_IND_APP_BACK = 14;		//app转入后台
+	public final static int CST_MSG_IND_APP_QUIT = 15;		//app退出
+	
+	
+	public final static String CST_MSG_TYPE_OTHER = "0";		//其它
+	public final static String CST_MSG_TYPE_HEALTH = "1";		//健康
+	public final static String CST_MSG_TYPE_SOIAL = "2";		//社区
+	public final static String CST_MSG_TYPE_SPORT = "3";		//运动
+	public final static String CST_MSG_TYPE_EFENCE = "4";		//电子围栏
+	public final static String CST_MSG_TYPE_REL_DEVICE = "5";		//设备相关
+	
+	
+	public static void start(String dir_base) {
+		dirBase = dir_base;
+		
+		try {
+			//if ( !"1.6".equals(PROTOCOL_VER) ) 
+				MqttClient.Init();
+				//log.info("push thread start dirBase::"+dirBase);					
+				
+			context = new ClassPathXmlApplicationContext(new String[] { "spring-context.xml" });
+            context.start();
+			threadPool = (ThreadPoolTaskExecutor) context.getBean("threadPool");
+			
+			wdeviceActiveInfoService = (WDeviceActiveInfoService) context.getBean("wdeviceActiveInfoService");
+			weFencingService = (WeFencingService) context.getBean("weFencingService");
+			locationInfoService = (LocationInfoService) context.getBean("locationInfoService");
+			deviceEsafeService= (WDeviceEsafeService) context.getBean("wDeviceEsafeService");
+			mqProducer = (MQProducer) context.getBean("mqProducer");
+
+			
+	        Timer timer1 = new Timer();  
+	        timer1.schedule(new TestTimerTaskMqNml(), 1000* 60* 2, 1000* 60 * 5 );
+			
+			//startAtonce();			
+			
+			while (true) {
+				Thread.sleep(2000);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("== App start error:", e);
+			return;
+		}
+/*
+		synchronized (App.class) {
+			while(true){
+				try {
+					//App.class.wait();
+					Thread.sleep(2000);
+				} catch (Exception e) {
+					log.error("== synchronized error:", e);
+				}
+			}
+		}
+*/		
+	}
+	
+	public static void main(String[] args) {
+		try {
+			//if ( !"1.6".equals(PROTOCOL_VER) ) 
+			//33678d960f34eee19e77445f2fd0f6543c86584ae8c075af9e0f8c3b90db120c
+			//proIosSendRealTest("d9bddfcd159d6b6a08ff5cca6e7a1ab031c74367bb0509f4b435f5e20b7d24da", "hy test 134", 2);
+			
+			try {
+				   WMsgInfo wi = new WMsgInfo();
+					wi.setApp_type("1");
+					wi.setBadge(0);
+					wi.setDevice_id(80);
+					wi.setHide_flag("0");
+					wi.setMsg_ind_id(8);
+					wi.setIos_real("5272e4539717fbfa4b409b894161a66afb02917f720d8f56c8948b64564be195");
+					wi.setIos_token("e405d8969f744814b6e8622bf87e5607");
+					wi.setMsg_content("mqtt server stopped!");
+					wi.setSummary("mqtt server stopped!");
+					wi.setTo_usrid(1);
+
+					PropDo pd = new PropDo();
+					
+					String iosPwd = pd.getPropFromFile("mq.properties", "iosPushPwd");
+					ApnsService service = APNS.newService()							
+							.withCert(App.dirBase + App.iosP12FileName, iosPwd)
+							.withSandboxDestination()
+							.build();
+					
+					//MqttClient.pushMsg("WTDEV_DUMMY", "AHA".getBytes());
+					
+							
+					String payload = APNS.newPayload().alertBody("mqtt server stopped!").build();
+					service.push(/*"045587774d1e9a8dd7afb75481165c02c35efbc6c8ed084f5199579acfa2ddb3"*/"5272e4539717fbfa4b409b894161a66afb02917f720d8f56c8948b64564be195", payload);
+					service = null;
+				} catch(Exception e) {
+					e.printStackTrace();
+					Logger.getLogger(App.class).info(e);				
+					
+				}
+					//MyThread myThread1 = new MyThread(wi);
+					//myThread1.start();  
+				
+			
+			
+			App ap=  new App();
+			ap.proIosSendRealTest("412b2564ad65b4d8f61f0b84d664de7defb6d8b143b0caffac4765ae51cde8e8", "hy test 1314", 2);
+
+			
+			MqttClient.Init();
+			context = new ClassPathXmlApplicationContext(new String[] { "spring-context.xml" });
+            context.start();
+			threadPool = (ThreadPoolTaskExecutor) context.getBean("threadPool");
+			
+			wdeviceActiveInfoService = (WDeviceActiveInfoService) context.getBean("wdeviceActiveInfoService");
+			weFencingService = (WeFencingService) context.getBean("weFencingService");
+			locationInfoService = (LocationInfoService) context.getBean("locationInfoService");
+			deviceEsafeService= (WDeviceEsafeService) context.getBean("wDeviceEsafeService");
+			mqProducer = (MQProducer) context.getBean("mqProducer");
+			
+			
+			/*
+			WMsgInfo curMsg = new WMsgInfo();
+			curMsg.setDevice_id(0);
+			curMsg.setTo_usrid(0);
+			curMsg.setMsg_ind_id(48);
+			
+
+			MyThread myThread1 = new MyThread(curMsg);
+			myThread1.start();
+			  */
+			
+			
+			//startAtonce();
+			while(true){
+				try {
+					//App.class.wait();
+					Thread.sleep(2000);
+				} catch (Exception e) {
+					;
+				}
+			}
+			
+		} catch (Exception e) {
+			log.error("== App start error:", e);
+			return;
+		}
+		
+
+	}
+	
+	static int i = 0;
+	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
+	public static void startThread(){
+		//log.info("startThread");
+		
+		threadPool.execute(new Runnable() {
+			public void run() {
+					while(true){
+						// 如果当前活动线程等于最大线程，那么不执行
+						int act_thrd_count = threadPool.getActiveCount();
+						int max_thrd_count = threadPool.getMaxPoolSize(); 
+						if( act_thrd_count < max_thrd_count){
+							i++;
+
+							try {
+
+								proSendUnPush();
+
+							} catch (Exception e) {
+								log.error("系统异常", e);
+							}
+
+							
+							try {
+								//proDevStatus();
+							} catch (Exception e) {
+								log.error("系统异常", e);
+							}
+							
+							
+							try {
+								Thread.sleep(800*1);//3分钟执行一次
+								//getDataByDB();
+							} catch (Exception e) {
+								log.error("系统异常", e);
+							}
+
+							
+							
+							
+						}
+					}
+			}
+		});
+	}
+
+	
+	public static void startAtonce(){
+		//log.info("startAtonce");
+		
+
+		while(true){
+			// 如果当前活动线程等于最大线程，那么不执行
+				i++;
+
+				try {
+
+					proSendUnPush();
+
+				} catch (Exception e) {
+				}
+
+				
+				try {
+					//proDevStatus();
+				} catch (Exception e) {
+				}
+				
+				
+				try {
+					Thread.sleep(800*1);//3分钟执行一次
+					//getDataByDB();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				
+				
+				
+
+		}
+
+		
+	}
+	
+	
+	/**
+	 *  从数据库获取数据
+	 */
+	public static void getDataByDB(){
+		//log.info("get data from database");
+		// 获取设备
+		List<WDeviceActiveInfo> deviceList = wdeviceActiveInfoService.queryDataList();
+		if(deviceList != null && deviceList.size() > 0){
+			for(int i=0;i<deviceList.size();i++){
+				try {
+					curDev = deviceList.get(i);
+					Integer deviceId = 0;
+					deviceId = curDev.getDeviceId();
+					WDeviceEsafe wde = deviceEsafeService.getById(deviceId);
+
+					if ( wde == null ) {
+						wde = new WDeviceEsafe();
+						wde.setDev_status("0");					
+						wde.setDeviceId(deviceId);
+						deviceEsafeService.insertData(wde);
+					}
+					
+					proEfence();
+				} catch (Exception e) {
+				}
+
+				/*
+				try {
+					proDevStatus();
+				} catch (Exception e) {
+					log.error("系统异常", e);
+					e.printStackTrace();
+				}*/
+				
+			
+			}
+		}
+		log.info("结束。。。");
+	}
+	
+	/**
+	 *  从数据库获取数据
+	 * @throws Exception 
+	 */
+	public void proDevStatus() throws Exception{
+		WDeviceEsafe msg_ent = new WDeviceEsafe();
+		WDeviceActiveInfo cur_user = null;
+		Integer cur_petId = 0;
+		
+		//找出所有上一状态是联机的脱机设备，并产生系统消息
+		List<WDeviceActiveInfo> deviceList = wdeviceActiveInfoService.searchOffline();
+		if(deviceList != null && deviceList.size() > 0){
+			for(int i=0;i<deviceList.size();i++){
+				WDeviceActiveInfo cur_dev = deviceList.get(i);
+				int deviceId = cur_dev.getDeviceId();
+				
+				List<WDeviceActiveInfo> listShareUsers = 
+						wdeviceActiveInfoService.getShareUser(deviceId);
+
+				
+				if(listShareUsers != null && listShareUsers.size() > 0){
+					for(int j=0;j<listShareUsers.size();j++){
+						cur_user = listShareUsers.get(j);
+						String app_type = cur_user.getApp_type().trim();
+						String device_token = cur_user.getDevice_token().trim();
+						String ios_token = cur_user.getIos_token().trim();					
+						String ios_real = cur_user.getIos_real().trim();					
+
+						msg_ent.setDeviceId(deviceId);
+						msg_ent.setMsg_type(CST_MSG_TYPE_REL_DEVICE);
+						msg_ent.setMsg_ind_id(CST_MSG_IND_DEV_LOGOUT);
+						msg_ent.setMsg_date(new Date());
+						msg_ent.setMsg_content("Pet '" + cur_user.getPet_nick() + "' is offline");
+						msg_ent.setFrom_usrid(0);	//0暂时定义为系统发起
+						msg_ent.setTo_usrid(cur_user.getFrom_usrid());	   //获取所有设备相关用户的ID
+						msg_ent.setFence_id(-1);
+						msg_ent.setStatus("0");		//默认消息未读
+						msg_ent.setShare_id(-1);
+						cur_petId = cur_user.getPet_id();
+						msg_ent.setPet_id(cur_petId);	//获取设备对应的宠物
+						msg_ent.setPush_status("1");		//设置为已经推送状态，马上推送
+						deviceEsafeService.insertSelectiveMsgInfo(msg_ent);
+						//马上推送
+						//...
+						if ("1".equals(app_type) &&  !isNullOrEmpty(ios_token))
+							proSend(ios_real, msg_ent, ios_token, true);
+						if (!"1".equals(app_type) &&  !isNullOrEmpty(device_token))
+							proSend(null, msg_ent, device_token, false);
+
+						
+					}
+
+				}
+					
+				
+				
+			}
+		}
+			
+		
+		
+		//找出所有上一状态是联机的脱机设备并设置其状态为脱机
+		int res = wdeviceActiveInfoService.updateOffline();
+		
+	}
+	
+	public static void proEfence() {
+
+		log.info("i:"+i+",deviceId："+curDev.getDeviceId());
+		
+		// 获取设备绑定的电子围栏 if_active = 1
+		List<WeFencing> fenceList = weFencingService.getDataById(curDev.getDeviceId());
+		if(fenceList != null && fenceList.size() > 0){
+			for(int j=0;j<fenceList.size();j++){
+
+				//debug start
+				/*
+				try {
+					WDeviceEsafe vo = new WDeviceEsafe();
+					vo.setDeviceId(device.getDeviceId());
+					vo.setCurEid(1);
+					vo.setEsafeOn("1");
+					vo.setPrevEid(1);
+					vo.setPrevTime(new Date());
+					deviceEsafeService.insertData(vo);		//debug
+				} catch(Exception e) {
+					e.printStackTrace();
+				}*/
+				//debug end
+					
+				WeFencing fence = fenceList.get(j);
+				
+				log.info("i:"+i+",j:"+j+",fenceId:"+fence.getId());
+				// 获取设备当前最新位置信息，判断是否在某个围栏
+				LocationInfo location = locationInfoService.getLocationByImei(curDev.getDeviceImei());
+				
+				if ( location != null && location.getLongitude() !=null && location.getLatitude() != null  ) {
+				
+					String key = "622b99b7cf7146e1243a0ad4fb3afbbe";
+					String origins = fence.getCenterGpsLo() + "," + fence.getCenterGpsLa();
+					String destination = location.getLongitude() + "," + location.getLatitude();
+					
+					String round = Distribution.distanceGaode(key, origins, destination);
+					if(Integer.parseInt(round) <= fence.getRoundDistance()){
+						//在某个电子围栏中，消息表增加一条数据，终止内存循环
+						mqProducer.sendMessage("在某个电子围栏中...");
+						break;
+					}else{
+						if(j == fenceList.size()-1){
+							//不在任何一个电子围栏内，消息表增加一条数据
+							mqProducer.sendMessage("不在某个电子围栏中...");
+						}
+					}
+				}
+
+
+			}
+		}
+			
+	}
+	
+	public static void proSendUnPush() throws Exception {
+		//找出所有未推送的消息	
+		WDeviceActiveInfo curMsg = null;
+		Integer cur_id;
+		//System.out.println("proSendUnPush enter");
+		
+		List<WDeviceActiveInfo> deviceList = wdeviceActiveInfoService.getUnpushMsg();
+		//System.out.println("proSendUnPush enter 2");
+
+		if(deviceList != null && deviceList.size() > 0 ){
+			Integer[] ids = new Integer[deviceList.size()];
+			for(int i=0;i<deviceList.size();i++){
+				curMsg = deviceList.get(i);
+				ids[i] = curMsg.getMsg_id();
+			}
+
+			wdeviceActiveInfoService.updateMsgPushStatus(ids);
+
+			
+			for(int i=0;i<deviceList.size();i++){
+				curMsg = deviceList.get(i);
+				ids[i] = curMsg.getMsg_id();
+
+				
+				
+				String tp = JSON.toJSONString(curMsg);
+			   Gson gson=new Gson();	
+				   
+				WMsgInfo chgMsg = gson.fromJson(tp, WMsgInfo.class);	
+				MyThread myThread1 = new MyThread(chgMsg);
+						myThread1.start();
+						  
+				
+			}
+
+			ids = null;
+			
+
+		}		
+		
+	}
+	
+	public void proIosSendReal(String ios_real, String msg, String ios_token, Boolean remind, String content, Integer badge) {
+		try {
+			if ( isNullOrEmpty(msg)) {
+				return;
+			}
+			
+			if ( "1.6".equals(PROTOCOL_VER) ) {
+				proIosSendRealAli(ios_real, msg, ios_token, remind, content, badge );
+			} else {
+			
+				PropDo pd = new PropDo();
+				//String p12_file_path = request.getSession(true).getServletContext().getRealPath("/push/") + "pushDevelop.p12";
+				//File directory = new File(iosP12FileName); 
+				//String p12_file_path = directory.getAbsolutePath();    //得到的是C:/test/abc 
+				
+				String iosPwd = pd.getPropFromFile("mq.properties", "iosPushPwd");
+				ApnsService service = APNS.newService()
+						.withCert(dirBase + iosP12FileName, iosPwd)
+						.withSandboxDestination()
+						.build();
+				
+				//MqttClient.pushMsg("WTDEV_DUMMY", "AHA".getBytes());
+				
+						
+				String payload = APNS.newPayload().alertBody(msg).build();
+				service.push(/*"045587774d1e9a8dd7afb75481165c02c35efbc6c8ed084f5199579acfa2ddb3"*/ios_real, payload);
+				service = null;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			log.error("proIosSendReal:", e);
+		}
+	}
+
+	
+	public void proSend(String ios_real, WDeviceEsafe data, String dev_token, boolean ios_flag) throws Exception {
+		if ( dev_token == null || "".equals(dev_token) )
+			return;
+		
+		StringBuffer sb = new StringBuffer("{\"wtpetMsg\":{\"msg_type\":\"");
+		sb.append(data.getMsg_type() + "\",\'msg_ind_id\":\"");
+		sb.append(data.getMsg_ind_id() + "\", \"msg_date\":\"");
+		sb.append(sdf.format(data.getMsg_date()) + "\", \"msg_content\":\"");
+		sb.append(data.getMsg_content() + "\", \"device_id\":\"");
+		sb.append(data.getDeviceId() + "\", \"from_usrid\":\"");
+		sb.append(data.getFrom_usrid() + "\", \"to_usrid\":\"");
+		sb.append(data.getTo_usrid() + "\", \"eference_id\":\"");
+		sb.append(data.getFence_id() + "\", \"msg_txt\":\"");
+		sb.append(data.getMsg_txt() + "\", \"share_id\":\"");
+		sb.append(data.getShare_id() + "\", \"pet_id\":\"");
+		sb.append(data.getPet_id() + "\"}");
+
+		if (ios_flag)
+			if ( ( data.getMsg_ind_id() == 5 ) || 
+					( data.getMsg_ind_id() == 6 ) || 
+					( data.getMsg_ind_id() == 7 )) {
+				proIosSendReal(ios_real, data.getMsg_content(), dev_token, true, data.getMsg_content(), data.getBadge() );
+			} else {
+				proIosSendReal(ios_real, data.getMsg_content(), dev_token, false, null, data.getBadge() );
+				
+			}
+		else
+			proArSendReal("WTDEV" +data.getDeviceId(), dev_token, sb.toString());
+		
+		sb = null;
+		
+		
+		
+	}
+	
+	
+	public static void proBrdAllDevice(WMsgInfo data) {
+		RespJsonData  resp = new RespJsonData(); 
+
+		resp.setMsg_id(data.getMsg_id());
+		resp.setMsg_type( data.getMsg_type());
+		resp.setMsg_ind_id( data.getMsg_ind_id());
+		resp.setMsg_date( data.getMsg_date());
+		resp.setMsg_txt( data.getMsg_content());
+		resp.setDevice_id( data.getDevice_id());
+		resp.setFrom_usrid( data.getFrom_usrid());
+		resp.setTo_usrid( data.getTo_usrid());
+		resp.setEference_id( data.getFence_id());
+		resp.setShare_id( data.getShare_id());
+		resp.setPet_id( data.getPet_id());
+		resp.setFrom_nick( data.getFrom_nick());
+		//resp.setFrom_email( data.getFrom_nick());
+		resp.setTo_nick( "");
+		resp.setTo_email( "");
+		resp.setSummary( data.getSummary() );
+		
+		String respStr = null;
+		respStr = JSON.toJSONString(resp);
+		
+		proBrdMsgIos(respStr);
+		proBrdMsgAdr(respStr);
+		
+	}
+	
+	//ios_real ： ios自己苹果的token
+	//dev_token 阿里的消息IOS token
+	public void proSend(String ios_real, WMsgInfo data, String dev_token, boolean ios_flag) {
+		try {
+			if ( dev_token == null || "".equals(dev_token) )
+				return;
+			RespJsonData  resp = new RespJsonData(); 
+			JSONObject json = new JSONObject();		
+	
+			resp.setMsg_id(data.getMsg_id());
+			resp.setMsg_type( data.getMsg_type());
+			resp.setMsg_ind_id( data.getMsg_ind_id());
+			resp.setMsg_date( data.getMsg_date());
+			resp.setMsg_date_utc( data.getMsg_date_utc());			
+			resp.setMsg_txt( data.getMsg_content());
+			resp.setDevice_id( data.getDevice_id());
+			resp.setFrom_usrid( data.getFrom_usrid());
+			resp.setTo_usrid( data.getTo_usrid());
+			resp.setEference_id( data.getFence_id());
+			resp.setShare_id( data.getShare_id());
+			resp.setPet_id( data.getPet_id());
+			resp.setFrom_nick( data.getFrom_nick());
+			//resp.setFrom_email( data.getFrom_nick());
+			resp.setTo_nick( "");
+			resp.setTo_email( "");
+			resp.setSummary( data.getSummary() );
+			
+			String respStr = null;
+			respStr = JSON.toJSONString(resp);
+					
+			if (ios_flag) {
+				if ( ( data.getMsg_ind_id() == 5 ) || 
+						( data.getMsg_ind_id() == 6 ) || 
+						( data.getMsg_ind_id() == 7 )) {
+					proIosSendReal(ios_real, respStr, dev_token, true, data.getMsg_content(), data.getBadge() );
+				} else {
+					proIosSendReal(ios_real, respStr, dev_token, false, null, data.getBadge() );
+	
+				}
+					
+			}
+			else
+				proArSendReal("WTDEV" + data.getDevice_id(),  respStr, dev_token);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("prosend:",e);					
+			
+		}
+		
+		
+	}
+
+    public static boolean isNullOrEmpty(Object obj) {  
+        if (obj == null)  
+            return true;  
+        
+        
+		if ( "".equals(obj.toString()) )
+				  return true;
+
+		if ( " ".equals(obj.toString()) )
+				  return true;
+		
+        if ( "\"null\"".equals(obj.toString()) )
+            return true;  	        	
+		  
+		  
+        if ( "null".equals(obj.toString()) )
+            return true;  	        	
+  
+        if (obj instanceof CharSequence)  
+            return ((CharSequence) obj).length() == 0;  
+  
+        if (obj instanceof Collection)  
+            return ((Collection) obj).isEmpty();  
+  
+        if (obj instanceof Map)  
+            return ((Map) obj).isEmpty();  
+  
+        if (obj instanceof Object[]) {  
+            Object[] object = (Object[]) obj;  
+            if (object.length == 0) {  
+                return true;  
+            }  
+            boolean empty = true;  
+            for (int i = 0; i < object.length; i++) {  
+                if (!isNullOrEmpty(object[i])) {  
+                    empty = false;  
+                    break;  
+                }  
+            }  
+            return empty;  
+        }  
+        return false;  
+    }  
+
+	public void proArSendReal(String topic, String msg, String device_token) throws Exception {
+		  if( isNullOrEmpty(msg) ) {
+			  log.info("device_token" + device_token);
+			  return;		
+		  }
+		  
+		if ( "1.6".equals(PROTOCOL_VER) ) {
+			proArSendRealAli(msg, device_token);
+		} else {
+
+			MqttClient.pushMsg(topic, msg.getBytes());
+		}
+	}
+
+
+//	  private static Long appkey= 23562416l;	//  23560482l;
+	  private static Long appkey= 23560482l;	//  23560482l;
+
+	  private static String secret="c20bb3955a373b2de5604b377875cb28";
+	  private static String url="http://gw.api.taobao.com/router/rest";
+
+	  private static String accessKeyId="LTAITqdUfjVdRTn2";
+	  private static String accessKeySecret="n1XcuIaaE2nibutsArudP9mquWA9dE";
+	  
+	  
+	  
+
+	  public void proArSendRealAli(String msg, String dev_token) {
+		  /*
+	        TaobaoClient client = new DefaultTaobaoClient(url, appkey, secret);
+	        CloudpushMessageAndroidRequest req = new CloudpushMessageAndroidRequest();
+	        req.setBody(msg);
+	        req.setTarget("all");
+	        req.setTargetValue("all");
+	        try {
+	             CloudpushMessageAndroidResponse response = client.execute(req);
+	             System.out.println(response.getBody());
+	             if(response.isSuccess()){
+	                 System.out.println("push message is success!");
+	             }
+	         }
+	         catch (Exception e){
+	             System.out.println("push message is error!");
+	         }
+	  	*/
+		  
+		  
+		  
+		  try {
+			  
+			  if ( isNullOrEmpty(msg) || isNullOrEmpty(dev_token) )
+				  return;
+		  
+		  IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+		  DefaultAcsClient client = new DefaultAcsClient(profile);
+		  /*
+		  PushNoticeToAndroidRequest androidRequest  = new PushNoticeToAndroidRequest();
+		  androidRequest.setAppKey(appkey);
+		  androidRequest.setTarget("all");
+		  androidRequest.setTargetValue("all");
+		  androidRequest.setTitle("Hello,push");
+		  androidRequest.setSummary("PushNoticeToAndroid from api");
+		  androidRequest.setAndroidExtParameters("{\"key\":\"value123\"}");
+		  
+		  com.aliyuncs.push.model.v20150827.PushNoticeToAndroidResponse pushNoticeToAndroidResponse = client.getAcsResponse(androidRequest);
+		  System.out.println(pushNoticeToAndroidResponse.getResponseId());
+		  */
+		  PushMessageToAndroidRequest androidRequest  = new PushMessageToAndroidRequest();
+		  androidRequest.setAppKey(appkey);
+		  //androidRequest.setTarget("device");
+		  //androidRequest.setTargetValue("4ffb999bc37efdcc");
+		  androidRequest.setTarget("device");
+		  
+		  //my device_token : "e65796f39f4d42b5951bcb6c70b1eb45"
+		  androidRequest.setTargetValue(dev_token);
+//		  androidRequest.setTargetValue("e65796f39f4d42b5951bcb6c70b1eb4");
+
+		  
+		  //androidRequest.setTitle("inner message");
+		  //androidRequest.setRegionId("cn-hangzhou");
+		  androidRequest.setMessage(msg);
+		  //androidRequest.setSummary("PushNoticeToAndroid from api");
+		  //androidRequest.setAndroidExtParameters("{\"key\":\"value123\"}");
+		  
+		  //		 
+		  PushMessageToAndroidResponse pushNoticeToAndroidResponse = client.getAcsResponse(androidRequest);
+		  //System.out.println(pushNoticeToAndroidResponse.getResponseId());
+		  
+		  
+		  } catch (Exception e) {
+			  //System.out.println(e.getMessage());
+			  //e.printStackTrace();
+		  }
+		  
+	  }
+
+	  public void proIosSendRealAli(String ios_real, String msg, String dev_token, Boolean remind, String content, Integer badge) {
+		  try {
+
+			  if( isNullOrEmpty(msg) && isNullOrEmpty(content)) {
+				  //log.info("ios_real" + ios_real);				  
+				  return;
+			  }
+			  
+			  	
+			  IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+			  DefaultAcsClient client = new DefaultAcsClient(profile);
+			  PushMessageToiOSRequest req  = new PushMessageToiOSRequest();
+			  
+			  req.setAppKey(appkey);
+			  req.setTarget("device");
+			  req.setTargetValue(dev_token);
+			  req.setMessage(msg);
+			  
+			  //abcde
+			  //注意：通知统一使用APNS直接发送
+			  //if( remind && !isNullOrEmpty(content))
+			  //	  req.setSummary(content);
+			  try {
+				  /*PushMessageToiOSResponse resp =*/ client.getAcsResponse(req);
+			  } catch(Exception e) {
+				  
+			  }
+			  //System.out.println(resp.getResponseId());
+
+			  //PushNoticeToiOSRequest reqNt  = new PushNoticeToiOSRequest();
+			  
+			  JSONObject jo = null;
+			  String m = null;
+			  
+			  if (msg.endsWith("}") ) {
+				  jo = JSONObject.fromObject(msg);
+				  m = jo.optString("summary");
+			  }
+			  
+			  if (  isNullOrEmpty(m) || m.equals("device status changed!") )
+				  return;
+
+			  /*
+			  if (m.endsWith("}") ) {
+				  JSONObject joi =  JSONObject.fromObject(m);
+				  m = joi.optString("txt");
+				  if ( m == null )
+					  return;
+			  }*/
+			  
+			  /*
+			  reqNt.setAppKey(appkey);
+			  reqNt.setTarget("device");
+			  reqNt.setTargetValue(dev_token);
+			  
+			  reqNt.setSummary(m);
+			  reqNt.setEnv("DEV");
+			  reqNt.setExt("{\"sound\":\"default\",\"badge\":\"1\"}");
+			  
+			  PushNoticeToiOSResponse respNt = client.getAcsResponse(reqNt);
+			  System.out.println(respNt.getResponseId());
+			  */
+			  int ret = proIosSendRealTest(ios_real, m, badge );
+			  if ( ret == 0  ) {
+				  Thread.sleep(200);
+				  ret = proIosSendRealTest(ios_real, m, badge );
+			  } //else
+				//  return;
+
+/*			  if ( ret == 0  ) {
+				  Thread.sleep(1000);
+				  ret = proIosSendRealTest(ios_real, m, badge );
+			  }
+*/
+
+			  if ( (ret == 0)  && ( apnsSrv != null )) {
+				  synchronized (apnsSrv) {				  
+					  apnsSrv.stop();
+					  apnsSrv = null;
+				  }
+			  }
+			  
+			  
+			  ret = proIosSendRealTestOnline(ios_real, m, badge );
+			  if ( ret == 0  ) {
+				  Thread.sleep(200);
+				  ret = proIosSendRealTestOnline(ios_real, m, badge );
+			  } else
+				  return;
+
+			  if ( (ret == 0)  && ( apnsSrvOnline != null )) {
+				  synchronized (apnsSrvOnline) {				  
+					  apnsSrvOnline.stop();
+					  apnsSrvOnline = null;
+				  }
+			  }
+			  
+			  
+
+		  
+		  } catch (Exception e) {
+			  //System.out.println(e.getMessage());
+			  e.printStackTrace();
+			log.error("proIosSendRealAli", e);
+			log.info("msg:"+msg + "content:" + content);
+			
+		  }
+		  
+	  }
+	  
+	  
+	  
+	  private static ApnsService apnsSrv = null;
+	  private static ApnsService apnsSrvOnline = null;
+
+	  
+	  private static void initApnsService() {
+		  try {
+				PropDo pd = new PropDo();
+				//String p12_file_path = request.getSession(true).getServletContext().getRealPath("/push/") + "pushDevelop.p12";
+				//File directory = new File(iosP12FileName); 
+				//String p12_file_path = directory.getAbsolutePath();    //得到的是C:/test/abc 
+				String iosPwd = pd.getPropFromFile("mq.properties", "iosPushPwd");
+				
+					
+				
+					if ( apnsSrv != null )
+						return;		
+					apnsSrv = APNS.newService()
+							.withCert(dirBase + iosP12FileName, iosPwd)
+							.withSandboxDestination()
+							.build();
+
+					/*
+					apnsSrv = APNS.newService()
+							.withCert(dirBase + iosP12FileName, iosPwd)
+							.withSandboxDestination()
+							.asQueued()
+							.withNoErrorDetection()
+							.build();
+							*/
+					
+					// 2、这里连接的是沙箱服务器，withSandboxDestination()。
+					//如果换成生产环境时，要换作withProduct那个。
+			  
+		  } catch ( Exception e ) {
+			  e.printStackTrace();
+			  apnsSrv = null;
+		  }
+	  }
+
+	  
+	  private static void initApnsServiceOnline() {
+		  try {
+				PropDo pd = new PropDo();
+				//String p12_file_path = request.getSession(true).getServletContext().getRealPath("/push/") + "pushDevelop.p12";
+				//File directory = new File(iosP12FileName); 
+				//String p12_file_path = directory.getAbsolutePath();    //得到的是C:/test/abc 
+				String iosPwd = pd.getPropFromFile("mq.properties", "iosPushPwd");
+				
+					
+				
+					if ( apnsSrvOnline != null )
+						return;				
+					apnsSrvOnline = APNS.newService()
+							.withCert(dirBase + iosP12FileNameOnline, iosPwd)
+							.withProductionDestination()
+							.build();//.withSandboxDestination()
+
+					
+					// 2、这里连接的是沙箱服务器，withSandboxDestination()。
+					//如果换成生产环境时，要换作withProduct那个。
+			  
+		  } catch ( Exception e ) {
+			  e.printStackTrace();
+			  apnsSrvOnline = null;
+		  }
+	  }
+	  
+	  
+		public static void proIosSendReal1(String ios_real, String msg, String ios_token, Boolean remind, String content) throws Exception {
+			if ( isNullOrEmpty(msg)) {
+				return;
+			}
+			
+			{
+			
+				PropDo pd = new PropDo();
+				//String p12_file_path = request.getSession(true).getServletContext().getRealPath("/push/") + "pushDevelop.p12";
+				//File directory = new File(iosP12FileName); 
+				//String p12_file_path = directory.getAbsolutePath();    //得到的是C:/test/abc 
+				
+				//String path = this.getClass().getClassLoader().getResource("/").getPath();
+				
+				String iosPwd = pd.getPropFromFile("mq.properties", "iosPushPwd");
+				ApnsService service = APNS.newService()
+						.withCert(dirBase + iosP12FileName, iosPwd)
+						.withSandboxDestination()
+						.build();
+				
+				//MqttClient.pushMsg("WTDEV_DUMMY", "AHA".getBytes());
+				
+						
+				String payload = APNS.newPayload().alertBody(msg).build();
+				service.push(/*"045587774d1e9a8dd7afb75481165c02c35efbc6c8ed084f5199579acfa2ddb3"*/ios_real, payload);
+				service = null;
+			}
+			
+		}
+	  
+
+		public int proIosSendRealTest(String ios_real, String msg, Integer badge) {
+			try {
+				log.info("proIosSendRealTest ios_real::" + ios_real + " msg:" + msg);			  				
+				
+				//ios_real = "d9bddfcd159d6b6a08ff5cca6e7a1ab031c74367bb0509f4b435f5e20b7d24da";
+				
+				if ( isNullOrEmpty(msg) || isNullOrEmpty(ios_real)) {
+					return -1;
+				}
+				
+				initApnsService();
+				//PayloadBuilder pl = APNS.newPayload();
+				//pl.
+				
+				if ( badge == null || badge <= 0 )
+					badge = 1;
+				
+				String payload = APNS.newPayload().alertBody(msg).badge(badge).sound("default").build();
+				ApnsNotification anf = null; 
+				if ( apnsSrv != null ) {
+					Map<String, Date> invTokens =  apnsSrv.getInactiveDevices();					
+					if ( !invTokens.containsKey(ios_real) ) { 	
+						 synchronized (apnsSrv) {
+							anf = apnsSrv.push(ios_real, payload);
+							
+						}
+						return 1;
+					}else
+						return -1;
+				} else
+					return 0;
+				
+			} catch( Exception e ) {
+				e.printStackTrace();
+				log.error("proIosSendRealTest", e);			  				
+				return 0;
+			}
+			
+		}
+		
+
+		public int proIosSendRealTestOnline(String ios_real, String msg, Integer badge) {
+			try {
+				log.info("proIosSendRealTest online ios_real::" + ios_real + " msg:" + msg);			  				
+				
+				//debug;
+				//ios_real = "f15e7f42bccaed91424ed4650a6a90e8986aee9aa26529291800c0e0ee190a71";
+				
+				if ( isNullOrEmpty(msg) || isNullOrEmpty(ios_real)) {
+					return -1;
+				}
+				
+				initApnsServiceOnline();
+				//PayloadBuilder pl = APNS.newPayload();
+				//pl.
+				
+				if ( badge == null || badge <= 0 )
+					badge = 1;
+				
+				String payload = APNS.newPayload().alertBody(msg).badge(badge).sound("default").build();
+				ApnsNotification anf = null; 
+				if ( apnsSrvOnline != null ) {
+					Map<String, Date> invTokens =  apnsSrvOnline.getInactiveDevices();
+					if ( !invTokens.containsKey(ios_real) ) { 	
+						 synchronized (apnsSrvOnline) {
+							anf = apnsSrvOnline.push(ios_real, payload);
+							//System.out.println(anf.toString());
+							
+						}
+						return 1;
+					}else
+						return -1;
+				} else
+					return 0;
+				
+			} catch( Exception e ) {
+				e.printStackTrace();
+				log.error("proIosSendRealTestOnline", e);			  				
+				return 0;
+			}
+			
+		}
+		
+		
+		  public static void proBrdMsgAdr(String msg) {
+			  try {
+			  
+			  IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+			  DefaultAcsClient client = new DefaultAcsClient(profile);
+
+			  PushMessageToAndroidRequest androidRequest  = new PushMessageToAndroidRequest();
+			  androidRequest.setAppKey(appkey);
+			  //androidRequest.setTarget("device");
+			  //androidRequest.setTargetValue("4ffb999bc37efdcc");
+			  androidRequest.setTarget("all");
+			  androidRequest.setTargetValue("all");
+			  
+			  //my device_token : "e65796f39f4d42b5951bcb6c70b1eb45"
+//			  androidRequest.setTargetValue(dev_token);
+//			  androidRequest.setTargetValue("e65796f39f4d42b5951bcb6c70b1eb4");
+
+			  
+			  //androidRequest.setTitle("inner message");
+			  //androidRequest.setRegionId("cn-hangzhou");
+			  androidRequest.setMessage(msg);
+			  //androidRequest.setSummary("PushNoticeToAndroid from api");
+			  //androidRequest.setAndroidExtParameters("{\"key\":\"value123\"}");
+			  
+			  PushMessageToAndroidResponse pushNoticeToAndroidResponse = client.getAcsResponse(androidRequest);
+			  //System.out.println(pushNoticeToAndroidResponse.getResponseId());
+			  
+			  
+			  } catch (Exception e) {
+				  //System.out.println(e.getMessage());
+				  e.printStackTrace();
+			  }
+			  
+		  }
+
+		  public static void proBrdMsgIos(String msg) {
+			  try {
+			  
+				  	
+				  IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+				  DefaultAcsClient client = new DefaultAcsClient(profile);
+				  /*
+				  PushMessageToiOSRequest req  = new PushMessageToiOSRequest();
+				  
+				  req.setAppKey(appkey);
+				  req.setTarget("device");
+				  req.setTargetValue("all");
+				  req.setMessage(msg);
+				  
+				  PushMessageToiOSResponse resp = client.getAcsResponse(req);
+				  */
+
+				  PushMessageToiOSRequest reqNt  = new PushMessageToiOSRequest();
+				  
+				  
+				  if (  isNullOrEmpty(msg) )
+					  return;
+
+				  /*
+				  if (m.endsWith("}") ) {
+					  JSONObject joi =  JSONObject.fromObject(m);
+					  m = joi.optString("txt");
+					  if ( m == null )
+						  return;
+				  }*/
+				  
+				  reqNt.setAppKey(appkey);
+				  reqNt.setTarget("all");
+				  reqNt.setTargetValue("all");
+				  reqNt.setMessage(msg);
+
+				  
+				  
+				  PushMessageToiOSResponse respNt = client.getAcsResponse(reqNt);
+				  //System.out.println(respNt.getResponseId());
+				  				  
+			  
+			  } catch (Exception e) {
+				  //System.out.println(e.getMessage());
+				  e.printStackTrace();
+				log.error("proBrdMsgIos", e);			  
+			  }
+			  
+		  }
+
+		  public static class TestTimerTaskMqNml extends TimerTask {
+				
+				public TestTimerTaskMqNml() {			
+				}
+				
+				@Override		
+				public void run() {
+					try {
+			            String host = "http://appserver1.paby.com:8161/";
+						
+			            WhttpPostAs whp = WhttpPostAs.getInstance();
+			            whp.httpPostInner(host, null);
+						
+					} catch ( Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}		
+		
+}
+
+
+
+
+
+
+class WhttpPostAs {
+	public WhttpPostAs() {
+		
+	}
+	
+	private static WhttpPostAs aIns= null;
+	
+	public static WhttpPostAs getInstance() {
+		if (aIns == null) {
+			aIns = new WhttpPostAs();
+			return aIns;
+		} else
+			return aIns;
+			
+	}
+	public /*staticsynchronized*/ void httpPostInner( String urlNameString,  String params ) {
+		//String urlNameString = "http://192.168.17.225:8080/wtpet/doWTSignin.do";
+		try {
+			//Logger.getLogger(App.class).info("mqSverPetMsger:httpPostInner");
+			
+			String encoding="UTF-8";    
+			
+			
+			URL url =new URL(urlNameString);        
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection(); 
+			//conn.setRequestMethod("POST");
+	        //conn.setDoOutput(true);        //application/x-javascript text/xml->xml数据 application/x-javascript->json对象 application/x-www-form-urlencoded->表单数据        
+			conn.setRequestProperty("Content-Type", "application/x-javascript; charset="+ encoding);     
+        	conn.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0");
+	        		        	
+			conn.setConnectTimeout(120*1000);
+
+	        try {
+				int code = conn.getResponseCode();
+				if(code >= 400){
+					Logger.getLogger(App.class).info("mqSverPetMsger: stop");				
+					WarnAdminMgr();																			
+					
+	
+				} else {
+				}
+	        } catch(Exception e) {
+				e.printStackTrace();
+				Logger.getLogger(App.class).info(e);				
+
+				Logger.getLogger(App.class).info("mqSverPetMsger: stop");				
+				WarnAdminMgr();
+
+	        	
+	        }
+			
+	        
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.getLogger(App.class).info(e);				
+			
+		}
+		
+	}
+	
+	public void WarnAdminMgr() {
+		try {
+		   WMsgInfo wi = new WMsgInfo();
+			wi.setApp_type("1");
+			wi.setBadge(0);
+			wi.setDevice_id(80);
+			wi.setHide_flag("0");
+			wi.setMsg_ind_id(8);
+			wi.setIos_real("5272e4539717fbfa4b409b894161a66afb02917f720d8f56c8948b64564be195");
+			wi.setIos_token("e405d8969f744814b6e8622bf87e5607");
+			wi.setMsg_content("mqtt server stopped!");
+			wi.setSummary("mqtt server stopped!");
+			wi.setTo_usrid(1);
+
+			PropDo pd = new PropDo();
+			
+			String iosPwd = pd.getPropFromFile("mq.properties", "iosPushPwd");
+			ApnsService service = APNS.newService()
+					.withCert(App.dirBase + App.iosP12FileName, iosPwd)
+					.withSandboxDestination()
+					.build();
+			
+			//MqttClient.pushMsg("WTDEV_DUMMY", "AHA".getBytes());
+			
+					
+			String payload = APNS.newPayload().alertBody("mqtt server stopped!").build();
+			service.push(/*"045587774d1e9a8dd7afb75481165c02c35efbc6c8ed084f5199579acfa2ddb3"*/"5272e4539717fbfa4b409b894161a66afb02917f720d8f56c8948b64564be195", payload);
+			service = null;
+		} catch(Exception e) {
+			e.printStackTrace();
+			Logger.getLogger(App.class).info(e);				
+			
+		}
+			//MyThread myThread1 = new MyThread(wi);
+			//myThread1.start();  
+		
+	}
+	
+}
+
+
+ 

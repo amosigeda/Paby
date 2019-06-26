@@ -1,0 +1,11 @@
+package com.wtwd.pet.app.service;
+
+import java.util.List;
+
+import com.wtwd.pet.app.entity.WeFencing;
+
+public interface WeFencingService {
+	
+	public List<WeFencing> getDataById(int deviceId);
+	
+}

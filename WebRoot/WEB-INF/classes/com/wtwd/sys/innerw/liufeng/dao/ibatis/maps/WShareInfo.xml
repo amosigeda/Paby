@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WShareInfo">
+	
+	<select id="getDeviceLocationInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT 
+			wsi.device_id,wdai.device_type,loi.battery,loi.fall,loi.longitude,loi.latitude,loi.accuracy,wdai.led_on,wdai.sel_mode,wdai.gps_on 
+		FROM wappusers wau LEFT JOIN wshare_info wsi ON wau.user_id = wsi.user_id 
+		LEFT JOIN wdevice_active_info wdai ON wsi.device_id = wdai.device_id 
+		LEFT JOIN locationinfo loi ON wdai.device_imei = loi.serie_no 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getDeviceLocationInfoCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT 
+			 COUNT(*) 
+		FROM wappusers wau LEFT JOIN wshare_info wsi ON wau.user_id = wsi.user_id 
+		LEFT JOIN wdevice_active_info wdai ON wsi.device_id = wdai.device_id 
+		LEFT JOIN locationinfo loi ON wdai.device_imei = loi.serie_no
+		<dynamic prepend="where"> 			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 获取单个设备的轨迹信息 -->
+	<!-- 验证用户信息是否正确 -->
+	<select id="getUserValidationInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT * FROM wappusers 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 获取指定条数的轨迹数据 -->
+	<select id="getDeviceTrackInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT 
+			wsi.device_id,loi.location_type,loi.change_longitude as longitude,loi.change_latitude as latitude,loi.accuracy,
+            date_format(loi.upload_time, "%Y-%m-%d %T") as upload_time  
+		FROM wshare_info wsi 
+		LEFT JOIN wdevice_active_info wai ON wsi.device_id = wai.device_id 
+		LEFT JOIN locationinfo loi ON wai.device_imei = loi.serie_no
+
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 获取所有符合条件的轨迹数据 -->
+	<select id="getDeviceTrackCountInfo" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.wappusers.domain.WappUsers">
+		SELECT 
+			 COUNT(*) 
+		FROM wshare_info wsi 
+		LEFT JOIN wdevice_active_info wai ON wsi.device_id = wai.device_id 
+		LEFT JOIN locationinfo loi ON wai.device_imei = loi.serie_no 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+
+	<!-- 获取指定设备的所有分享者 -->
+	<select id="getAllUsers" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wshareInfo.domain.WshareInfo">	
+		select distinct a.user_id as user_id, b.email, b.born_date as user_born, b.nickname as user_nick, 
+			b.photo as user_photo, b.sex as user_sex, date_format(b.lastlogin_time, "%Y-%m-%d %T") as login_time, 
+		    b.firstname, b.lastname, b.signtext, b.photo_time_stamp 
+		    from  wshare_info a  left join wappusers b on a.user_id = b.user_id 
+
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+</sqlMap>

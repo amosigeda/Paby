@@ -1,0 +1,10 @@
+package com.wtwd.sys.innerw.wpetwifirange.form;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.godoing.rose.http.PublicFormBean;
+
+public class WpetWifiRangeForm extends PublicFormBean implements Serializable{
+
+}

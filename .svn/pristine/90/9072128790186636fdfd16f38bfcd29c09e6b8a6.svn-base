@@ -1,0 +1,150 @@
+package com.wtwd.sys.feedbackinfo.action;
+
+import java.util.*;
+
+import javax.servlet.http.*;
+
+import org.apache.commons.beanutils.*;
+import org.apache.struts.action.*;
+
+import com.godoing.rose.http.common.HttpTools;
+import com.godoing.rose.http.common.PagePys;
+import com.godoing.rose.lang.*;
+
+import org.apache.commons.logging.Log;
+
+import com.godoing.rose.log.LogFactory;
+import com.godoing.rose.http.common.*;
+import com.wtwd.common.config.Config;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.lang.CommUtils;
+import com.wtwd.sys.feedbackinfo.domain.FeedBackInfo;
+import com.wtwd.sys.feedbackinfo.domain.logic.FeedBackInfoFacade;
+import com.wtwd.sys.feedbackinfo.form.FeedBackInfoForm;
+import com.wtwd.sys.projectinfo.domain.ProjectInfo;
+import com.wtwd.sys.roleinfo.domain.RoleInfo;
+import com.wtwd.sys.userinfo.domain.*;
+import com.wtwd.sys.userinfo.domain.logic.*;
+import com.wtwd.sys.userinfo.form.*;
+
+/* rose1.2 to files
+ * rose anthor:wlb  1.0 version by time 2005/12/12
+ * rose anthor:wlb  1.1 version by time 2006/06/06
+ * rose anthor:wlb  1.2 version by time 2006/12/27*/
+public class FeedBackInfoAction extends BaseAction {
+	
+	Log logger = LogFactory.getLog(FeedBackInfoAction.class);
+
+	public ActionForward queryFeedBackInfo(ActionMapping mapping,
+			ActionForm actionForm, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		String href= request.getServletPath();
+		Date start = new Date();		
+		Result result = new Result();
+		PagePys pys = new PagePys();
+		DataList list = null;
+		StringBuffer sb = new StringBuffer();//�����ַ�����
+		FeedBackInfoFacade info = ServiceBean.getInstance().getFeedBackInfoFacade();
+		try {
+			FeedBackInfoForm form = (FeedBackInfoForm) actionForm;
+
+			/* ���ó�ʼ��������� */			
+			form.setOrderBy("date_time");
+			form.setSort("1");
+
+			FeedBackInfo vo = new FeedBackInfo();
+			String userId = request.getParameter("userId");
+			String startTime = request.getParameter("startTime");
+			String endTime   = request.getParameter("endTime");		
+			String belongProject = request.getParameter("belongProject");
+
+			/*���û������ֶ�*/
+            form.setOrderBy("date_time"); 
+            form.setSort("1"); 
+
+            if(userId != null && !"".equals(userId)){
+				sb.append("user_id like '%"+userId+"%'");
+			}
+			if(startTime != null && !"".equals(startTime)){
+				if(sb.length() > 0){
+					sb.append(" and ");
+				}
+				sb.append("substring(date_time,1,10) >= '"+startTime+"'");
+			}
+			if(endTime != null && !"".equals(endTime)){
+				if(sb.length() > 0){
+					sb.append(" and ");
+				}
+				sb.append("substring(date_time,1,10) <= '"+endTime+"'");
+			}
+			if(belongProject != null && !"".equals(belongProject)){
+				if(sb.length() > 0){
+					sb.append(" and ");
+				}
+				sb.append("belong_project = '" + belongProject + "'");
+			}
+			vo.setCondition(sb.toString());
+			request.setAttribute("fNow_date", startTime);
+		    request.setAttribute("now_date", endTime);
+		    request.setAttribute("userId", userId);
+		    request.setAttribute("belongProject", belongProject);
+			BeanUtils.copyProperties(vo, form);
+			list = info.getDataFeedBackInfoListByVo(vo);
+			BeanUtils.copyProperties(pys, form);
+			pys.setCounts(list.getTotalSize());
+			/* ���û������ֶ� */
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.debug(request.getQueryString() + "  " + e);
+			result.setBackPage(Config.ABOUT_PAGE); /* ����Ϊ����ҳ�棬���Գ������ת��ϵͳĬ��ҳ�� */
+			if (e instanceof SystemException) { /* ����֪�쳣���н��� */
+				result.setResultCode(((SystemException) e).getErrCode());
+				result.setResultType(((SystemException) e).getErrType());
+			} else { /* ��δ֪�쳣���н�������ȫ�������δ֪�쳣 */
+				result.setResultCode("noKnownException");
+				result.setResultType("sysRunException");
+			}
+		} finally {
+			request.setAttribute("result", result);
+			request.setAttribute("pageList", list);
+			request.setAttribute("PagePys", pys);
+		}
+		CommUtils.getIntervalTime(start, new Date(), href);
+		return mapping.findForward("queryFeedBackInfo");
+	}
+
+	public ActionForward deleteFeedBackInfo(ActionMapping mapping,
+			ActionForm actionForm, HttpServletRequest request,
+			HttpServletResponse response) {
+		Result result = new Result();
+		try {
+			String id = request.getParameter("id");
+			FeedBackInfo vo = new FeedBackInfo();
+				vo.setCondition("id ='"+id+"'");            //�����û��˻�
+				ServiceBean.getInstance().getFeedBackInfoFacade()
+						.deleteFeedBackInfo(vo);   //��bean��ɾ���û�
+			
+			result.setBackPage(HttpTools.httpServletPath(request,
+					"queryFeedBackInfo"));
+			result.setResultCode("deletes");
+			result.setResultType("success");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.debug(request.getQueryString() + "  " + e);
+			result.setBackPage(HttpTools.httpServletPath(request,
+					"queryFeedBackInfo"));
+			if (e instanceof SystemException) { /* ����֪�쳣���н��� */
+				result.setResultCode(((SystemException) e).getErrCode());
+				result.setResultType(((SystemException) e).getErrType());
+			} else { /* ��δ֪�쳣���н�������ȫ�������δ֪�쳣 */
+				result.setResultCode("noKnownException");
+				result.setResultType("sysRunException");
+			}
+		} finally {
+			request.setAttribute("result", result);
+		}
+		return mapping.findForward("result");
+	}
+}

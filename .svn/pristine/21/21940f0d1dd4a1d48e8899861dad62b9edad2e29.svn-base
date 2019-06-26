@@ -1,0 +1,131 @@
+package com.wtwd.pet.app.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.wtwd.pet.app.base.BaseEntity;
+
+public class LocationInfo extends BaseEntity implements Serializable {
+    
+	private static final long serialVersionUID = 1197712037473212475L;
+
+	private Integer id;
+
+    private String serieNo;
+
+    private Integer battery;
+
+    private String longitude;
+
+    private String latitude;
+
+    private String locationType;
+
+    private Integer accuracy;
+
+    private Date uploadTime;
+
+    private String changeLongitude;
+
+    private String changeLatitude;
+
+    private Integer belongProject;
+
+    private String fall;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getSerieNo() {
+        return serieNo;
+    }
+
+    public void setSerieNo(String serieNo) {
+        this.serieNo = serieNo == null ? null : serieNo.trim();
+    }
+
+    public Integer getBattery() {
+        return battery;
+    }
+
+    public void setBattery(Integer battery) {
+        this.battery = battery;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude == null ? null : longitude.trim();
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude == null ? null : latitude.trim();
+    }
+
+    public String getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(String locationType) {
+        this.locationType = locationType == null ? null : locationType.trim();
+    }
+
+    public Integer getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Integer accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public Date getUploadTime() {
+        return uploadTime;
+    }
+
+    public void setUploadTime(Date uploadTime) {
+        this.uploadTime = uploadTime;
+    }
+
+    public String getChangeLongitude() {
+        return changeLongitude;
+    }
+
+    public void setChangeLongitude(String changeLongitude) {
+        this.changeLongitude = changeLongitude == null ? null : changeLongitude.trim();
+    }
+
+    public String getChangeLatitude() {
+        return changeLatitude;
+    }
+
+    public void setChangeLatitude(String changeLatitude) {
+        this.changeLatitude = changeLatitude == null ? null : changeLatitude.trim();
+    }
+
+    public Integer getBelongProject() {
+        return belongProject;
+    }
+
+    public void setBelongProject(Integer belongProject) {
+        this.belongProject = belongProject;
+    }
+
+    public String getFall() {
+        return fall;
+    }
+
+    public void setFall(String fall) {
+        this.fall = fall == null ? null : fall.trim();
+    }
+}

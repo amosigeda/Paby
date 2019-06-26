@@ -1,0 +1,337 @@
+package com.wtwd.pet.app.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.wtwd.pet.app.base.BaseEntity;
+
+public class WDeviceEsafe extends BaseEntity implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2241066306822413178L;
+
+	private Integer deviceId;
+
+    private String esafeOn;
+
+    private Integer prevEid;
+
+    private Integer curEid;
+
+    private Date prevTime;
+    
+    private Date app_timestamp;
+    private Date dev_timestamp;
+    private String app_status;
+    private String dev_status;
+    
+    
+    //消息表属性
+    private String msg_type;
+    private Integer msg_ind_id;
+    private Date msg_date;
+    private String msg_content;
+    private Integer from_usrid;
+    private Integer to_usrid;
+    private Integer fence_id;
+    private String status;
+    private Integer share_id;
+    private Integer pet_id;
+    private String push_status;
+    private String msg_txt;
+    private String msg_date_utc;    
+    private Integer badge;
+
+    public Integer getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(Integer deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getEsafeOn() {
+        return esafeOn;
+    }
+
+    public void setEsafeOn(String esafeOn) {
+        this.esafeOn = esafeOn == null ? null : esafeOn.trim();
+    }
+
+    public Integer getPrevEid() {
+        return prevEid;
+    }
+
+    public void setPrevEid(Integer prevEid) {
+        this.prevEid = prevEid;
+    }
+
+    public Integer getCurEid() {
+        return curEid;
+    }
+
+    public void setCurEid(Integer curEid) {
+        this.curEid = curEid;
+    }
+
+    public Date getPrevTime() {
+        return prevTime;
+    }
+
+    public void setPrevTime(Date prevTime) {
+        this.prevTime = prevTime;
+    }
+
+	/**
+	 * @return the app_timestamp
+	 */
+	public Date getApp_timestamp() {
+		return app_timestamp;
+	}
+
+	/**
+	 * @param app_timestamp the app_timestamp to set
+	 */
+	public void setApp_timestamp(Date app_timestamp) {
+		this.app_timestamp = app_timestamp;
+	}
+
+	/**
+	 * @return the dev_timestamp
+	 */
+	public Date getDev_timestamp() {
+		return dev_timestamp;
+	}
+
+	/**
+	 * @param dev_timestamp the dev_timestamp to set
+	 */
+	public void setDev_timestamp(Date dev_timestamp) {
+		this.dev_timestamp = dev_timestamp;
+	}
+
+	/**
+	 * @return the app_status
+	 */
+	public String getApp_status() {
+		return app_status;
+	}
+
+	/**
+	 * @param app_status the app_status to set
+	 */
+	public void setApp_status(String app_status) {
+		this.app_status = app_status;
+	}
+
+	/**
+	 * @return the dev_status
+	 */
+	public String getDev_status() {
+		return dev_status;
+	}
+
+	/**
+	 * @param dev_status the dev_status to set
+	 */
+	public void setDev_status(String dev_status) {
+		this.dev_status = dev_status;
+	}
+
+	/**
+	 * @return the msg_type
+	 */
+	public String getMsg_type() {
+		return msg_type;
+	}
+
+	/**
+	 * @param msg_type the msg_type to set
+	 */
+	public void setMsg_type(String msg_type) {
+		this.msg_type = msg_type;
+	}
+
+	/**
+	 * @return the msg_date
+	 */
+	public Date getMsg_date() {
+		return msg_date;
+	}
+
+	/**
+	 * @param msg_date the msg_date to set
+	 */
+	public void setMsg_date(Date msg_date) {
+		this.msg_date = msg_date;
+	}
+
+	/**
+	 * @return the msg_ind_id
+	 */
+	public Integer getMsg_ind_id() {
+		return msg_ind_id;
+	}
+
+	/**
+	 * @param msg_ind_id the msg_ind_id to set
+	 */
+	public void setMsg_ind_id(Integer msg_ind_id) {
+		this.msg_ind_id = msg_ind_id;
+	}
+
+	/**
+	 * @return the msg_content
+	 */
+	public String getMsg_content() {
+		return msg_content;
+	}
+
+	/**
+	 * @param msg_content the msg_content to set
+	 */
+	public void setMsg_content(String msg_content) {
+		this.msg_content = msg_content;
+	}
+
+	/**
+	 * @return the to_usrid
+	 */
+	public Integer getTo_usrid() {
+		return to_usrid;
+	}
+
+	/**
+	 * @param to_usrid the to_usrid to set
+	 */
+	public void setTo_usrid(Integer to_usrid) {
+		this.to_usrid = to_usrid;
+	}
+
+	/**
+	 * @return the from_usrid
+	 */
+	public Integer getFrom_usrid() {
+		return from_usrid;
+	}
+
+	/**
+	 * @param from_usrid the from_usrid to set
+	 */
+	public void setFrom_usrid(Integer from_usrid) {
+		this.from_usrid = from_usrid;
+	}
+
+	/**
+	 * @return the fence_id
+	 */
+	public Integer getFence_id() {
+		return fence_id;
+	}
+
+	/**
+	 * @param fence_id the fence_id to set
+	 */
+	public void setFence_id(Integer fence_id) {
+		this.fence_id = fence_id;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the share_id
+	 */
+	public Integer getShare_id() {
+		return share_id;
+	}
+
+	/**
+	 * @param share_id the share_id to set
+	 */
+	public void setShare_id(Integer share_id) {
+		this.share_id = share_id;
+	}
+
+	/**
+	 * @return the pet_id
+	 */
+	public Integer getPet_id() {
+		return pet_id;
+	}
+
+	/**
+	 * @param pet_id the pet_id to set
+	 */
+	public void setPet_id(Integer pet_id) {
+		this.pet_id = pet_id;
+	}
+
+	/**
+	 * @return the push_status
+	 */
+	public String getPush_status() {
+		return push_status;
+	}
+
+	/**
+	 * @param push_status the push_status to set
+	 */
+	public void setPush_status(String push_status) {
+		this.push_status = push_status;
+	}
+
+	/**
+	 * @return the msg_txt
+	 */
+	public String getMsg_txt() {
+		return msg_txt;
+	}
+
+	/**
+	 * @param msg_txt the msg_txt to set
+	 */
+	public void setMsg_txt(String msg_txt) {
+		this.msg_txt = msg_txt;
+	}
+
+	/**
+	 * @return the badge
+	 */
+	public Integer getBadge() {
+		return badge;
+	}
+
+	/**
+	 * @param badge the badge to set
+	 */
+	public void setBadge(Integer badge) {
+		this.badge = badge;
+	}
+
+	/**
+	 * @return the msg_date_utc
+	 */
+	public String getMsg_date_utc() {
+		return msg_date_utc;
+	}
+
+	/**
+	 * @param msg_date_utc the msg_date_utc to set
+	 */
+	public void setMsg_date_utc(String msg_date_utc) {
+		this.msg_date_utc = msg_date_utc;
+	}
+}

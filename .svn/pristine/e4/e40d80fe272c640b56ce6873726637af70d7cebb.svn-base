@@ -1,0 +1,998 @@
+package com.wtwd.sys.client.handler.helper;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import net.sf.json.JSONObject;
+
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.lang.SystemException;
+import com.wtwd.common.bean.other.AppUserInfoAdr;
+import com.wtwd.common.bean.other.CheckInfoAdr;
+import com.wtwd.common.bean.other.LocationInfoAdr;
+import com.wtwd.common.bean.other.MsgInfoAdr;
+import com.wtwd.common.bean.other.SafeAreaAdr;
+import com.wtwd.common.bean.other.ShareInfoAdr;
+import com.wtwd.common.bean.request.ReqJsonData;
+import com.wtwd.common.bean.response.RespJsonData;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.sys.appuserinfo.domain.AppUserInfo;
+import com.wtwd.sys.appuserinfo.domain.logic.AppUserInfoFacade;
+import com.wtwd.sys.checkinfo.domain.CheckInfo;
+import com.wtwd.sys.checkinfo.domain.logic.CheckInfoFacade;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+import com.wtwd.sys.deviceactiveinfo.domain.logic.DeviceActiveInfoFacade;
+import com.wtwd.sys.directiveinfo.domain.DirectiveInfo;
+import com.wtwd.sys.directiveinfo.domain.logic.DirectiveInfoFacade;
+import com.wtwd.sys.feedbackinfo.domain.FeedBackInfo;
+import com.wtwd.sys.feedbackinfo.domain.logic.FeedBackInfoFacade;
+import com.wtwd.sys.locationinfo.domain.LocationInfo;
+import com.wtwd.sys.locationinfo.domain.logic.LocationInfoFacade;
+import com.wtwd.sys.msginfo.domain.MsgInfo;
+import com.wtwd.sys.msginfo.domain.logic.MsgInfoFacade;
+import com.wtwd.sys.phoneinfo.domain.PhoneInfo;
+import com.wtwd.sys.phoneinfo.domain.logic.PhoneInfoFacade;
+import com.wtwd.sys.relativecallinfo.domain.RelativeCallInfo;
+import com.wtwd.sys.relativecallinfo.domain.logic.RelativeCallInfoFacade;
+import com.wtwd.sys.safearea.domain.SafeArea;
+import com.wtwd.sys.safearea.domain.logic.SafeAreaFacade;
+import com.wtwd.sys.settinginfo.domain.SettingInfo;
+import com.wtwd.sys.settinginfo.domain.logic.SettingInfoFacade;
+import com.wtwd.sys.shareinfo.domain.ShareInfo;
+import com.wtwd.sys.shareinfo.domain.logic.ShareInfoFacade;
+
+public class AdragonUserHandlerHelperII {
+	
+	private static ServiceBean serviceBean = ServiceBean.getInstance();
+	
+	//添加亲情号码
+	public static RespJsonData addAdrDeviceFamily(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String phoneNum = reqJsonData.getFamily_number();
+		String nickName = reqJsonData.getFamily_name();
+		String relationType = reqJsonData.getRelationType();
+		String belongProject = reqJsonData.getB_g();
+		
+		nickName = Constant.transCodingToUtf(nickName);
+		RelativeCallInfo relativeCallInfo = new RelativeCallInfo();
+		relativeCallInfo.setUserId(userId);
+		relativeCallInfo.setSerieNo(serieNo);
+		relativeCallInfo.setNickName(nickName);
+		relativeCallInfo.setPhoneNumber(phoneNum);
+		relativeCallInfo.setRelativeType(relationType);
+		relativeCallInfo.setStatus("1");
+		relativeCallInfo.setAddTime(new Date());
+		relativeCallInfo.setBelongProject(belongProject);
+		relativeCallInfo.setCondition("user_id ='"+userId+"' and serie_no ='"+serieNo+"' and belong_project='"+belongProject+"' and phone_number ='"+phoneNum+"'");
+		RelativeCallInfoFacade relativeCallInfoFacade = serviceBean.getRelativeCallInfoFacade();
+		List<DataMap> relativeCallInfos = relativeCallInfoFacade.getRelativeCallInfo(relativeCallInfo);
+		if(relativeCallInfos.size()<=0){
+			result = Constant.SUCCESS_CODE;
+			relativeCallInfoFacade.insertRelativeCallInfo(relativeCallInfo);
+			relativeCallInfo.setCondition("user_id ='"+userId+"' and serie_no ='"+serieNo+"' and belong_project='"+belongProject+"'");
+			relativeCallInfoFacade.updateRelativeCallInfoStatus(relativeCallInfo);
+			int maxCount = relativeCallInfoFacade.getMaxCountRelativeCallInfo(relativeCallInfo);
+			respJsonData.setRelative_id(String.valueOf(maxCount));
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		
+		return respJsonData;		
+	}
+	
+	//删除亲情号码
+	public static RespJsonData deleteAdrDeviceFamily(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String phoneNum = reqJsonData.getFamily_number();
+		String relative_id = reqJsonData.getRelative_id();
+		String belongProject = reqJsonData.getB_g();
+		
+		RelativeCallInfo relativeCallInfo = new RelativeCallInfo();
+		RelativeCallInfoFacade relativeCallInfoFacade = serviceBean.getRelativeCallInfoFacade();
+		
+		relativeCallInfo.setCondition("serie_no ='"+serieNo+"' and belong_project='"+belongProject+"' and phone_number='"+phoneNum+"' and id ='"+relative_id+"'");
+		int num = relativeCallInfoFacade.deleteRelativeCallInfo(relativeCallInfo);
+		
+		relativeCallInfo.setStatus("1");
+		relativeCallInfo.setCondition("user_id ='"+userId+"' and serie_no ='"+serieNo+"' and belong_project='"+belongProject+"'");
+		relativeCallInfoFacade.updateRelativeCallInfoStatus(relativeCallInfo);   //把状态设为,只要有变化就变为1
+		
+		if(num > 0){
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}		
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;		
+	}
+	
+	//修改亲情号码
+	public static RespJsonData modifyAdrDeviceFamily(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String deviceImei = reqJsonData.getDevice_imei();
+		String userId = reqJsonData.getUser_id();
+		String phoneNum = reqJsonData.getFamily_number();
+		String nickName = reqJsonData.getFamily_name();
+		String relativeId = reqJsonData.getRelative_id();
+		String relativeType = reqJsonData.getRelationType();
+		String belongProject = reqJsonData.getB_g();
+				
+		RelativeCallInfo relativeCallInfo = new RelativeCallInfo();
+		relativeCallInfo.setPhoneNumber(phoneNum);
+		nickName = Constant.transCodingToUtf(nickName);
+		
+		relativeCallInfo.setNickName(nickName);
+		relativeCallInfo.setRelativeType(relativeType);
+		relativeCallInfo.setStatus("1");
+
+		relativeCallInfo.setCondition("user_id ='"+userId+"' and serie_no ='"+deviceImei+"' and belong_project='"+belongProject+"'");
+		ServiceBean.getInstance().getRelativeCallInfoFacade().updateRelativeCallInfoStatus(relativeCallInfo);   //把状态设为,只要有变化就变为1
+		
+		relativeCallInfo.setCondition("id ='"+relativeId+"'");
+		int num = ServiceBean.getInstance().getRelativeCallInfoFacade().updateRelativeCallInfo(relativeCallInfo);
+		
+		if(num > 0){
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}					
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//历史轨迹查询
+	public static RespJsonData queryDeviceTrack(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String deviceId = reqJsonData.getDevice_imei();
+		String startTime = reqJsonData.getStart_time();
+		String endTime = reqJsonData.getEnd_time();
+		String belongProject = reqJsonData.getB_g();
+		
+		LocationInfo locationInfo = new LocationInfo();
+		locationInfo.setCondition("serie_no= '"+deviceId+"' and belong_project = '"+belongProject+"' and upload_time >= '"+startTime+"' and upload_time <= '"+endTime+"' and longitude !='0.000000' and latituede !='90.000000'");
+		locationInfo.setOrderBy("upload_time");
+		LocationInfoFacade locationInfoFacade = serviceBean.getLocationInfoFacade();
+		List<DataMap> locationInfos = locationInfoFacade.getLocationListInfo(locationInfo);
+		List<LocationInfoAdr> locationInfoAdrs = new ArrayList<LocationInfoAdr>();
+		for(int i=0;i<locationInfos.size();i++){
+			DataMap locationMap =(DataMap)locationInfos.get(i);
+			String changeLon = (String) locationMap.getAt("change_longitude");
+			String changeLat = (String) locationMap.getAt("change_latitude");
+			String lon = (String) locationMap.getAt("longitude");
+			String lat=(String)locationMap.getAt("latitude");
+			
+			int battery = (Integer)locationMap.getAt("battery");
+			String type = (String)locationMap.getAt("location_type");
+			String uploadtime=locationMap.getAt("upload_time").toString();
+			int accuracy = (Integer)locationMap.getAt("accuracy");
+			LocationInfoAdr locationInfoAdr = new LocationInfoAdr();
+			locationInfoAdr.setChangeLat(Double.valueOf(changeLat));
+			locationInfoAdr.setChangeLon(Double.valueOf(changeLon));
+			locationInfoAdr.setLon(Double.valueOf(lon));
+			locationInfoAdr.setLat(Double.valueOf(lat));
+			locationInfoAdr.setBattery(battery);
+			locationInfoAdr.setLocationType(type);
+			locationInfoAdr.setUpload_time(uploadtime);
+			locationInfoAdr.setAccuracy(accuracy);
+			locationInfoAdrs.add(locationInfoAdr);
+		}
+		respJsonData.setLocationInfos(locationInfoAdrs);
+		if(locationInfos.isEmpty()){
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		respJsonData.setResultCode(result);
+		return respJsonData;
+	}
+	
+	//设备安全区域
+	public static RespJsonData modifyDeviceSafeArea(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		int type= Integer.valueOf(reqJsonData.getLocationType());
+		String userId = reqJsonData.getUser_id();
+		String deviceId = reqJsonData.getSerie_no();
+		String lat = reqJsonData.getLat();
+		String lng = reqJsonData.getLng();
+		String deviceSafeId = reqJsonData.getDevice_safeId();
+		String deviceSafeRange = reqJsonData.getDevice_safeRange();
+		String deviceSafeName = reqJsonData.getDevice_safeName();
+		String deviceSafeAddr = reqJsonData.getDevice_safeAddr();
+		String deviceEffetTime = reqJsonData.getDevice_safeEffectTime();
+		String safeType = reqJsonData.getSafe_type();
+		String belongProject = reqJsonData.getB_g();
+		
+		SafeArea safeArea = new SafeArea();
+		SafeAreaFacade safeAreaFacade = serviceBean.getSafeAreaFacade();
+		if(type == 1) {
+			safeArea.setArea_effect_time(deviceEffetTime);
+			safeArea.setArea_name(deviceSafeName);
+			safeArea.setLatitude(lat);
+			safeArea.setLongitude(lng);
+			safeArea.setSafe_range(Integer.parseInt(deviceSafeRange));
+			safeArea.setSeriNo(deviceId);
+			safeArea.setUserId(userId);
+			safeArea.setCreate_time(new Date());
+			safeArea.setSafeAddress(deviceSafeAddr);
+			safeArea.setBelongProject(belongProject);
+			safeArea.setStatus("0");  //设为正常状态
+			safeAreaFacade.insertSafeArea(safeArea);
+			
+			int countMax = safeAreaFacade.getSafeAreaMaxCount(safeArea);		
+			result = Constant.SUCCESS_CODE;
+			respJsonData.setDevice_SafeId(String.valueOf(countMax));
+		}else {
+			safeArea.setCondition("seri_no = '"+deviceId+"' and belong_project='"+belongProject+"' and id = '"+deviceSafeId+"'");
+			List<DataMap> safeAreas = safeAreaFacade.getSafeArea(safeArea);
+			if(safeAreas.size() > 0) {
+				result = Constant.SUCCESS_CODE;
+				safeArea.setArea_effect_time(deviceEffetTime);
+				safeArea.setArea_name(deviceSafeName);
+				safeArea.setLatitude(lat);
+				safeArea.setLongitude(lng);
+				safeArea.setSafe_range(Integer.parseInt(deviceSafeRange));
+				safeArea.setUpdate_time(new Date());
+				
+				safeAreaFacade.updateSafeArea(safeArea);
+			}else {
+				result = Constant.FAIL_CODE;
+			}
+		}
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//设备远程数据设置
+	public static RespJsonData setDeviceData(ReqJsonData reqJsonData){
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		return respJsonData;
+		
+	}
+	
+	//设备数据下载
+	public static RespJsonData downLoadDeviceData(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String belongProject = reqJsonData.getB_g();
+		
+		if(userId!=null && !"".equals(userId)){			
+			ShareInfo shareInfo = new ShareInfo();
+			shareInfo.setCondition("to_user_id='"+userId+"' and belong_Project ='"+belongProject+"'");
+			ShareInfoFacade shareInfoFacade = serviceBean.getShareInfoFacade();
+			List<DataMap> shareInfos = shareInfoFacade.getShareInfo(shareInfo);		
+			
+			for(int i=0;i<shareInfos.size();i++){
+				String device_imei = ""+ shareInfos.get(i).getAt("device_imei");
+				String is_priority = ""+ shareInfos.get(i).getAt("is_priority");  	
+				
+			    if("1".equals(is_priority)){	
+			    	List<AppUserInfoAdr> appUserInfoAdrs = new ArrayList<AppUserInfoAdr>();
+			    	shareInfo.setCondition("user_id ='"+userId+"' and is_priority ='0' and device_imei ='"+device_imei+"' and belong_project='"+belongProject+"'"); 
+			    	List<DataMap> userShareList = shareInfoFacade.getShareInfo(shareInfo);
+			    	
+			    	for(int j=0;j<userShareList.size();j++){
+			    		AppUserInfoAdr appUserInfoAdr = new AppUserInfoAdr();
+			    		AppUserInfo appUserInfo = new AppUserInfo();
+			    		AppUserInfoFacade appUserInfoFacade = serviceBean.getAppUserInfoFacade();
+			    		String to_user_id = ""+ userShareList.get(j).getAt("to_user_id");
+			    		appUserInfo.setCondition("id ='"+to_user_id+"'");
+			    		List<DataMap> userList = appUserInfoFacade.getAppUserInfo(appUserInfo);
+			    			
+			    		String userHead = ""+userList.get(0).getAt("head");
+			    		String userNick = ""+userList.get(0).getAt("nick_name");
+			    		String id = ""+userList.get(0).getAt("id");
+			    		String userName = ""+userList.get(0).getAt("user_name");
+			    		
+			    		appUserInfoAdr.setUser_head(userHead);
+			    		appUserInfoAdr.setUser_nick(userNick);
+			    		appUserInfoAdr.setUser_id(userId);
+			    		appUserInfoAdr.setUser_name(userName);
+			    		respJsonData.setUser_head(userHead);
+
+			    		appUserInfoAdrs.add(appUserInfoAdr);
+			    	}			    	
+			    }
+			}			
+		}	
+		return respJsonData;
+	}
+	
+	//版本升级
+	public static RespJsonData updateApp(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		CheckInfo checkInfo = new CheckInfo();
+		CheckInfoAdr checkInfoAdr = new CheckInfoAdr();
+		String versionCode = reqJsonData.getVersion_code();
+		String belongProject = reqJsonData.getB_g();
+		checkInfo.setCondition("belong_project ='"+belongProject+"'");
+		CheckInfoFacade checkInfoFacade = serviceBean.getCheckInfoFacade();
+		List<DataMap> checkInfos = checkInfoFacade.getCheckInfo(checkInfo);
+		if(checkInfos.isEmpty()){
+			result = Constant.FAIL_CODE;
+		}else{
+			String versionCodeNow = ""+checkInfos.get(0).getAt("version_code");
+			if(Integer.valueOf(versionCode)<Integer.valueOf(versionCodeNow)){
+				checkInfoAdr.setApkVersionCode(versionCodeNow);
+				checkInfoAdr.setApkVersionName(checkInfos.get(0).getAt("version_name").toString());
+				checkInfoAdr.setDownloadUrl(checkInfos.get(0).getAt("download_path").toString());
+				checkInfoAdr.setApkFunctionCap(checkInfos.get(0).getAt("function_cap").toString());			
+				result = Constant.SUCCESS_CODE;
+				respJsonData.setCheckInfo(checkInfoAdr);
+			}else{
+				result = Constant.FAIL_CODE;
+			}
+		}
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//意见反馈
+	public static RespJsonData feedBack(ReqJsonData reqJsonData) throws SystemException{
+		int result =0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String feedbackContent = reqJsonData.getFeedbackContent();
+		String belongProject = reqJsonData.getB_g();
+		
+		if(userId!=null && !"".equals(userId)){
+			feedbackContent = Constant.transCodingToUtf(feedbackContent);
+			FeedBackInfo feedBackInfo = new FeedBackInfo();
+			feedBackInfo.setContactWay(userId);
+			feedBackInfo.setDateTime(new Date());
+			feedBackInfo.setFeedBackContent(feedbackContent);
+			feedBackInfo.setBelongProject(belongProject);
+			
+			FeedBackInfoFacade feedBackInfoFacade = serviceBean.getFeedbackInfoFacade();
+			if(feedBackInfoFacade.insertFeedBackInfo(feedBackInfo)>0){
+				result = Constant.SUCCESS_CODE;
+			}else{
+				result = Constant.FAIL_CODE;
+			}			
+		}
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//倾听
+	public static RespJsonData listen(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String phone = reqJsonData.getUser_phone();
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String belongProject = reqJsonData.getB_g();
+		
+		DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+		deviceActiveInfo.setCondition("device_imei = '"+serieNo+"' and belong_project='"+belongProject+"'");
+		
+		DeviceActiveInfoFacade deviceActiveFacade = serviceBean.getDeviceActiveInfoFacade();
+		
+		List<DataMap> deviceActiveInfos = deviceActiveFacade.getDeviceActiveInfo(deviceActiveInfo);
+		if(deviceActiveInfos.size()>0){
+			deviceActiveInfo.setListenType("1");
+			deviceActiveFacade.updateDeviceActiveInfo(deviceActiveInfo);
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//定位
+	public static RespJsonData location(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String belongProject = reqJsonData.getB_g();
+		String map = reqJsonData.getMap();
+		
+		if(userId==null || "".equals(userId)){
+			userId="-1";
+		}
+		
+		if("-1".equals(userId)){
+			DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+			deviceActiveInfo.setCondition("device_imei ='"+serieNo+"' and belong_project='"+belongProject+"'");
+			DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+			List<DataMap> deviceActiveInfos = deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+			if(!deviceActiveInfos.isEmpty()){
+				userId = ""+deviceActiveInfos.get(0).getAt("user_id");
+			}
+		}
+		
+		LocationInfo locationInfo = new LocationInfo();
+		locationInfo.setCondition("serie_no = '"+serieNo+"' and belong_project='"+belongProject+"' and longitude != '0.000000' and latitude != '90.000000'");
+		locationInfo.setOrderBy("upload_time");
+		locationInfo.setSort("1");
+		locationInfo.setFrom(0);
+		locationInfo.setPageSize(1);
+		List<LocationInfoAdr> locationInfoAdrs = new ArrayList<LocationInfoAdr>();
+		LocationInfoFacade locationInfoFacade = serviceBean.getLocationInfoFacade();
+		List<DataMap> locationInfos = locationInfoFacade.getLocationInfo(locationInfo);
+	    for(int i=0;i<locationInfos.size();i++){
+	    	LocationInfoAdr locationInfoAdr= new LocationInfoAdr();
+	    	DataMap locationMap=(DataMap)locationInfos.get(i);
+			String lng=(String)locationMap.getAt("change_longitude");
+			String lat=(String)locationMap.getAt("change_latitude");
+			
+			String no_trans_lng=(String)locationMap.getAt("longitude");
+			String no_trans_lat=(String)locationMap.getAt("latitude");
+			
+			int battery = (Integer)locationMap.getAt("battery");
+			String type = (String)locationMap.getAt("location_type");
+			String time=locationMap.getAt("upload_time").toString();
+			int accuracy = (Integer)locationMap.getAt("accuracy");
+			locationInfoAdr.setLat(Double.valueOf(no_trans_lat));
+			locationInfoAdr.setLon(Double.valueOf(no_trans_lng));
+			locationInfoAdr.setChangeLat(Double.valueOf(lat));
+			locationInfoAdr.setChangeLon(Double.valueOf(lng));
+			locationInfoAdr.setBattery(battery);
+			locationInfoAdr.setLocationType(type);
+			locationInfoAdr.setTime(time);
+			locationInfoAdr.setAccuracy(accuracy);
+			locationInfoAdrs.add(locationInfoAdr);
+	    }
+	    
+	    if(locationInfos.isEmpty()){
+	    	result = Constant.FAIL_CODE;
+	    }else{
+	    	result = Constant.SUCCESS_CODE;
+	    }
+
+		SettingInfo settingInfo = new SettingInfo();
+		settingInfo.setCondition("serie_no = '"+serieNo+"' and belong_project ='"+belongProject+"'");
+		settingInfo.setMap(map);
+		ServiceBean.getInstance().getSettingInfoFacade().updateSettingInfo(settingInfo);
+		
+		respJsonData.setResultCode(result);
+		respJsonData.setLocationInfos(locationInfoAdrs);
+		
+		return respJsonData;
+	}
+	
+	//找宝贝
+	public static RespJsonData findBaby(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String belongProject = reqJsonData.getB_g();
+		if("-1".equals(userId)){
+			DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+			deviceActiveInfo.setCondition("device_imei ='"+serieNo+"' and belong_project='"+belongProject+"'");
+			DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+			List<DataMap> deviceActiveInfos = deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+			if(deviceActiveInfos.size()>0){
+				userId = ""+deviceActiveInfos.get(0).getAt("user_id");
+			}
+		}
+		
+		PhoneInfo phoneInfo = new PhoneInfo();
+		phoneInfo.setCondition("serie_no = '"+serieNo+"' and belong_project='"+belongProject+"'");	
+		PhoneInfoFacade phoneInfoFacade = ServiceBean.getInstance().getPhoneInfoFacade();	
+		List<DataMap> phoneInfos = phoneInfoFacade.getPhoneInfo(phoneInfo);
+		if(phoneInfos.size() > 0){
+			phoneInfo.setAlarmBellType("1");
+			phoneInfoFacade.updatePhoneInfo(phoneInfo);
+			result = Constant.SUCCESS_CODE;
+		}else {
+			result = Constant.FAIL_CODE;
+		}
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//删除安全区域
+	public static RespJsonData deleteDeviceSafeArea(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String deviceId = reqJsonData.getSerie_no();
+		String deviceSafeId = reqJsonData.getDevice_safeId();
+		String belongProject = reqJsonData.getB_g();
+		
+		SafeArea safeArea = new SafeArea();
+		if(userId!=null && !"".equals(userId) && deviceId!=null && !"".equals(deviceId) && deviceSafeId!=null && !"".equals(deviceSafeId)){
+			safeArea.setCondition("id = '"+deviceSafeId+"' and user_id ='"+userId+"' and serie_no ='"+deviceId+"' and belong_project ='"+belongProject+"'");
+			SafeAreaFacade safeAreaFacade = serviceBean.getSafeAreaFacade();
+			int count = safeAreaFacade.deleteSafeArea(safeArea);
+			if(count>0){
+				result = Constant.SUCCESS_CODE;
+			}else{
+				result = Constant.FAIL_CODE;
+			}
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;		
+	}
+	
+	//获取安全区域
+	public static RespJsonData getDeviceSafeArea(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String devcieImei = reqJsonData.getSerie_no();
+		String belongProject = reqJsonData.getB_g();
+		List<SafeAreaAdr> safeAreaAdrs = new ArrayList<SafeAreaAdr>();
+		if(userId!=null && !"".equals(userId) && devcieImei!=null && !"".equals(devcieImei)){
+			SafeArea safeArea = new SafeArea();
+			safeArea.setCondition("seri_no ='"+devcieImei+"'");
+			SafeAreaFacade safeAreaFacade = serviceBean.getSafeAreaFacade();	
+			List<DataMap> safeAreas = safeAreaFacade.getSafeArea(safeArea);
+			int safecount = safeAreas.size();
+			
+			for(int i=0;i<safeAreas.size();i++){	
+			    SafeAreaAdr safeAreaAdr =new SafeAreaAdr();
+				String longitude = ""+ safeAreas.get(i).getAt("longitude");
+				String latitude = ""+ safeAreas.get(i).getAt("latitude");
+				String safeRange = ""+ safeAreas.get(i).getAt("safe_range");
+				String areaName = ""+ safeAreas.get(i).getAt("area_name");
+				String areaEffect_time = ""+ safeAreas.get(i).getAt("area_effect_time");
+				String safeAddress = ""+ safeAreas.get(i).getAt("safe_address");
+				String safeId = ""+ safeAreas.get(i).getAt("id");
+				
+				safeAreaAdr.setLongitude(longitude);
+				safeAreaAdr.setLatitude(latitude);
+				safeAreaAdr.setSafeRange(safeRange);
+				safeAreaAdr.setAreaName(areaName);
+				safeAreaAdr.setAreaEffectTime(areaEffect_time);
+				safeAreaAdr.setSafeAddress(safeAddress);
+				safeAreaAdr.setSafeId(safeId);
+				safeAreaAdrs.add(safeAreaAdr);
+			}
+			result = Constant.SUCCESS_CODE;
+			respJsonData.setSafe_count(safecount);
+			respJsonData.setSafeAreas(safeAreaAdrs);			
+		}else{
+			result = Constant.FAIL_CODE;			
+		}
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;		
+	}
+	
+	//设备分享
+	public static RespJsonData shareDeviceHelper(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String deviceImei = reqJsonData.getSerie_no();
+		String userPhone = reqJsonData.getUser_phone();
+		String message = reqJsonData.getMessage();
+		String messageLevel = reqJsonData.getMessageLevel();
+		String belongProject = reqJsonData.getB_g();
+		message = Constant.transCodingToUtf(message);
+		
+		
+		if(userId!=null && !"".equals(userId) && deviceImei!=null && !"".equals(deviceImei) && message!=null && !"".equals(message)){
+			AppUserInfo appUserInfo = new AppUserInfo();
+			appUserInfo.setCondition("user_name ='"+userPhone+"' and belongProject = '"+belongProject+"'");
+			AppUserInfoFacade appUserInfoFacade = serviceBean.getAppUserInfoFacade();
+			List<DataMap> appUserInfos = appUserInfoFacade.getAppUserInfo(appUserInfo);
+			if(appUserInfos.size()>0){
+				String toUserId = ""+appUserInfos.get(0).getAt("id");
+				String nickName = ""+appUserInfos.get(0).getAt("nick_name");
+				String userHead = ""+appUserInfos.get(0).getAt("head");
+				String userName = ""+appUserInfos.get(0).getAt("user_name");
+				
+				if(toUserId.equals(userId)){
+					result = -2; //分享失败,不能分享给自己(手机端自己判断)
+				}else{
+					ShareInfo shareInfo = new ShareInfo();
+					shareInfo.setCondition("user_id='"+userId+"' and to_user_id='"+toUserId+"' and device_imei='"+deviceImei+"' and belong_project ='"+belongProject+"'");
+					ShareInfoFacade shareInfoFacade = serviceBean.getShareInfoFacade();
+					int count = shareInfoFacade.getShareInfoMaxCount(shareInfo);
+					if(count <=0){
+						shareInfo = new ShareInfo();
+						shareInfo.setUserId(userId);
+						shareInfo.setToUserId(toUserId);
+						shareInfo.setDeviceId(deviceImei);
+						shareInfo.setIsPriority("0");
+						shareInfo.setShareDate(new Date());
+						shareInfo.setBelongProject(belongProject);
+						shareInfoFacade.insertShareInfo(shareInfo);
+						
+						MsgInfo msgInfo = new MsgInfo();
+						msgInfo.setFromId(userId);
+						msgInfo.setToId(toUserId);					
+						msgInfo.setIsHandler("0");
+						msgInfo.setMsgLevel(messageLevel);
+						msgInfo.setMsgContent("1@"+deviceImei+"@0");
+						msgInfo.setMsgHandlerDate(new Date());
+						msgInfo.setBelongProject(belongProject);
+						MsgInfoFacade msgInfoFacade = serviceBean.getMsgInfoFacade();
+						msgInfoFacade.insertMsgInfo(msgInfo);
+						result = Constant.SUCCESS_CODE;
+						
+						List<ShareInfoAdr> shareInfoAdrs = new ArrayList<ShareInfoAdr>();
+						ShareInfoAdr shareInfoAdr = new ShareInfoAdr();
+						shareInfoAdr.setUser_id(userId);
+						shareInfoAdr.setUser_name(userName);
+						shareInfoAdr.setNick_name(nickName);
+						shareInfoAdr.setUser_head(userHead);
+						
+						respJsonData.setShareInfos(shareInfoAdrs);				
+					}
+				}					
+			}
+			
+			if(appUserInfos.isEmpty()){
+				result = Constant.FAIL_CODE;
+			}
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;		
+	}
+	
+	//消息处理
+	public static RespJsonData msgHandlerHelper(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userId = reqJsonData.getUser_id();
+		String belongProject = reqJsonData.getB_g();
+		if(belongProject!=null && !"".equals(belongProject)){
+			belongProject ="1";
+		}
+		
+		if(userId!=null && !"".equals(userId)){
+			MsgInfo msgInfo = new MsgInfo();
+			msgInfo.setCondition("to_id ='"+userId+"' and belong_project ='"+belongProject+"'");
+			msgInfo.setIsHandler("1");
+			
+			MsgInfoFacade msgInfoFacade = serviceBean.getMsgInfoFacade();
+			msgInfoFacade.updateMsgInfo(msgInfo);
+			
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		
+		return respJsonData;
+	}
+	
+	//消息获取
+	public static RespJsonData getMessageHelper(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userId= reqJsonData.getUser_id();
+		String belongProject = reqJsonData.getB_g();
+		
+		MsgInfo msgInfo = new MsgInfo();
+		String condition = Constant.getDaysAgoCondition("msg_handler_date", -7);
+		msgInfo.setCondition("to_id = '"+userId+"' and belong_project ='"+belongProject+"' and is_handler = '0' and "+condition);
+		msgInfo.setOrderBy("id");
+		msgInfo.setSort("1");
+		
+		List<MsgInfoAdr> msgInfoAdrs = new ArrayList<MsgInfoAdr>();
+		
+		MsgInfoFacade msgInfoFacade = serviceBean.getMsgInfoFacade();
+		List<DataMap> msgInfos = msgInfoFacade.getMsgInfo(msgInfo);
+		for(int i=0;i<msgInfos.size();i++){
+			MsgInfoAdr  msgInfoAdr = new MsgInfoAdr();
+			String msgId =""+msgInfos.get(i).getAt("msg_content");
+			String msgContent = ""+msgInfos.get(i).getAt("msg_handler_date");
+			String msgDate = ""+msgInfos.get(i).getAt("msg_handler_date");
+			msgInfoAdr.setMsg_id(msgId);
+			msgInfoAdr.setMsg_date(msgDate);
+			msgInfoAdr.setMsg_content(msgContent);
+			msgInfoAdrs.add(msgInfoAdr);
+		}
+		respJsonData.setMsgInfos(msgInfoAdrs);
+		result =  Constant.SUCCESS_CODE;
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//LBS定位(Get请求)
+	
+	
+	//取消分享
+	public static RespJsonData deleteShareDeviceHelper(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userId = reqJsonData.getUser_id();
+		String deviceImei = reqJsonData.getSerie_no();
+		String toUserId = reqJsonData.getTo_userId();
+		String toMessage = reqJsonData.getMessage();
+		String messageLevel = reqJsonData.getMessageLevel();
+		String belongProject = reqJsonData.getB_g();
+		
+		ShareInfo shareInfo = new ShareInfo();
+		ShareInfoFacade shareInfoFacade= serviceBean.getShareInfoFacade();
+		
+		shareInfo.setCondition("user_id='"+toUserId+"' and to_user_id='"+userId +"' and device_imei = '"+deviceImei+"' and belong_project ='"+belongProject+"'");
+		shareInfoFacade.deleteShareInfo(shareInfo);
+		
+		MsgInfo msgInfo = new MsgInfo();
+		toMessage = Constant.transCodingToUtf(toMessage);
+		msgInfo.setFromId(userId);
+		msgInfo.setToId(toUserId);
+		msgInfo.setMsgContent("5@"+deviceImei+"@0");
+		msgInfo.setMsgHandlerDate(new Date());
+		msgInfo.setMsgLevel(messageLevel);
+		msgInfo.setIsHandler("0");
+		msgInfo.setBelongProject(belongProject);
+		MsgInfoFacade msgInfoFacade = serviceBean.getMsgInfoFacade();
+		msgInfoFacade.insertMsgInfo(msgInfo);
+		
+		return respJsonData;		
+	}
+	
+	//找回密码
+	public static RespJsonData findPasswordHelp(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userPhone = reqJsonData.getUser_phone();
+		String type = reqJsonData.getType();  //0表示验证密码，1表示修改密码  当为1时，新密码必须传递
+		String newPassword = reqJsonData.getNew_password();
+		String belongProject = reqJsonData.getB_g();
+		String userId = "0";
+		AppUserInfo appUserInfo = new AppUserInfo();
+		AppUserInfoFacade appUserInfoFacade=serviceBean.getAppUserInfoFacade();
+		appUserInfo.setCondition("user_name ='"+userPhone+"' and belong_project ='"+belongProject+"'");
+		List<DataMap> appUserInfos = appUserInfoFacade.getAppUserInfo(appUserInfo);
+		if(appUserInfos.size()>0){
+			userId = appUserInfos.get(0).getAt("id").toString();
+			if("1".equals(type)&&(newPassword!=null && !"".equals(newPassword))){
+				appUserInfo.setPassword(newPassword);
+				appUserInfoFacade.updateAppUserInfo(appUserInfo);
+			}
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//远程关机、驱蚊，爱心
+	public static RespJsonData remoteHelp(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String type = reqJsonData.getType();   //0表示远程关机   1表示驱蚊，2表示爱心，3表示打开关闭GPS   4 表示远程关机  5 老人跌倒
+		String belongProject = reqJsonData.getB_g();
+		if(userId==null || "".equals(userId)){
+			userId = "-1";	
+			DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+			deviceActiveInfo.setCondition("devcie_imei='"+serieNo+"' and belong_project ='"+belongProject+"'");
+			DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+			List<DataMap> deviceActiveInfos = deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+			if(deviceActiveInfos.size()>0){
+				userId = ""+deviceActiveInfos.get(0).getAt("user_id");
+			}
+		}
+		
+		PhoneInfo phoneInfo = new PhoneInfo();
+		phoneInfo.setCondition("serie_no='"+serieNo+"' and belong_project ='"+belongProject+"'");
+		
+		SettingInfo settingInfo = new SettingInfo();
+		settingInfo.setCondition("serie_no = '" + serieNo+ "' and belong_project='" + belongProject + "'");
+		SettingInfoFacade settingInfoFacade = ServiceBean.getInstance().getSettingInfoFacade();
+		if("3".equals(type)) {
+			String gpsOn = reqJsonData.getGsp_on();
+			settingInfo.setGps_on(gpsOn);
+			settingInfoFacade.updateSettingInfo(settingInfo);
+			result = Constant.SUCCESS_CODE;
+		}else if("4".equals(type)){
+			String light = reqJsonData.getP_l();
+			if(light==null || "".equals(light)){
+				light="0";
+			}
+			settingInfo.setLight(light);
+			settingInfoFacade.updateSettingInfo(settingInfo);
+			result = Constant.SUCCESS_CODE;			
+		}else {
+			PhoneInfoFacade phoneInfoFacade = serviceBean.getPhoneInfoFacade();
+			List<DataMap> phoneInfos = phoneInfoFacade.getPhoneInfo(phoneInfo);
+			if(phoneInfos.size()>0){
+				if("0".equals(type)){
+					phoneInfo.setShutdown("1");
+				}else if("1".equals(type)){
+					String repellent = reqJsonData.getRepellent();
+					phoneInfo.setRepellent(repellent);
+				}else if("2".equals(type)){
+					String heart = reqJsonData.getHeart();
+					phoneInfo.setHeart(heart);
+				}
+				phoneInfo.setSerieNo(serieNo);
+				phoneInfoFacade.updatePhoneInfo(phoneInfo);
+				result = Constant.SUCCESS_CODE;
+			}else{
+				result = Constant.FAIL_CODE;
+			}
+		}
+		respJsonData.setResultCode(result);
+		return respJsonData;
+	}
+	
+	//上课防打扰提醒
+	public static RespJsonData disturbHelp(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String monday = reqJsonData.getMonday();
+		String tuesday = reqJsonData.getTuesday();
+		String wednesday = reqJsonData.getWednesday();
+		String thursday = reqJsonData.getThursday();
+		String firday = reqJsonData.getFriday();
+		String saturday = reqJsonData.getSaturday();
+		String sunday = reqJsonData.getSunday();
+		String distrub = reqJsonData.getDistrub();
+		String belongProject = reqJsonData.getB_g();
+		
+		if(userId==null ||"".equals(userId)){
+			DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+			deviceActiveInfo.setCondition("device_imei = '"+serieNo+"' and belongProject ='"+belongProject+"'");
+			DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+			List<DataMap> deviceActiveInfos = deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+			if(deviceActiveInfos.size()>0){
+				userId = ""+deviceActiveInfos.get(0).getAt("user_id");
+			}			
+		}
+		DirectiveInfo directiveInfo = new DirectiveInfo();
+		directiveInfo.setCondition("serie_no = '"+serieNo+"' and belong_project='"+belongProject+"'");
+		
+		DirectiveInfoFacade directiveInfoFacade = serviceBean.getDirectiveInfoFacade();
+		List<DataMap> directiveInfos = directiveInfoFacade.getDirectiveInfo(directiveInfo);
+		directiveInfo.setMdistime(monday);
+		directiveInfo.setTdistime(tuesday);
+		directiveInfo.setWdistime(wednesday);
+		directiveInfo.setThdistime(thursday);
+		directiveInfo.setFdistime(firday);
+		directiveInfo.setSdistime(saturday);
+		directiveInfo.setSudistime(sunday);
+		directiveInfo.setDistrub(distrub);
+		directiveInfo.setDistrubChange("1");
+		
+		if(directiveInfos.size()>0){
+			directiveInfoFacade.updateDirectiveInfo(directiveInfo);
+			result = Constant.SUCCESS_CODE;
+		}else{
+			directiveInfo.setSerie_no(serieNo);
+			directiveInfo.setBelongProject(belongProject);
+			directiveInfoFacade.insertDirectiveInfo(directiveInfo);
+			result = Constant.SUCCESS_CODE;
+		}
+		
+		respJsonData.setResultCode(result);
+		return respJsonData;
+	}
+	
+	//低电提醒
+	public static RespJsonData lowElectricityHelp(ReqJsonData reqJsonData) throws SystemException{
+		int result =0;
+		RespJsonData respJsonData= new RespJsonData();
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String belongProject = reqJsonData.getB_g();
+		if(userId==null || "".equals(userId)){
+			DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+			deviceActiveInfo.setCondition("device_imei='"+serieNo+"' and belong_project='"+belongProject+"'");
+			DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+			List<DataMap> deviceActiveInfos = deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+			if(deviceActiveInfos.size()>0){
+				userId = ""+deviceActiveInfos.get(0).getAt("user_id");		
+			}
+		}
+		DirectiveInfo directiveInfo = new DirectiveInfo();
+		directiveInfo.setCondition("serie_no ='"+serieNo+"' and belong_project ='"+belongProject+"'");
+		DirectiveInfoFacade directiveInfoFacade = serviceBean.getDirectiveInfoFacade();
+		List<DataMap> directiveInfos = directiveInfoFacade.getDirectiveInfo(directiveInfo);
+		if(directiveInfos.size()>0){
+			String isLow = directiveInfos.get(0).getAt("isLow").toString();
+			String electricity = (String) directiveInfos.get(0).getAt("lowelectricity");
+			if("1".equals(isLow)){
+				directiveInfo.setIsLow("0");
+				directiveInfoFacade.updateDirectiveInfo(directiveInfo);
+			}else if("0".equals(isLow)){
+				respJsonData.setElectricity(electricity);
+			}
+			result = Constant.SUCCESS_CODE;
+		}else{
+			result = Constant.FAIL_CODE;
+		}
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+	
+	//远程闹钟
+	public static RespJsonData setClockHelp(ReqJsonData reqJsonData) throws SystemException{
+		int result = 0;
+		RespJsonData respJsonData = new RespJsonData();
+		
+		String userId = reqJsonData.getUser_id();
+		String serieNo = reqJsonData.getSerie_no();
+		String clock = reqJsonData.getClock();
+		String belongProject = reqJsonData.getB_g();
+		if(userId==null || "".equals(userId)){
+			DeviceActiveInfo deviceActiveInfo = new DeviceActiveInfo();
+			deviceActiveInfo.setCondition("device_imei ='"+serieNo+"' and belong_project ='"+belongProject+"'");
+			DeviceActiveInfoFacade deviceActiveInfoFacade = serviceBean.getDeviceActiveInfoFacade();
+			List<DataMap> deviceActiveInfos = deviceActiveInfoFacade.getDeviceActiveInfo(deviceActiveInfo);
+			if(deviceActiveInfos.size()>0){
+				userId = ""+deviceActiveInfos.get(0).getAt("user_id");
+			}
+			
+		}
+		
+		DirectiveInfo directiveInfo = new DirectiveInfo();
+		directiveInfo.setCondition("serie_no = '"+serieNo+"' and belong_project ='"+belongProject+"'");
+		DirectiveInfoFacade directiveInfoFacade = serviceBean.getDirectiveInfoFacade();
+		List<DataMap> directiveInfos =directiveInfoFacade.getDirectiveInfo(directiveInfo);
+		if(directiveInfos.size()>0){
+			if("".equals(clock)){
+				clock=" ";
+			}
+			
+			directiveInfo.setClock(clock);
+			directiveInfo.setAlarmChange("1");
+			directiveInfoFacade.updateDirectiveInfo(directiveInfo);
+			result = Constant.SUCCESS_CODE;
+		}else{
+			if("".equals(clock)){
+				clock=" ";
+			}
+			directiveInfo.setClock(clock);
+			directiveInfo.setAlarmChange("1");
+			directiveInfo.setBelongProject(belongProject);
+			directiveInfo.setSerie_no(serieNo);
+			directiveInfoFacade.insertDirectiveInfo(directiveInfo);
+			result = Constant.SUCCESS_CODE;
+		}
+		respJsonData.setResultCode(result);
+		
+		return respJsonData;
+	}
+}

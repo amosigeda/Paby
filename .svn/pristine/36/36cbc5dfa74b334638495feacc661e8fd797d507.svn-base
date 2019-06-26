@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="deviceActiveInfo">
+
+	<select id="getDeviceActiveInfo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT device_id,device_imei,device_phone,
+device_name,device_update_time,device_disable,listen_type,belong_project,
+isphoneHelp,isserverHelp,deadline,brandname,fall_on,device_type,conn_type,is_sos,sel_mode,gps_on,callback_on,temperature_on,iccid,belong_company
+FROM wdevice_active_info 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+	<select id="getPayForInfo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT id,imei,create_time,customer_id,subscription_id,description,plan_count,iccid,sub_status
+		FROM payfor_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getSalesPromotion" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT id,promotion_code,card_status,type,card_type,discount_rate,use_count
+		FROM sales_promotion
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+		<select id="getcancleImeiInfo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT id,imei,card_status,stop_time,iccid,belong_company FROM cancel_sub_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+
+	<select id="getSsidInfo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT id,iccid,friendly_name,sid,rate_plan,card_status,imsi,belong_company FROM sim_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getDeviceActiveInfoListByVo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT d.*,a.user_name user_name,p.project_name project FROM
+		device_active_info d LEFT JOIN appuserinfo a ON d.user_id=a.id LEFT
+		JOIN projectinfo p ON d.belong_project=p.id
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="belongProject">
+				$belongProject$
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userName">
+				$userName$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+		limit
+		<isNotEmpty prepend=" " property="from">
+			$from$
+		</isNotEmpty>
+		,
+		<isNotEmpty prepend=" " property="pageSize">
+			$pageSize$
+		</isNotEmpty>
+	</select>
+
+	<select id="getDeviceActiveInfoCount" resultClass="java.lang.Integer"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT COUNT(*) FROM device_active_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+		<select id="getPromotionCodePayForSuccessCount" resultClass="java.lang.Integer"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT COUNT(id) FROM payfor_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<insert id="insertDeviceActiveInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		insert into device_active_info
+		(device_phone,device_imei,device_name,device_head,device_sex,device_age,device_height,device_weight,device_disable,user_id,device_update_time,count,belong_project,actural_step,target_step,temperature,heatrate,isphoneHelp,isserverHelp,deadline,is_sos,old_fall)
+		VALUES
+		(#devicePhone#,#deviceImei#,#deviceName#,#deviceHead#,#deviceSex#,#deviceAge#,#deviceHeight#,#deviceWeight#,#deviceDisable#,#userId#,#deviceUpdateTime#,#count#,#belongProject#,#actural_step#,#target_step#,#temperature#,#heatrate#,#isPhoneHelp#,#isServerHelp#,#deadline#,#isSos#,#oldFall#)
+	</insert>
+
+
+	<insert id="insertPayForInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		insert into payfor_info
+		(imei,create_time,account,pay_status,message,currency,description,source,card_number,customer_id,email,subscription_id,plan_count,iccid,sub_status,card_name,zip_code,receipt_number,belong_company,promotion_code)
+		VALUES
+		(#deviceImei#,#createTime#,#receive#,#cardStatus#,#message#,#currency#,#description#,#source#,#friendlyName#,#brandName#,#email#,#subscriptionId#,#ratePlan#,#iccid#,#subStatus#,#cardName#,#zipCode#,#receiptNumber#,#belongCompany#,#promotionCode#)
+	</insert>
+
+	<insert id="insertSmsInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		insert into sim_info
+		(iccid,friendly_name,sid,rate_plan,card_status,create_time,update_time)
+		VALUES
+		(#iccid#,#friendlyName#,#sid#,#ratePlan#,#cardStatus#,#createTime#,#updateTime#)
+	</insert>
+
+	<insert id="insertFlowInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		insert into flow_info
+		(sid,iccid,unique_name,start_time,end_time,sent,reveive,total)
+		VALUES
+		(#sid#,#iccid#,#userName#,#createTime#,#updateTime#,#send#,#receive#,#total#)
+	</insert>
+
+	<update id="updateDeviceSmsInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		update sim_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="cardStatus">
+				card_status=#cardStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="updateTime">
+				update_time=#updateTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ratePlan">
+				rate_plan=#ratePlan#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	
+	
+	<update id="updatePayForDeviceInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		update payfor_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="subStatus">
+				sub_status=#subStatus#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<update id="updateCancelSubSriptionInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		update cancel_sub_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="updateTime">
+				stop_time=#updateTime#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	<update id="updateDeviceActiveInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		update wdevice_active_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="deviceName">
+				device_name=#deviceName#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="count">
+				count=#count#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="devicePhone">
+				device_phone=#devicePhone#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="deviceHead">
+				device_head=#deviceHead#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="deviceSex">
+				device_sex=#deviceSex#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="deviceAge">
+				device_age=#deviceAge#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="deviceHeight">
+				device_height=#deviceHeight#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="deviceWeight">
+				device_weight=#deviceWeight#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="deviceDisable">
+				device_disable=#deviceDisable#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="listenType">
+				listen_type=#listenType#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="userId">
+				user_id=#userId#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="target_step">
+				target_step
+				=#target_step#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="actural_step">
+				actural_step="actural_step"
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="temperature">
+				temperature
+				=#temperature#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="," property="heatrate">
+				heatrate =#heatrate#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="," property="isPhoneHelp">
+				isphoneHelp
+				=#isPhoneHelp#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="isServerHelp">
+				isserverHelp
+				=#isServerHelp#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="," property="deadline">
+				deadline =#deadline#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="oldFall">
+				old_fall =#oldFall#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="isSos">
+				is_sos =#isSos#
+			</isNotEmpty>
+				<isNotEmpty prepend="," property="iccid">
+				iccid =#iccid#
+			</isNotEmpty>
+				<isNotEmpty prepend="," property="belongCompany">
+				belong_company =#belongCompany#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+
+	<delete id="deleteDeviceActiveInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		delete from device_active_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+	<select id="getDeviceActiveInfoGroupByTime" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT COUNT(id) AS id,device_update_time FROM device_active_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		GROUP BY SUBSTRING(device_update_time,1,10)
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+		limit
+		<isNotEmpty prepend=" " property="from">
+			$from$
+		</isNotEmpty>
+		,
+		<isNotEmpty prepend=" " property="pageSize">
+			$pageSize$
+		</isNotEmpty>
+	</select>
+
+	<select id="getDeviceActiveInfoCountGroupByTime" resultClass="java.lang.Integer"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT COUNT(DISTINCT(SUBSTRING(device_update_time,1,10))) FROM
+		device_active_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<insert id="insertDeviceActiveHistory"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		insert into device_active_history
+		(serie_no,belong_project,user_id,status,date_time)
+		VALUES
+		(#deviceImei#,#belongProject#,#userId#,#deviceDisable#,#deviceUpdateTime#)
+	</insert>
+
+	<select id="getDeviceActiveHistory" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT * FROM device_active_history
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getDeviceActiveHistoryListByVo" resultClass="com.godoing.rose.lang.DataMap"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT * FROM device_active_history
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+		limit
+		<isNotEmpty prepend=" " property="from">
+			$from$
+		</isNotEmpty>
+		,
+		<isNotEmpty prepend=" " property="pageSize">
+			$pageSize$
+		</isNotEmpty>
+	</select>
+
+	<select id="getDeviceActiveHistoryCount" resultClass="java.lang.Integer"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		SELECT COUNT(*) FROM device_active_history
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<insert id="insertCancelSubSriptionInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		insert into cancel_sub_info
+		(imei,date_time,card_status,message,customer_id,subscription_id,stop_time,iccid,belong_company)
+		VALUES
+		(#deviceImei#,#createTime#,#cardStatus#,#message#,#brandName#,#deviceAge#,#updateTime#,#iccid#,#belongCompany#)
+	</insert>
+	
+	
+		<insert id="insertCancelSubSriptionLogInfo"
+		parameterClass="com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo">
+		insert into cancel_sub_loginfo
+		(imei,date_time,card_status,stop_time,belong_company,message)
+		VALUES
+		(#deviceImei#,#createTime#,#cardStatus#,#updateTime#,#belongCompany#,#message#)
+	</insert>
+
+</sqlMap>

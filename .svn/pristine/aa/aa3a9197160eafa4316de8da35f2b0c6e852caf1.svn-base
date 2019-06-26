@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wtwd.pet.app.dao.impl.LocationInfoDaoImpl" >
+  <resultMap id="BaseResultMap" type="com.wtwd.pet.app.entity.LocationInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="serie_no" property="serieNo" jdbcType="VARCHAR" />
+    <result column="battery" property="battery" jdbcType="INTEGER" />
+    <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+    <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+    <result column="location_type" property="locationType" jdbcType="CHAR" />
+    <result column="accuracy" property="accuracy" jdbcType="INTEGER" />
+    <result column="upload_time" property="uploadTime" jdbcType="TIMESTAMP" />
+    <result column="change_longitude" property="changeLongitude" jdbcType="VARCHAR" />
+    <result column="change_latitude" property="changeLatitude" jdbcType="VARCHAR" />
+    <result column="belong_project" property="belongProject" jdbcType="INTEGER" />
+    <result column="fall" property="fall" jdbcType="CHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, serie_no, battery, longitude, latitude, location_type, accuracy, upload_time, 
+    change_longitude, change_latitude, belong_project, fall
+  </sql>
+  
+  <select id="listBy" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    SELECT 
+    <include refid="Base_Column_List" />
+    FROM locationinfo WHERE serie_no = #{serieNo} 
+    ORDER BY upload_time DESC LIMIT 0,1
+  </select>
+  
+</mapper>

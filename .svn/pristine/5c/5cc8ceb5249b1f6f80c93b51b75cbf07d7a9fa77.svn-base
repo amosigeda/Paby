@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wtwd.pet.app.dao.impl.WDeviceActiveInfoDaoImpl" >
+  <resultMap id="BaseResultMap" type="com.wtwd.pet.app.entity.WDeviceActiveInfo" >
+    <id column="device_id" property="deviceId" jdbcType="INTEGER" />
+    <result column="device_phone" property="devicePhone" jdbcType="VARCHAR" />
+    <result column="device_imei" property="deviceImei" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="device_update_time" property="deviceUpdateTime" jdbcType="TIMESTAMP" />
+    <result column="device_disable" property="deviceDisable" jdbcType="VARCHAR" />
+    <result column="listen_type" property="listenType" jdbcType="CHAR" />
+    <result column="belong_project" property="belongProject" jdbcType="INTEGER" />
+    <result column="isphoneHelp" property="isphonehelp" jdbcType="CHAR" />
+    <result column="isserverHelp" property="isserverhelp" jdbcType="CHAR" />
+    <result column="deadline" property="deadline" jdbcType="TIMESTAMP" />
+    <result column="brandname" property="brandname" jdbcType="VARCHAR" />
+    <result column="fall_on" property="fallOn" jdbcType="CHAR" />
+    <result column="device_type" property="deviceType" jdbcType="CHAR" />
+    <result column="conn_type" property="connType" jdbcType="CHAR" />
+    <result column="is_sos" property="isSos" jdbcType="CHAR" />
+    <result column="sel_mode" property="selMode" jdbcType="CHAR" />
+    <result column="gps_on" property="gpsOn" jdbcType="CHAR" />
+    <result column="callback_on" property="callbackOn" jdbcType="CHAR" />
+    <result column="temperature_on" property="temperatureOn" jdbcType="CHAR" />
+    <result column="heatout_on" property="heatoutOn" jdbcType="CHAR" />
+    <result column="led_on" property="ledOn" jdbcType="CHAR" />
+    <result column="flight_mode" property="flightMode" jdbcType="CHAR" />
+    <result column="urgent_mode" property="urgentMode" jdbcType="CHAR" />
+    <result column="battery" property="battery" jdbcType="INTEGER" />
+    <result column="is_lowbat" property="isLowbat" jdbcType="CHAR" />
+    <result column="data_mute" property="dataMute" jdbcType="CHAR" />
+    <result column="data_volume" property="dataVolume" jdbcType="CHAR" />
+    <result column="data_power" property="dataPower" jdbcType="CHAR" />
+    <result column="bind_count" property="bindCount" jdbcType="INTEGER" />
+    <result column="wifir_interval" property="wifirInterval" jdbcType="CHAR" />
+    <result column="wifir_flag" property="wifirFlag" jdbcType="CHAR" />
+    <result column="time_zone" property="time_zone" jdbcType="VARCHAR" />
+    <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+    <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+
+    <result column="esafe_on" property="esafeOn" jdbcType="CHAR" />
+    <result column="prev_eid" property="prevEid" jdbcType="INTEGER" />
+    <result column="cur_eid" property="curEid" jdbcType="INTEGER" />
+    <result column="prev_time" property="prevTime" jdbcType="TIMESTAMP" />
+
+    <result column="app_timestamp" property="app_timestamp" jdbcType="TIMESTAMP" />
+    <result column="dev_timestamp" property="dev_timestamp" jdbcType="TIMESTAMP" />
+    <result column="app_status" property="app_status" jdbcType="VARCHAR" />
+    <result column="dev_status" property="dev_status" jdbcType="VARCHAR" />
+
+    <result column="from_usrid" property="from_usrid" jdbcType="INTEGER" />
+    <result column="user_id" property="user_id" jdbcType="INTEGER" />
+    <result column="pet_id" property="pet_id" jdbcType="INTEGER" />
+
+    <result column="to_usrid" property="to_usrid" jdbcType="INTEGER" />
+    <result column="msg_type" property="msg_type" jdbcType="INTEGER" />
+    <result column="msg_ind_id" property="msg_ind_id" jdbcType="INTEGER" />
+    <result column="msg_date" property="msg_date" jdbcType="TIMESTAMP" />
+
+    <result column="msg_content" property="msg_content" jdbcType="VARCHAR" />
+    <result column="fence_id" property="fence_id" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="share_id" property="share_id" jdbcType="INTEGER" />
+    <result column="push_status" property="push_status" jdbcType="INTEGER" />
+
+    <result column="from_email" property="from_email" jdbcType="VARCHAR" />
+    <result column="from_nick" property="from_nick" jdbcType="VARCHAR" />    
+
+    <result column="to_email" property="to_email" jdbcType="VARCHAR" />
+    <result column="to_nick" property="to_nick" jdbcType="VARCHAR" />            
+
+    <result column="app_type" property="app_type" jdbcType="VARCHAR" />            
+    <result column="device_token" property="device_token" jdbcType="VARCHAR" />            
+    <result column="ios_token" property="ios_token" jdbcType="VARCHAR" />            
+    <result column="ios_real" property="ios_real" jdbcType="VARCHAR" />            
+
+    <result column="msg_id" property="msg_id" jdbcType="INTEGER" />            
+
+  </resultMap>
+  
+  <resultMap id="msgResultMap" type="com.wtwd.pet.app.entity.WDeviceActiveInfo" >
+    <id column="from_usrid" property="from_usrid" jdbcType="INTEGER" />
+    <id column="user_id" property="user_id" jdbcType="INTEGER" />
+    <id column="pet_id" property="pet_id" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    a.device_id, device_phone, device_imei, device_name, device_update_time, device_disable, 
+    listen_type, belong_project, isphoneHelp, isserverHelp, deadline, brandname, fall_on, 
+    device_type, conn_type, is_sos, sel_mode, gps_on, callback_on, temperature_on, heatout_on, 
+    led_on, flight_mode, urgent_mode, battery, is_lowbat, data_mute, data_volume, data_power, 
+    bind_count, wifir_interval, wifir_flag, time_zone, longitude, latitude,  b.esafe_on, b.prev_eid, 
+    b.cur_eid, b.prev_time, b.app_timestamp, b.dev_timestamp, b.app_status, b.dev_status
+  </sql>
+  
+  <select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	SELECT device_id,device_imei FROM wdevice_active_info 
+  </select>
+
+  <select id="searchOffline" parameterType="java.util.Map" resultMap="BaseResultMap">
+	select device_id from wDeviceExtra    
+    where id > 0 and device_id > 0 and 
+     ( TIMESTAMPDIFF(SECOND, dev_timestamp,  now() )  > 462 and dev_status = 1   );  	
+  </select>
+
+
+  <update id="updateOffline" parameterType="java.util.Map">
+	update wDeviceExtra set dev_status = 0    
+ where id > 0 and device_id > 0 and 
+  ( TIMESTAMPDIFF(SECOND, dev_timestamp,  now() )  > 462 and dev_status != 0  or  isnull(dev_timestamp)  );  	
+  </update>
+
+<!-- 获取设备所有分享者用户id -->
+  <select id="getShareUser" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+	select distinct a.user_id as from_usrid, b.pet_id, 
+	b.user_id, c.ext1 as app_type, c.device_token, c.ios_token, c.ios_real,
+	 b.nickname as pet_nick 
+	from wshare_info a left join 
+	wpets b on a.device_id = a.device_id left join wappusers c on a.user_id = c.user_id       
+    WHERE a.STATUS=1 and 
+    	a.device_id = #{deviceId,jdbcType=INTEGER} 	
+  </select>
+
+<!-- 获取设备对应的主人ID和宠物ID -->
+  <select id="getPetUserr" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+	select pet_id,user_id from `wpets`     
+    WHERE pet_id > 0 and device_id = #{deviceId,jdbcType=INTEGER} 	
+  </select>
+
+<!-- 获取所有未推送的消息 -->
+  <select id="getUnpushMsg" resultMap="BaseResultMap">
+	select a.msg_type, a.msg_ind_id, date_format(a.msg_date, "%Y-%m-%d %T") as msg_date, a.msg_content, a.device_id, a.from_usrid,
+	a.to_usrid, a.fence_id, a.status, a.share_id,a.pet_id,a.push_status,
+	b.email as from_email, b.nickname as from_nick, c.email as to_email, c.nickname as to_nick, 
+	c.ext1 as app_type, c.device_token, c.ios_token, 
+	c.ios_real, a.summary, 
+	a.msg_id 
+	from wmsg_info a 
+	left join wappusers b on a.from_usrid = b.user_id left join wappusers c on a.to_usrid = c.user_id 
+    where a.push_status != 1 	
+  </select>
+
+
+  <update id="updateMsgPushStatus" parameterType="com.wtwd.pet.app.entity.WDeviceActiveInfo" >
+    update wmsg_info
+    set push_status = 1     
+    where msg_id in 
+   		<foreach item="item" index="index" collection="array" 
+        	open="(" separator="," close=")">
+            #{item}
+   		</foreach>    
+  </update>
+
+
+
+  
+</mapper>

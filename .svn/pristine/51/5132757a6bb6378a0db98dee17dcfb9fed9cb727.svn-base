@@ -1,0 +1,25 @@
+package com.wtwd.pet.app.service.impl;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wtwd.pet.app.dao.LocationInfoDao;
+import com.wtwd.pet.app.entity.LocationInfo;
+import com.wtwd.pet.app.service.LocationInfoService;
+
+@Service("locationInfoService")
+public class LocationInfoServiceImpl implements LocationInfoService {
+	
+	@Autowired
+	private LocationInfoDao locationInfoDao;
+
+	public LocationInfo getLocationByImei(String imei) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("serieNo", imei);
+		return locationInfoDao.getBy(paramMap);
+	}
+	
+}

@@ -1,0 +1,70 @@
+package com.wtwd.sys.checkinfo.form;
+
+import java.io.Serializable;
+
+import org.apache.struts.upload.FormFile;
+
+import com.godoing.rose.http.PublicFormBean;
+
+public class CheckInfoForm extends PublicFormBean implements Serializable{
+	
+	private int id;
+	private String packageName;
+	private String versionName;
+	private Integer versionCode;
+	private String downloadPath;
+	private String functionCap;
+	private FormFile file1;
+	private String belongProject;
+		 	
+	public String getFunctionCap() {
+		return functionCap;
+	}
+	public String getBelongProject() {
+		return belongProject;
+	}
+	public void setBelongProject(String belongProject) {
+		this.belongProject = belongProject;
+	}
+	public void setFunctionCap(String functionCap) {
+		this.functionCap = functionCap;
+	}
+	public FormFile getFile1() {
+		return file1;
+	}
+	public void setFile1(FormFile file1) {
+		this.file1 = file1;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getPackageName() {
+		return packageName;
+	}
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+	public String getVersionName() {
+		return versionName;
+	}
+	public void setVersionName(String versionName) {
+		this.versionName = versionName;
+	}
+	public Integer getVersionCode() {
+		return versionCode;
+	}
+	public void setVersionCode(Integer versionCode) {
+		this.versionCode = versionCode;
+	}
+	public String getDownloadPath() {
+		return downloadPath;
+	}
+	public void setDownloadPath(String downloadPath) {
+		this.downloadPath = downloadPath;
+	}
+	
+
+}

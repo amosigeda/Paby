@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WDeviceActiveInfo">
+	
+	<update id="updateAppDeviceDiscoveryMan" parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		UPDATE wdevice_active_info  
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="sel_mode">
+				sel_mode=#sel_mode#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<update id="updateDevSetaInfo" parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		UPDATE wdevice_active_info  
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="led_on">
+				led_on=#led_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="data_mute">
+				data_mute=#data_mute#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="data_volume">
+				data_volume=#data_volume#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="data_power">
+				data_power=#data_power#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="callback_on">
+				callback_on=#callback_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="flight_mode">
+				flight_mode=#flight_mode#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="wifir_interval">
+				wifir_interval=#wifir_interval#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="wifir_flag">
+				wifir_flag=#wifir_flag#
+			</isNotEmpty>
+
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<update id="updateDeviceCallBackStatus" parameterClass="com.wtwd.sys.innerw.wdeviceActiveInfo.domain.WdeviceActiveInfo">
+		UPDATE wdevice_active_info  
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="callback_on">
+				callback_on=#callback_on#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+</sqlMap>

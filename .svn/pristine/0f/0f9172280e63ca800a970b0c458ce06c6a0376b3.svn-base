@@ -1,0 +1,17 @@
+package com.wtwd.sys.playiteminfo.domain.logic;
+
+import java.util.List;
+
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.lang.SystemException;
+import com.wtwd.sys.playiteminfo.domain.PlayItemInfo;
+
+public interface PlayItemInfoFacade {
+	
+	public List<DataMap> getPlayItemInfo(PlayItemInfo vo) throws SystemException;
+	
+	public int insertPlayItemInfo(PlayItemInfo vo) throws SystemException;
+	
+	public int updatePlayItemInfoControlType(PlayItemInfo vo) throws SystemException;
+
+}

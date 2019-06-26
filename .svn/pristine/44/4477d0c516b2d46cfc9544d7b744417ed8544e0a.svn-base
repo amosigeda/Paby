@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WappWiFiInfo">
+	
+	<insert id="insertUserWiFiInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WappWiFiInfo">
+		INSERT INTO wappWiFiInfo(user_id,device_id,ssid,pwd, wifi_on) VALUES(#user_id#,#device_id#, #ssid#,#pwd#, #wifi_on#) 
+	</insert>
+	<delete id="delUserWiFiInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WappWiFiInfo">
+		delete from wappWiFiInfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+	
+	<select id="getWappWiFiInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WappWiFiInfo" resultClass="com.godoing.rose.lang.DataMap">	
+		select * from wappWiFiInfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

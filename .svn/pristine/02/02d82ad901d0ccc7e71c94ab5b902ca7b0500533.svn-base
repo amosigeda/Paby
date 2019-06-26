@@ -1,0 +1,28 @@
+# Properties file with JDBC-related settings.
+# Applied by PropertyPlaceholderConfigurer from "dataAccessContext-local.xml".
+# Targeted at system administrators, to avoid touching the context XML files.
+
+#*****mysql
+jdbc.driverClassName=com.mysql.jdbc.Driver
+
+#jdbc.url=jdbc:mysql://localhost:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+
+#jdbc.url=jdbc:mysql://121.196.232.11:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+#jdbc.url=jdbc:mysql://dbpet.csgxbtvcz509.us-west-1.rds.amazonaws.com:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+
+#jdbc.url=jdbc:mysql://47.91.132.78:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+
+
+jdbc.url=jdbc:mysql://appserver.paby.com:3306/dbdog?useUnicode=true&characterEncoding=UTF-8
+#jdbc.url=jdbc:mysql://appserver1.paby.com:8066/MTPET?useUnicode=true&characterEncoding=UTF-8
+
+
+
+jdbc.username=root
+#jdbc.username=dbpet
+
+jdbc.password=szdbcpet@p!tep
+#szdbcpetptep
+#jdbc.password=szdbcpetptep
+#jdbc.password=pets@paby#
+#jdbc.password=siw@9890

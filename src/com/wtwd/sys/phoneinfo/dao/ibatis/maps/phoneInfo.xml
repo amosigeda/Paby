@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="phoneInfo">
+
+	<select id="getPhoneInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		SELECT * FROM phoneinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getPWdeviceActiveInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		SELECT device_id,device_imei,iccid,belong_company FROM wdevice_active_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<select id="selectDeviceEnterServiceActiveInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		SELECT id,device_imei,service_ip,port,h_port FROM device_ip_active_info
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getPhoneInfoListByVo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		SELECT * FROM phoneinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty> 
+		</dynamic>   
+			 limit
+			<isNotEmpty prepend=" " property="from">
+				$from$
+			</isNotEmpty>
+				,
+			<isNotEmpty prepend=" " property="pageSize">
+				$pageSize$
+			</isNotEmpty>
+	</select>
+	
+	<select id="getPhoneInfoCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo" >
+		SELECT COUNT(*) FROM phoneinfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<insert id="insertPhoneInfo" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		INSERT INTO phoneinfo(serie_no,input_time,upload_time,product_model,firmware_edition,phone,belong_project,phone_manage_id,status) 
+		VALUES (#serieNo#,#inputTime#,#uploadTime#,#productModel#,#firmwareEdition#,#phone#,#belongProject#,#phoneManageId#,#status#)
+	</insert>
+	
+	<insert id="insertDeviceServiceActiveInfo" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		INSERT INTO device_ip_active_info(device_imei,service_ip,date_time,port,h_port) 
+		VALUES (#serieNo#,#countNum#,#shutdown#,#port#,#hPort#)
+	</insert>
+	
+	<update id="updatePhoneInfo" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		UPDATE phoneinfo
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="productModel">
+				product_model=#productModel#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="firmwareEdition">
+				firmware_edition=#firmwareEdition#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="phone">
+				phone=#phone#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="alarmBellType">
+				alarm_bell_type=#alarmBellType#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="inputTime">
+				input_time=#inputTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="uploadTime">
+				upload_time=#uploadTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+				status=#status#
+			</isNotEmpty>		
+			<isNotEmpty prepend="," property="shutdown">
+				shutdown=#shutdown#
+			</isNotEmpty>	
+			<isNotEmpty prepend="," property="repellent">
+				repellent=#repellent#
+			</isNotEmpty>	
+			<isNotEmpty prepend="," property="heart">
+				heart=#heart#
+			</isNotEmpty>	
+			<isNotEmpty prepend="," property="relativeCallStatus">
+				relative_call_status=#relativeCallStatus#
+			</isNotEmpty>										
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="serieNo">
+				serie_no=#serieNo#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>		
+	</update>
+	
+	
+		<update id="updateDeviceServiceActiveInfo" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		UPDATE device_ip_active_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="countNum">
+				service_ip=#countNum#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="port">
+				port=#port#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="hPort">
+				h_port=#hPort#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="shutdown">
+				date_time=#shutdown#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>		
+	</update>
+	
+	<insert id="insertPhoneManage" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		INSERT INTO phone_manage
+		(id,input_time,company_id,project_id,count_num,mini_num,max_num) 
+		VALUES 
+		(#id#,#inputTime#,#companyId#,#belongProject#,#countNum#,#miniNum#,#maxNum#)
+	</insert>
+	
+	<select id="getPhoneManageListByVo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo">
+		SELECT * FROM phone_manage
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty> 
+		</dynamic>   
+			 limit
+			<isNotEmpty prepend=" " property="from">
+				$from$
+			</isNotEmpty>
+				,
+			<isNotEmpty prepend=" " property="pageSize">
+				$pageSize$
+			</isNotEmpty>
+	</select>
+	
+	<select id="getPhoneManageCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo" >
+		SELECT COUNT(*) FROM phone_manage
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getPhoneManageMaxId" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.phoneinfo.domain.PhoneInfo" >
+		SELECT MAX(id) FROM phone_manage		
+	</select>
+
+</sqlMap>

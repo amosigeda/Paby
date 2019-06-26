@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="QuestionInfo">
+	
+	<!-- <insert id="insertUserLocationInfo" parameterClass="com.wtwd.sys.innerw.liufeng.domain.QuestionInfo">
+		INSERT INTO questioninfo(user_id,longitude,latitude,accuracy) VALUES(#user_id#,#longitude#,#latitude#,#accuracy#)
+	</insert> -->
+	
+	<!-- 获取所有问题列表 -->
+	<select id="getAllQuestionList" parameterClass="com.wtwd.sys.innerw.liufeng.domain.QuestionInfo" resultClass="com.godoing.rose.lang.DataMap">	
+		select * from questioninfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+</sqlMap>

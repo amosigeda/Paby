@@ -1,0 +1,21 @@
+package com.wtwd.pet.app.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.wtwd.pet.app.base.BaseDao;
+import com.wtwd.pet.app.entity.WDeviceActiveInfo;
+import com.wtwd.pet.app.entity.WDeviceEsafe;
+
+public interface WDeviceActiveInfoDao extends BaseDao<WDeviceActiveInfo> {
+    public int updateOffline(Map<String, Object> paramMap);
+    public List<WDeviceActiveInfo> searchOffline(Map<String, Object> paramMap);
+
+    public List<WDeviceActiveInfo> getShareUser(Integer id);
+    public List<WDeviceActiveInfo> getPetUserr(Integer id);
+
+    public List<WDeviceActiveInfo> getUnpushMsg();
+       
+    public int updateMsgPushStatus(Integer[] data);
+    
+}

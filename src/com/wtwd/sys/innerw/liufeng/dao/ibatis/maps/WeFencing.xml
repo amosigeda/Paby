@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WeFencing">
+	
+	<insert id="insertAppSafeAreaMan" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WeFencing">
+		INSERT INTO wefencing(device_id,center_gps_la,center_gps_lo,round_distance,device_safe_name,center_addr,device_safe_effect_time,safe_type, photo, pst) 
+		VALUES(#device_id#,#center_gps_la#,#center_gps_lo#,#round_distance#,#device_safe_name#,#center_addr#,#device_safe_effect_time#,#safe_type#, #photo#, #pst#) 
+	</insert>
+	
+	<update id="updateAppSafeAreaMan" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WeFencing">
+		UPDATE wefencing 
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="device_safe_name">
+				device_safe_name=#device_safe_name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="device_safe_effect_time">
+				device_safe_effect_time=#device_safe_effect_time#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="safe_type">
+				safe_type=#safe_type#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="center_gps_la">
+				center_gps_la=#center_gps_la#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="center_gps_lo">
+				center_gps_lo=#center_gps_lo#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="round_distance">
+				round_distance=#round_distance#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="center_addr">
+				center_addr=#center_addr#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="flag">
+				flag=#flag#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="photo">
+				photo=#photo#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="pst">
+				pst=#pst#
+			</isNotEmpty>
+			
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<select id="queryWeFencingInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WeFencing">
+		SELECT * FROM wefencing 
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 根据user_id和device_id查询 -->
+	<select id="queryMasterDevice" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WeFencing">
+		SELECT * FROM wshare_info 
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<delete id="deleteAppSafeAreaMan" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WeFencing">
+		DELETE FROM wefencing 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+
+
+	<select id="getWsafeAreaCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WeFencing">
+	   SELECT COUNT(*) FROM wefencing
+		<dynamic prepend="where"> 			
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+	<select id="getSafeAreaNextId" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.innerw.liufeng.domain.WeFencing">
+	   SELECT auto_increment FROM information_schema.`TABLES` WHERE TABLE_SCHEMA='dbdog' AND TABLE_NAME='wefencing'
+	</select>
+
+	
+</sqlMap>

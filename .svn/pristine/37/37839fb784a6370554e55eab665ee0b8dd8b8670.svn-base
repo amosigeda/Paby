@@ -1,0 +1,55 @@
+package com.wtwd.pet.app.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wtwd.pet.app.dao.WDeviceActiveInfoDao;
+import com.wtwd.pet.app.entity.WDeviceActiveInfo;
+import com.wtwd.pet.app.service.WDeviceActiveInfoService;
+
+@Service("wdeviceActiveInfoService")
+public class WDeviceActiveInfoServiceImpl implements WDeviceActiveInfoService {
+	
+	@Autowired
+	private WDeviceActiveInfoDao wdeviceActiveInfoDao;
+	
+	public List<WDeviceActiveInfo> queryDataList() {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		return wdeviceActiveInfoDao.listBy(paramMap);
+		//return wdeviceActiveInfoDao.listByColumn(paramMap);
+
+	}
+
+	public int updateOffline() {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		//return wdeviceActiveInfoDao.listBy(paramMap);
+		return wdeviceActiveInfoDao.updateOffline(paramMap);
+	}
+
+	public List<WDeviceActiveInfo> searchOffline() {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		//return wdeviceActiveInfoDao.listBy(paramMap);
+		return wdeviceActiveInfoDao.searchOffline(paramMap);
+	}
+
+    public List<WDeviceActiveInfo> getShareUser(Integer id) {
+		return wdeviceActiveInfoDao.getShareUser(id);
+    	
+    }
+    public List<WDeviceActiveInfo> getPetUserr(Integer id) {
+		return wdeviceActiveInfoDao.getPetUserr(id);    	
+    }
+	
+    public List<WDeviceActiveInfo> getUnpushMsg() {
+		return wdeviceActiveInfoDao.getUnpushMsg();    	
+    }
+	
+    public int updateMsgPushStatus(Integer[] data) {
+		return wdeviceActiveInfoDao.updateMsgPushStatus(data);    	
+    }
+	
+}

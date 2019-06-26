@@ -1,0 +1,146 @@
+package com.wtwd.sys.appinterfaces;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Date;
+
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.log.LogFactory;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+import com.wtwd.sys.msginfo.domain.MsgInfo;
+import com.wtwd.sys.phoneinfo.domain.PhoneInfo;
+import com.wtwd.sys.relativecallinfo.domain.RelativeCallInfo;
+import com.wtwd.sys.safearea.domain.SafeArea;
+import com.wtwd.sys.settinginfo.domain.SettingInfo;
+import com.wtwd.sys.shareinfo.domain.ShareInfo;
+
+public class DeleteDeviceAction extends BaseAction{
+	
+	Log logger = LogFactory.getLog(DeleteDeviceAction.class);
+	
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		JSONObject json = new JSONObject();
+		Date start = new Date();
+		String href= request.getServletPath();
+		try{
+			ServletInputStream input = request.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+			StringBuffer sb = new StringBuffer();
+			String online = "";
+			while((online = reader.readLine()) != null){
+				sb.append(online);
+			}
+			JSONObject object = JSONObject.fromObject(sb.toString());
+			String userId = object.getString("user_id");
+			String deviceImei = object.getString("device_imei");
+			String belongProject = object.getString("belong_project");			
+			
+			ServiceBean instance = ServiceBean.getInstance();
+			DeviceActiveInfo vo = new DeviceActiveInfo();
+			RelativeCallInfo relativeCallInfo = new RelativeCallInfo();
+			SafeArea safeArea = new SafeArea();
+			SettingInfo settingInfo = new SettingInfo();
+			ShareInfo shareInfo = new ShareInfo();
+			
+			vo.setDeviceDisable("0");//鎶婄姸鎬佺疆涓�
+			vo.setDeviceAge("2015-12-12");
+			vo.setDeviceHead("0");
+			vo.setDeviceHeight("170");
+			vo.setDeviceName("0");
+			vo.setDevicePhone("0");
+			vo.setDeviceSex("0");
+			vo.setDeviceWeight("170");
+			vo.setUserId("0");	
+			
+			vo.setCondition("user_id='"+userId+"' and device_imei='"+deviceImei+"' and belong_project='"+belongProject+"'");		
+			instance.getDeviceActiveInfoFacade().updateDeviceActiveInfo(vo);
+			
+			relativeCallInfo.setCondition("user_id ='"+userId+"' and serie_no ='"+deviceImei+"' and belong_project='"+belongProject+"'");
+			instance.getRelativeCallInfoFacade().deleteRelativeCallInfo(relativeCallInfo);
+			
+			safeArea.setCondition("user_id ='"+userId+"' and seri_no ='"+deviceImei+"' and belong_project='"+belongProject+"'");
+			instance.getSafeAreaFacade().deleteSafeArea(safeArea);
+			
+			settingInfo.setCondition("serie_no ='"+deviceImei+"' and belong_project='"+belongProject+"'");
+			instance.getSettingInfoFacade().deleteSettingInfo(settingInfo);
+			
+			shareInfo.setCondition("user_id ='"+userId+"' and device_imei='"+deviceImei+"' and belong_project='"+belongProject+"'");
+			instance.getShareInfoFacade().deleteShareInfo(shareInfo);
+			
+			String deletePath = request.getSession(true).getServletContext().getRealPath(Constant.DEVICE_SAVE) + deviceImei;
+			Constant.deleteFile(deletePath);
+			
+			PhoneInfo phoneInfo = new PhoneInfo();
+			phoneInfo.setStatus("3");   //3琛ㄧず瑙ｇ粦
+			phoneInfo.setRelativeCallStatus("1");
+			phoneInfo.setCondition("serie_no='"+deviceImei+"' and belong_project='"+belongProject+"'");
+			instance.getPhoneInfoFacade().updatePhoneInfo(phoneInfo);
+			
+			result = Constant.SUCCESS_CODE;
+			json.put("request", href);
+			
+			MsgInfo msgInfo = new MsgInfo();
+			msgInfo.setToId(userId);
+			msgInfo.setFromId(userId);
+			msgInfo.setIsHandler("0"); // 未处理
+			msgInfo.setMsgLevel("1"); // 级别较高
+			msgInfo.setMsgContent("1@" + deviceImei + "@" + "0");
+			msgInfo.setMsgHandlerDate(new Date());
+			msgInfo.setBelongProject(belongProject);
+			
+			ServiceBean.getInstance().getMsgInfoFacade().insertMsgInfo(msgInfo);
+			getMessageFrom(json, userId, belongProject);
+			
+			DeviceActiveInfo da = new DeviceActiveInfo();
+			da.setDeviceImei(deviceImei);
+			da.setBelongProject(belongProject);
+			da.setUserId(userId);
+			da.setDeviceDisable("0");
+			da.setDeviceUpdateTime(new Date());
+			ServiceBean.getInstance().getDeviceActiveInfoFacade().insertDeviceActiveHistory(da);
+			
+			insertVisit(href,belongProject,userId,0,start,new Date());
+		}catch(Exception e){
+			e.printStackTrace();	
+			StringBuffer sb = new StringBuffer();
+			Writer writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Throwable cause = e.getCause();		
+			while (cause != null) {
+				cause.printStackTrace(printWriter);
+				cause = cause.getCause();
+			}
+			printWriter.close();
+			String resultSb = writer.toString();
+			sb.append(resultSb);
+			
+			logger.error(e);
+			result = Constant.EXCEPTION_CODE;
+			json.put(Constant.EXCEPTION, sb.toString());
+		}
+		json.put(Constant.RESULTCODE, result);
+		response.setCharacterEncoding("UTF-8");	
+		response.getWriter().write(json.toString());
+		return null;	
+		}
+
+}

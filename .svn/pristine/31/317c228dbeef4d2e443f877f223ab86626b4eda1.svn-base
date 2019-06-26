@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wtwd.pet.app.dao.impl.WeFencingDaoImpl" >
+  <resultMap id="BaseResultMap" type="com.wtwd.pet.app.entity.WeFencing" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="center_gps_lo" property="centerGpsLo" jdbcType="REAL" />
+    <result column="center_gps_la" property="centerGpsLa" jdbcType="REAL" />
+    <result column="round_distance" property="roundDistance" jdbcType="INTEGER" />
+    <result column="device_safe_name" property="deviceSafeName" jdbcType="VARCHAR" />
+    <result column="device_safe_effect_time" property="deviceSafeEffectTime" jdbcType="VARCHAR" />
+    <result column="if_active" property="ifActive" jdbcType="CHAR" />
+    <result column="if_prompt_user" property="ifPromptUser" jdbcType="CHAR" />
+    <result column="device_id" property="deviceId" jdbcType="INTEGER" />
+    <result column="center_addr" property="centerAddr" jdbcType="VARCHAR" />
+    <result column="safe_type" property="safeType" jdbcType="CHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, center_gps_lo, center_gps_la, round_distance, device_safe_name, device_safe_effect_time, 
+    if_active, if_prompt_user, device_id, center_addr, safe_type
+  </sql>
+  
+  <select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	SELECT * FROM wefencing 
+  	<where>
+      <include refid="condition_sql" />
+    </where>
+  </select>
+  
+  <sql id="condition_sql">
+	<if test="deviceId != null and deviceId !='' "> and device_id = #{deviceId}</if>
+	<if test="ifActive != null and ifActive !='' "> and if_active = #{ifActive}</if>
+	
+	<!-- 是否行锁，要放在查询条件最后 -->
+	<if test="isPessimist != null and isPessimist == true "> for update</if>
+  </sql>
+  
+</mapper>

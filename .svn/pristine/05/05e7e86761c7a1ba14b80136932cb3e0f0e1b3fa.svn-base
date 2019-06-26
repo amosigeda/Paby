@@ -1,0 +1,8 @@
+package com.wtwd.pet.app.dao;
+
+import com.wtwd.pet.app.base.BaseDao;
+import com.wtwd.pet.app.entity.WeFencing;
+
+public interface WeFencingDao extends BaseDao<WeFencing> {
+    
+}

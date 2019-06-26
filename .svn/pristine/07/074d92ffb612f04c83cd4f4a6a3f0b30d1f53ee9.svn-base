@@ -1,0 +1,17 @@
+package com.wtwd.sys.checkinfo.domain.logic;
+
+import java.util.List;
+
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.lang.SystemException;
+import com.wtwd.sys.checkinfo.domain.CheckInfo;
+
+public interface CheckInfoFacade {
+
+	
+	public List<DataMap> getCheckInfo(CheckInfo vo) throws SystemException;
+	
+	public int updateCheckInfo(CheckInfo vo)throws SystemException;
+
+	public int insertCheckInfo(CheckInfo vo)throws SystemException;
+}

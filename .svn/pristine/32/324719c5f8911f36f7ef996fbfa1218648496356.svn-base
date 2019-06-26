@@ -1,0 +1,138 @@
+package com.wtwd.sys.appinterfaces;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.godoing.rose.lang.DataMap;
+import com.godoing.rose.log.LogFactory;
+import com.twilio.Twilio;
+import com.twilio.rest.preview.wireless.Sim;
+import com.wtwd.common.config.ServiceBean;
+import com.wtwd.common.http.BaseAction;
+import com.wtwd.common.http.HttpRequest;
+import com.wtwd.common.lang.Constant;
+import com.wtwd.sys.deviceactiveinfo.domain.DeviceActiveInfo;
+
+public class doSeletFlowData extends BaseAction {
+
+	Log logger = LogFactory.getLog(doSeletFlowData.class);
+	public static final String ACCOUNT_SID = "AC08d153f6d0fb9a2135f0edd5614229f6";
+	public static final String AUTH_TOKEN = "5fc4e38b694dfd9a530871996a4a038e";
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		long s1=new Date().getTime();
+		request.setCharacterEncoding("UTF-8");
+		String href = request.getServletPath();
+		Date start = new Date();
+		JSONObject json = new JSONObject();
+		try {
+			ServletInputStream input = request.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					input));
+			StringBuffer sb = new StringBuffer();
+			String online = "";
+			while ((online = reader.readLine()) != null) {
+				sb.append(online);
+			}
+			JSONObject object = JSONObject.fromObject(sb.toString());
+			String iccid = object.getString("iccid");
+			// 0 停止 1激活
+			DeviceActiveInfo vo = new DeviceActiveInfo();
+			vo.setCondition("iccid ='" + iccid + "' limit 1");
+			List<DataMap> list = ServiceBean.getInstance()
+					.getDeviceActiveInfoFacade().getSsidInfo(vo);
+			if (list.size() > 0) {
+				Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+				Sim sim = Sim.fetcher(list.get(0).get("sid") + "").fetch();
+				String usage = sim.getLinks().get("usage");
+				String msg = HttpRequest.httpsUrlReturnParams(usage);
+				if (msg.length() > 0) {
+					JSONObject data = JSONObject.fromObject(msg);
+					String simSid = data.getString("sim_sid");
+					String simUniqueName = data.getString("sim_unique_name");
+
+					String startTime = JSONObject.fromObject(
+							data.getString("period")).get("start")
+							+ "";
+					String endTime = JSONObject.fromObject(
+							data.getString("period")).get("end")
+							+ "";
+
+					String sent = JSONObject.fromObject(
+							data.getString("data_usage")).get("sent")
+							+ "";
+					String receive = JSONObject.fromObject(
+							data.getString("data_usage")).get("received")
+							+ "";
+					String total = JSONObject.fromObject(
+							data.getString("data_usage")).get("total")
+							+ "";
+
+					json.put("iccid", iccid);
+					json.put("start", startTime);
+					json.put("end", endTime);
+					json.put("sent", sent);
+					json.put("receive", receive);
+					json.put("total", total);
+
+					vo.setSid(simSid);
+					vo.setIccid(iccid);
+					vo.setUserName(simUniqueName);
+					vo.setCreateTime(startTime);
+					vo.setUpdateTime(endTime);
+					vo.setSend(Integer.valueOf(sent));
+					vo.setReceive(Integer.valueOf(receive));
+					vo.setTotal(Integer.valueOf(total));
+					int a = ServiceBean.getInstance()
+							.getDeviceActiveInfoFacade().insertFlowInfo(vo);
+					if (a > 0) {
+						result = 1;
+					}
+				}
+			}
+
+			json.put("request", href);
+		} catch (Exception e) {
+			e.printStackTrace();
+			StringBuffer sb = new StringBuffer();
+			Writer writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Throwable cause = e.getCause();
+			while (cause != null) {
+				cause.printStackTrace(printWriter);
+				cause = cause.getCause();
+			}
+			printWriter.close();
+			String resultSb = writer.toString();
+			sb.append(resultSb);
+
+			logger.error(e);
+			result = Constant.EXCEPTION_CODE;
+			json.put(Constant.EXCEPTION, sb.toString());
+		}
+		json.put(Constant.RESULTCODE, result);
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json.toString());
+		long s2=new Date().getTime();
+        System.out.println("执行时间："+(s2-s1)/1000+"s");
+		return null;
+	}
+}

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="wappuserverify">
+	
+	<select id="getAppuVerifyData" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wappuserverify.domain.WappuserVerify">
+		SELECT * FROM  wappuserverify  
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="getAppuVerifyDataLevel2" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.innerw.wappuserverify.domain.WappuserVerify">
+		SELECT * FROM  wappuserverify2  
+		<dynamic prepend="where"> 
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+	<insert id="insertAppuVerify" parameterClass="com.wtwd.sys.innerw.wappuserverify.domain.WappuserVerify">
+		INSERT INTO wappuserverify(email,verify_code,create_time,belong_project) 
+		VALUES (#email#,#verify_code#,#create_time#,#belong_project#)
+	</insert>
+
+	<delete id="deleteAppuVerify" parameterClass="com.wtwd.sys.innerw.wappuserverify.domain.WappuserVerify">
+		delete from wappuserverify
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+	<insert id="insertAppuVerifyLevel2" parameterClass="com.wtwd.sys.innerw.wappuserverify.domain.WappuserVerify">
+		INSERT INTO wappuserverify2(email,verify_code,create_time,belong_project) 
+		VALUES (#email#,#verify_code#,#create_time#,#belong_project#)
+	</insert>
+
+	<delete id="deleteAppuVerifyLevel2" parameterClass="com.wtwd.sys.innerw.wappuserverify.domain.WappuserVerify">
+		delete from wappuserverify2
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+
+</sqlMap>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wtwd.pet.app.dao.impl.WDeviceEsafeMapperImpl" >
+  <resultMap id="BaseResultMap" type="com.wtwd.pet.app.entity.WDeviceEsafe" >
+    <id column="device_id" property="deviceId" jdbcType="INTEGER" />
+    <result column="esafe_on" property="esafeOn" jdbcType="CHAR" />
+    <result column="prev_eid" property="prevEid" jdbcType="INTEGER" />
+    <result column="cur_eid" property="curEid" jdbcType="INTEGER" />
+    <result column="prev_time" property="prevTime" jdbcType="TIMESTAMP" />
+
+    <result column="app_timestamp" property="app_timestamp" jdbcType="TIMESTAMP" />
+    <result column="dev_timestamp" property="dev_timestamp" jdbcType="TIMESTAMP" />
+    <result column="app_status" property="app_status" jdbcType="VARCHAR" />
+    <result column="dev_status" property="dev_status" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    device_id, esafe_on, prev_eid, cur_eid, prev_time, app_timestamp, dev_timestamp, app_status, dev_status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from wDeviceExtra
+    where device_id = #{deviceId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from wDeviceExtra
+    where device_id = #{deviceId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wtwd.pet.app.entity.WDeviceEsafe" >
+    insert into wDeviceExtra (device_id, esafe_on, prev_eid, 
+      cur_eid, prev_time)
+    values (#{deviceId,jdbcType=INTEGER}, #{esafeOn,jdbcType=CHAR}, #{prevEid,jdbcType=INTEGER}, 
+      #{curEid,jdbcType=INTEGER}, #{prevTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wtwd.pet.app.entity.WDeviceEsafe" >
+    insert into wDeviceExtra
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="esafeOn != null" >
+        esafe_on,
+      </if>
+      <if test="prevEid != null" >
+        prev_eid,
+      </if>
+      <if test="curEid != null" >
+        cur_eid,
+      </if>
+      <if test="prevTime != null" >
+        prev_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="esafeOn != null" >
+        #{esafeOn,jdbcType=CHAR},
+      </if>
+      <if test="prevEid != null" >
+        #{prevEid,jdbcType=INTEGER},
+      </if>
+      <if test="curEid != null" >
+        #{curEid,jdbcType=INTEGER},
+      </if>
+      <if test="prevTime != null" >
+        #{prevTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wtwd.pet.app.entity.WDeviceEsafe" >
+    update wDeviceExtra
+    <set >
+      <if test="esafeOn != null" >
+        esafe_on = #{esafeOn,jdbcType=CHAR},
+      </if>
+      <if test="prevEid != null" >
+        prev_eid = #{prevEid,jdbcType=INTEGER},
+      </if>
+      <if test="curEid != null" >
+        cur_eid = #{curEid,jdbcType=INTEGER},
+      </if>
+      <if test="prevTime != null" >
+        prev_time = #{prevTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="app_timestamp != null" >
+        app_timestamp = #{app_timestamp,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dev_timestamp != null" >
+        dev_timestamp = #{dev_timestamp,jdbcType=TIMESTAMP},
+      </if>
+      <if test="app_status != null" >
+        app_status = #{app_status,jdbcType=VARCHAR},
+      </if>
+      <if test="dev_status != null" >
+        dev_status = #{dev_status,jdbcType=VARCHAR},
+      </if>
+
+
+    </set>
+    where device_id = #{deviceId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wtwd.pet.app.entity.WDeviceEsafe" >
+    update wDeviceExtra
+    set esafe_on = #{esafeOn,jdbcType=CHAR},
+      prev_eid = #{prevEid,jdbcType=INTEGER},
+      cur_eid = #{curEid,jdbcType=INTEGER},
+      prev_time = #{prevTime,jdbcType=TIMESTAMP}
+    where device_id = #{deviceId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 操作消息表 -->
+  <insert id="insertSelectiveMsgInfo" parameterType="com.wtwd.pet.app.entity.WDeviceEsafe" >
+    insert into wmsg_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="msg_type != null" >
+        msg_type,
+      </if>
+      <if test="msg_ind_id != null" >
+        msg_ind_id,
+      </if>
+      <if test="msg_date != null" >
+        msg_date,
+      </if>
+      <if test="msg_content != null" >
+        msg_content,
+      </if>
+      <if test="from_usrid != null" >
+        from_usrid,
+      </if>
+      <if test="to_usrid != null" >
+        to_usrid,
+      </if>
+      <if test="fence_id != null" >
+        fence_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="share_id != null" >
+        share_id,
+      </if>
+      <if test="pet_id != null" >
+        pet_id,
+      </if>
+      <if test="push_status != null" >
+        push_status,
+      </if>      
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="msg_type != null" >
+        #{msg_type,jdbcType=VARCHAR},
+      </if>
+      <if test="msg_ind_id != null" >
+        #{msg_ind_id,jdbcType=INTEGER},
+      </if>
+      <if test="msg_date != null" >
+        #{msg_date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="msg_content != null" >
+        #{msg_content,jdbcType=VARCHAR},
+      </if>
+      <if test="from_usrid != null" >
+        #{from_usrid,jdbcType=INTEGER},
+      </if>
+      <if test="to_usrid != null" >
+        #{to_usrid,jdbcType=INTEGER},
+      </if>
+      <if test="fence_id != null" >
+        #{fence_id,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="share_id != null" >
+        #{share_id,jdbcType=INTEGER},
+      </if>
+      <if test="pet_id != null" >
+        #{pet_id,jdbcType=INTEGER},
+      </if>
+      <if test="push_status != null" >
+        #{push_status,jdbcType=VARCHAR},
+      </if>
+  </trim>
+  </insert>
+
+  <update id="updateMsgInfoFlag" parameterType="com.wtwd.pet.app.entity.WDeviceEsafe" >
+    update wmsg_info
+    set push_status = #{push_status,jdbcType=VARCHAR}
+    where msg_id > 0 and push_status=0
+  </update>
+  
+  
+  
+</mapper>

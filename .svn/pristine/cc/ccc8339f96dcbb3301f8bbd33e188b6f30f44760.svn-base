@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="settingInfo">
+	<select id="getSettingInfo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.settinginfo.domain.SettingInfo">
+		SELECT * FROM settinginfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<insert id="insertSettingInfo" parameterClass="com.wtwd.sys.settinginfo.domain.SettingInfo">		
+		INSERT INTO settinginfo
+		(serie_no,volume,map,fallOn,light,gps_on,light_sensor,fall,belong_project,auto_mute,power_off) 
+		VALUES 
+		(#serieNo#,#volume#,#map#,#fallOn#,#light#,#gps_on#,#light_sensor#,#fall#,#belongProject#,#autoMute#,#powerOff#)
+	</insert>
+	
+	<update id="updateSettingInfo" parameterClass="com.wtwd.sys.settinginfo.domain.SettingInfo">
+		UPDATE settinginfo 
+		<dynamic prepend="SET">
+			<isNotEmpty prepend="," property="volume">
+		      volume=#volume#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="map">
+		      map=#map#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fallOn">
+		      fallOn=#fallOn#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="light">
+		      light=#light#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gps_on">
+		      gps_on=#gps_on#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="light_sensor">
+		      light_sensor=#light_sensor#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="fall">
+		      fall=#fall#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="autoMute">
+		      auto_mute=#autoMute#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="powerOff">
+		      power_off=#powerOff#
+			</isNotEmpty>
+		</dynamic>  
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<delete id="deleteSettingInfo" parameterClass="com.wtwd.sys.settinginfo.domain.SettingInfo">
+		DELETE FROM settinginfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$ 
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+	
+	<select id="getSettingInfoListByVo" resultClass="com.godoing.rose.lang.DataMap" parameterClass="com.wtwd.sys.settinginfo.domain.SettingInfo">
+		SELECT * FROM settinginfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="order by">
+			<isNotEmpty prepend="order by" property="orderBy">
+				$orderBy$
+			</isNotEmpty>
+		</dynamic>
+			limit
+			<isNotEmpty prepend=" " property="from">
+				$from$
+			</isNotEmpty>
+				,
+			<isNotEmpty prepend=" " property="pageSize">
+				$pageSize$
+			</isNotEmpty>
+	</select>
+	
+	<select id="getSettingInfoCount" resultClass="java.lang.Integer" parameterClass="com.wtwd.sys.settinginfo.domain.SettingInfo" >
+		SELECT COUNT(*) FROM settinginfo
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="condition">
+				$condition$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+</sqlMap>
